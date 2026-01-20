@@ -1,0 +1,225 @@
+[
+  {
+    "id": "backpack001",
+    "name": "เป้เดินป่าเทรคกิ้งขนาด 50 ลิตรรุ่น MT100",
+    "category": "backpack",
+    "brand": "SIMOND",
+    "price": 129,
+    "stock": 1,
+    "status": "active",
+    "description": "เป้อเนกประสงค์ดีไซน์เรียบง่ายมาพร้อมช่องกระเป๋าและช่องใส่ของด้านหน้าเหมาะสำหรับออกเดินทางไกลเป็นครั้งคราวเมื่อต้องการพื้นที่บรรจุสิ่งของ 50 ลิตร ทีมผู้เชี่ยวชาญผู้ชื่นชอบในการเดินป่าร่วมกันออกแบบเป้สะพายหลังรุ่นนี้ สำหรับการผจญภัยกลางแจ้งทุกรูปแบบ",
+    "images": [
+      "/images/backpack-1/backpack1-1.avif",
+      "/images/backpack-1/backpack1-2.avif",
+      "/images/backpack-1/backpack1-3.avif",
+      "/images/backpack-1/backpack1-4.avif",
+      "/images/backpack-1/backpack1-5.avif"
+    ],
+    "specs": {
+      "capacity": "50 ลิตร",
+      "weight_kg": 1.4,
+      "material": "โพลีเอสเตอร์",
+      "waterproof": true,
+      "dimensions_cm": "62 x 32 x 24"
+    },
+    "suitable_for": ["เป้เดินทาง", "เดินป่า", "ทุกฤดู"],
+    "level": "ปานกลาง",
+    "rating": 4.8,
+    "review_count": 2731
+  },
+  {
+    "id": "trekkingpole001",
+    "name": "ไม้เท้าเดินป่าราคาย่อมเยารุ่น MT100 (สีฟ้า)",
+    "category": "trekking_pole",
+    "brand": "FORCLAZ",
+    "price": 22,
+    "stock": 6,
+    "status": "active",
+    "description": "ระบบการปรับด้วยหมุดกดที่เรียบง่ายแต่ใช้งานได้ดีเป็นพิเศษ เพียงกดหมุดกดก็ออกไปสนุกได้เลย! นักออกแบบของเราผู้ชื่นชอบการเดินป่าร่วมกันพัฒนาไม้เท้าราคาประหยัดรุ่นนี้เพื่อให้คุณเดินได้อย่างปลอดภัยขณะออกเดินทางไกลในประเทศเป็นครั้งคราว",
+    "images": [
+      "/images/trekkingpole-1/trekkingpole1-1.avif",
+      "/images/trekkingpole-1/trekkingpole1-2.avif",
+      "/images/trekkingpole-1/trekkingpole1-3.avif",
+      "/images/trekkingpole-1/trekkingpole1-4.avif"
+    ],
+    "specs": {
+      "weight_kg": 0.2,
+      "adjustable": "105/110/115/120 ซม.",
+      "material": "อะลูมิเนียม",
+      "waterproof": true
+    },
+    "suitable_for": ["hiking"],
+    "level": "เริ่มต้น",
+    "rating": 4.8,
+    "review_count": 5925
+  },
+  {
+    "id": "backpack002",
+    "name": "เป้สะพายหลังสำหรับผู้ชายเพื่อการเทรคกิ้งขนาด 50+10 ลิตรรุ่น MT500 Air",
+    "category": "backpack",
+    "brand": "SIMOND",
+    "price": 350,
+    "stock": 0,
+    "status": "active",
+    "description": "ด้วยต้นแบบจากรุ่น TREK 500 เป้สะพายหลังในรุ่น MT500 AIR นี้จะเพิ่มตาข่ายขึงตึงบริเวณหลังและเปลี่ยนไปใช้โพลีเอไมด์ที่ทั้งน้ำหนักเบาและทนทาน นี่จึงเป็นเป้สะพายหลังที่เหมาะกับการเดินป่าทุกรูปแบบ! ถ้าคุณกำลังมองหาเป้สะพายหลังที่ทั้งสะพายสบายและอเนกประสงค์โดยที่ไม่หนักจนเกินไป ทีมงานของเราผู้ชื่นชอบการเทรคกิ้งร่วมกันสร้างสรรค์เป้สะพายหลังรุ่น MT500 AIR นี้สำหรับคุณ",
+    "images": [
+      "/images/backpack-2/backpack2-1.avif",
+      "/images/backpack-2/backpack2-2.avif",
+      "/images/backpack-2/backpack2-3.avif",
+      "/images/backpack-2/backpack2-4.avif"
+    ],
+    "specs": {
+      "capacity_liter": "50 ลิตร",
+      "weight_kg": 1.7,
+      "material": "โพลีเอไมด์",
+      "waterproof": false,
+      "dimensions_cm": "65 x 35 x 35"
+    },
+    "suitable_for": ["เดินป่า", "เป้เดินทาง"],
+    "level": "เชี่ยวชาญ",
+    "rating": 4.7,
+    "review_count": 1094
+  },
+  {
+    "id": "shoes001",
+    "name": "รองเท้าใส่เดินบนภูเขาสำหรับผู้หญิงรุ่น MH100 (สีเทา/เขียว)",
+    "category": "shoes",
+    "brand": "QUECHUA",
+    "price": 140,
+    "variants": [
+      { "size": 36, "stock": 2 },
+      { "size": 37, "stock": 0 },
+      { "size": 38, "stock": 1 },
+      { "size": 39, "stock": 4 },
+      { "size": 40, "stock": 0 },
+      { "size": 41, "stock": 3 }
+    ],
+    "status": "active",
+    "description": "สวมใส่สบายพร้อมให้การปกป้องเท้าด้วยส่วนซับแรงกระแทกเต็มฝ่าเท้า มีส่วนป้องกันเศษก้อนหินและพื้นรองเท้าช่วยยึดเกาะ รองเท้ารุ่นนี้ทำขึ้นสำหรับการเดินป่าบนภูเขาในสภาพอากาศแห้งเป็นครั้งคราว ซึ่งได้รับการออกแบบที่เชิงเขามองต์บลังค์",
+    "images": [
+      "/images/shoes-1/shoes1-1.avif",
+      "/images/shoes-1/shoes1-2.avif"
+    ],
+    "specs": {
+      "material": "-",
+      "weight_kg": 0.295,
+      "waterproof": false
+    },
+    "suitable_for": ["เดินป่า"],
+    "level": "เริ่มต้น",
+    "rating": 4.7,
+    "review_count": 3378
+  },
+  {
+    "id": "tent001",
+    "name": "เต็นท์ตั้งแคมป์สำหรับ 3 คน (สีขาว)",
+    "category": "tent",
+    "brand": "QUECHUA",
+    "price": 220,
+    "stock": 1,
+    "status": "active",
+    "description": "เพิ่มความสบายในการพักผ่อนด้วยเทคโนโลยี Fresh&Black ที่ช่วยให้เต็นท์มืดสนิทและเย็นสบายจึงหลับสนิท โครงสร้างรูปโดมตั้งได้อิสระ ย้ายที่กางเต็นท์หาจุดที่ดีที่สุดได้ง่าย นอนแคมป์ครั้งแรกได้อย่างสบายใจ ทีมนักออกแบบของเราร่วมกันพัฒนาเต็นท์สำหรับ 3 คนรุ่นนี้ให้กางง่าย ใช้งานสะดวก ปกป้องคุณจากสภาพอากาศ",
+    "images": [
+      "/images/tent-1/tent1-1.avif",
+      "/images/tent-1/tent1-2.avif",
+      "/images/tent-1/tent1-3.avif",
+      "/images/tent-1/tent1-4.avif",
+      "/images/tent-1/tent1-5.avif",
+      "/images/tent-1/tent1-6.avif"
+    ],
+    "specs": {
+      "dimensions_cm": "197 x 210 x 116",
+      "weight_kg": 4.1,
+      "material": "-",
+      "waterproof": true
+    },
+    "suitable_for": ["เดินป่า", "ตั้งแคมป์"],
+    "level": "beginner",
+    "rating": 4.7,
+    "review_count": 2419
+  },
+  {
+    "id": "light001",
+    "name": "ไฟฉายคาดศีรษะสำหรับพักแรมกลางแจ้งใช้พลังงานจากแบตเตอรี่รุ่น ONNIGHT 100 ความสว่าง 80 ลูเมน",
+    "category": "lighting",
+    "brand": "QUECHUA",
+    "price": 25,
+    "stock": 50,
+    "status": "active",
+    "description": "ไฟฉายคาดศีรษะรุ่น ONNIGHT 100 ใช้งานง่าย สะดวก และยืดหยุ่น ปลอกเนื้อยืดหยุ่นช่วยกันน้ำและป้องกันแรงกระแทก ไฟฉาย FORCLAZ เหมาะสำหรับทุกสถานการณ์ ทีมงานที่รักการเทรคกิ้งบนภูเขาของเราได้พัฒนาไฟฉายคาดศีรษะนี้ขึ้นมาสำหรับการเดินในเส้นทางไกลที่ค่อนข้างเดินง่าย และการตั้งแคมป์หรือค่ายพักแรม",
+    "images": [
+      "/images/light-1/light1-1.avif",
+      "/images/light-1/light1-2.avif",
+      "/images/light-1/light1-3.avif",
+      "/images/light-1/light1-4.avif",
+      "/images/light-1/light1-5.avif",
+      "/images/light-1/light1-6.avif"
+    ],
+    "specs": {
+      "brightness_lumen": 80,
+      "battery_type": "AAA x3",
+      "mode": "โหมดส่องสว่าง 3 โหมด: Red, White Eco, White Strong",
+      "weight_kg": 0.08,
+      "dimensions_cm": "6 x 4 x 3.1",
+      "waterproof": false
+    },
+    "suitable_for": ["เดินป่า", "ตั้งแคมป์", "กลางคืน"],
+    "level": "เริ่มต้น",
+    "rating": 4.8,
+    "review_count": 3072
+  },
+  {
+    "id": "burner001",
+    "name": "เตาแก๊สแคมป์ปิ้ง 1 หัว พร้อมระบบจุดไฟแบบ Piezo - 2,200 วัตต์",
+    "category": "cooking",
+    "brand": "QUECHUA",
+    "price": 115,
+    "stock": 50,
+    "status": "active",
+    "description": "เพียงคลิกเดียว คุณก็พร้อมใช้งาน! ด้วยระบบจุดไฟอัตโนมัติ Piezo การเปิดใช้งานเตาของคุณจึงง่ายกว่าที่เคย ตลับแก๊สแบบถอดเปลี่ยนได้ช่วยให้ใช้งานได้อย่างปลอดภัย เตาขนาด 2,200 วัตต์นี้สามารถต้มน้ำ 1 ลิตรได้ใน 5 นาที ด้วยตลับแก๊สขนาด 220 กรัม คุณจะมีเวลาทำอาหารนานถึง 1 ชั่วโมง 15 นาที ช่วยให้คุณทำอาหารได้อย่างไร้กังวลระหว่างการเดินทาง",
+    "images": [
+      "/images/burner-1/burner1-1.avif",
+      "/images/burner-1/burner1-2.avif",
+      "/images/burner-1/burner1-3.avif",
+      "/images/burner-1/burner1-4.avif"
+    ],
+    "specs": {
+      "weight_kg": 1.6,
+      "dimensions_cm": "34 x 28 x 12",
+      "waterproof": false
+    },
+    "suitable_for": ["ตั้งแคมป์", "ทำอาหาร"],
+    "level": "ปานกลาง",
+    "rating": 4.6,
+    "review_count": 155
+  },
+  {
+    "id": "pot001",
+    "name": "หม้อสเตนเลสเพื่อการทำอาหารในการตั้งแคมป์สำหรับ 4 คน",
+    "category": "cooking",
+    "brand": "QUECHUA",
+    "price": 120,
+    "stock": 50,
+    "status": "active",
+    "description": "หม้อรุ่นนี้ทำจากสเตนเลสสตีล 100% จึงแข็งแรงทนทาน ใช้ทำอาหารก็ง่าย ดูแลรักษาก็ง่าย ใช้กับไฟได้ทุกประเภทรวมถึงแคมป์ไฟ เพื่อสร้างประสบการณ์อันน่าจดจำไม่รู้ลืม หม้อขนาด 3 ลิตรเพื่อการทำอาหารสำหรับ 4 คน เหมาะสำหรับใช้ทำอาหารในการตั้งแคมป์ มีน้ำหนักเบาเพียง 950 กรัม ช่วยให้คุณทำอาหารได้เหมือนกับเชฟ",
+    "images": [
+      "/images/pot-1/pot1-1.avif",
+      "/images/pot-1/pot1-2.avif",
+      "/images/pot-1/pot1-3.avif",
+      "/images/pot-1/pot1-4.avif",
+      "/images/pot-1/pot1-5.avif",
+      "/images/pot-1/pot1-6.avif"
+    ],
+    "specs": {
+      "capacity": "3 ลิตร",
+      "weight_kg": 0.95,
+      "dimensions_cm": "Ø20 x 12",
+      "material": "สเตนเลส",
+      "waterproof": true
+    },
+    "suitable_for": ["ตั้งแคมป์", "ทำอาหาร"],
+    "level": "ปานกลาง",
+    "rating": 4.8,
+    "review_count": 56
+  }
+]
