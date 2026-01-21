@@ -9,6 +9,8 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
 
+  const user = JSON.parse(localStorage.getItem("user"));
+
   const tomorrow = new Date();
   const afterTomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -17,11 +19,13 @@ export default function ProductDetail() {
 
   const [blink, setBlink] = useState(false);
 
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
   const [startDate, setStartDate] = useState(
-    tomorrow.toISOString().split("T")[0]
+    tomorrow.toISOString().split("T")[0],
   );
   const [endDate, setEndDate] = useState(
-    afterTomorrow.toISOString().split("T")[0]
+    afterTomorrow.toISOString().split("T")[0],
   );
   const [time, setTime] = useState("08:00");
 
@@ -38,7 +42,7 @@ export default function ProductDetail() {
   const totalStock =
     product?.category === "shoes" && product?.variants
       ? product.variants.reduce((sum, v) => sum + v.stock, 0)
-      : product?.stock ?? 0;
+      : (product?.stock ?? 0);
 
   const handleBlink = () => {
     setBlink(true);
@@ -136,6 +140,36 @@ export default function ProductDetail() {
                   }}
                 >
                   ยืนยันการจอง
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showLoginModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl w-full max-w-sm p-6">
+              <h2 className="text-xl font-bold mb-2">ยังไม่ได้เข้าสู่ระบบ</h2>
+              <p className="text-gray-600 mb-6">
+                คุณต้องเข้าสู่ระบบก่อนจึงจะสามารถจองสินค้าได้
+              </p>
+
+              <div className="flex justify-end gap-2">
+                <button
+                  className="px-4 py-2 border rounded"
+                  onClick={() => setShowLoginModal(false)}
+                >
+                  ยกเลิก
+                </button>
+
+                <button
+                  className="px-4 py-2 bg-black text-white rounded"
+                  onClick={() => {
+                    setShowLoginModal(false);
+                    navigate("/login");
+                  }}
+                >
+                  เข้าสู่ระบบ
                 </button>
               </div>
             </div>
@@ -296,8 +330,8 @@ export default function ProductDetail() {
               v.stock === 0
                 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                 : selectedSize === v.size
-                ? "bg-black text-white border-black"
-                : "bg-white hover:bg-gray-100"
+                  ? "bg-black text-white border-black"
+                  : "bg-white hover:bg-gray-100"
             }
           `}
                   >
@@ -328,8 +362,13 @@ export default function ProductDetail() {
               (product.category === "shoes" && !selectedSize)
             }
             onClick={() => {
-              setSelectedProduct(product); // ✅ ส่งสินค้าเข้า modal
-              setOpenModal(true); // ✅ เปิด modal
+              if (!user) {
+                setShowLoginModal(true);
+                return;
+              }
+
+              setSelectedProduct(product);
+              setOpenModal(true);
             }}
           >
             {product.category === "shoes"
@@ -337,8 +376,8 @@ export default function ProductDetail() {
                 ? "จองสินค้าเช่า"
                 : "กรุณาเลือกไซส์"
               : totalStock === 0
-              ? "สินค้าหมด"
-              : "จองสินค้าเช่า"}
+                ? "สินค้าหมด"
+                : "จองสินค้าเช่า"}
           </button>
           <div className="flex justify-end text-sm mt-2">
             <p>พร้อมให้เช่า: {totalStock} ชิ้น</p>

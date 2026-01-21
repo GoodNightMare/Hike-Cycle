@@ -117,7 +117,7 @@ export default function Products() {
                   <img
                     src={item.images[0]}
                     alt={item.name}
-                    className="h-72 w-full object-cover rounded-lg"
+                    className="h-72 m-auto object-cover rounded-lg"
                   />
 
                   {totalStock === 0 && (

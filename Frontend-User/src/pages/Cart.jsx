@@ -1,8 +1,24 @@
 // src/pages/Cart.jsx
+import { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
+import user from "./../data/user.json";
 
 export default function Cart() {
   const { cartItems, removeFromCart } = useCart();
+  const [users, setUsers] = useState(user);
+  const me = JSON.parse(localStorage.getItem("user"));
+  
+  const meInJson = users.find((u) => u.email === me?.email);
+
+  const [showModal, setShowModal] = useState(false);
+  const [deliveryType, setDeliveryType] = useState("address"); // address | store
+  const [address, setAddress] = useState(meInJson?.address || "");
+
+
+  useEffect(() => {
+    console.log(users);
+    console.log(meInJson);
+  }, [users, meInJson]);
 
   if (cartItems.length === 0) {
     return (
@@ -32,6 +48,74 @@ export default function Cart() {
 
   return (
     <div className="min-h-screen py-8">
+      {showModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl w-full max-w-md p-6">
+            <h2 className="text-xl font-bold mb-4">เลือกวิธีรับสินค้า</h2>
+
+            {/* ตัวเลือก */}
+            <div className="space-y-3">
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  checked={deliveryType === "address"}
+                  onChange={() => setDeliveryType("address")}
+                />
+                ใช้ที่อยู่ที่มีอยู่
+              </label>
+
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  checked={deliveryType === "store"}
+                  onChange={() => setDeliveryType("store")}
+                />
+                ไปรับหน้าร้าน
+              </label>
+            </div>
+
+            {/* กรอกที่อยู่ */}
+            {deliveryType === "address" && (
+              <textarea
+                className="border w-full mt-4 p-2 rounded"
+                rows={3}
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="กรอกที่อยู่จัดส่ง"
+              />
+            )}
+
+            {/* ปุ่ม */}
+            <div className="flex justify-end gap-2 mt-6">
+              <button
+                className="px-4 py-2 border rounded"
+                onClick={() => setShowModal(false)}
+              >
+                ยกเลิก
+              </button>
+
+              <button
+                className="px-4 py-2 bg-black text-white rounded"
+                onClick={() => {
+                  const orderData = {
+                    items: cartItems,
+                    total,
+                    deliveryType,
+                    address:
+                      deliveryType === "address" ? address : "รับหน้าร้าน",
+                  };
+
+                  console.log("ORDER:", orderData);
+                  setShowModal(false);
+                }}
+              >
+                ยืนยัน
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-5xl mx-auto p-6 bg-white rounded-xl shadow">
         <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
           🛒 ตะกร้าสินค้า
@@ -100,7 +184,10 @@ export default function Cart() {
         </div>
 
         <div className="flex justify-end mt-6">
-          <button className="bg-black hover:bg-gray-800 text-white px-8 py-4 rounded-xl text-lg font-semibold transition">
+          <button
+            className="bg-black hover:bg-gray-800 text-white px-8 py-4 rounded-xl text-lg font-semibold transition"
+            onClick={() => setShowModal(true)}
+          >
             ชำระเงิน
           </button>
         </div>
