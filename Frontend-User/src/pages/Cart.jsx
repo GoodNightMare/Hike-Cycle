@@ -13,11 +13,6 @@ export default function Cart() {
   const [deliveryType, setDeliveryType] = useState("address");
   const [address, setAddress] = useState("");
 
-  useEffect(()=>{
-    // setAddress(user.address);
-    console.log(user);
-  },[])
-
   // ❌ ยังไม่ login
   if (!user) {
     return (
@@ -31,7 +26,7 @@ export default function Cart() {
             onClick={() => navigate("/login")}
             className="bg-black text-white px-4 py-2 rounded"
           >
-            ไปหน้าเข้าสู่ระบบ
+            เข้าสู่ระบบ
           </button>
         </div>
       </div>

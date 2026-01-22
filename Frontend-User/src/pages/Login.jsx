@@ -12,6 +12,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false); // ✅ เพิ่ม
+  const [regError, setRegError] = useState("");
 
   const [showRegister, setShowRegister] = useState(false);
 
@@ -51,11 +52,31 @@ export default function Login() {
     }, 1200);
   };
 
+  const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const isValidPhone = (phone) => {
+    return /^0\d{9}$/.test(phone);
+  };
+
   const register = () => {
     if (!regData.email || !regData.password) {
-      alert("กรุณากรอก Email และ Password");
+      setRegError("กรุณากรอก Email และ Password");
       return;
     }
+
+    if (!isValidEmail(regData.email)) {
+      setRegError("รูปแบบ Email ไม่ถูกต้อง");
+      return;
+    }
+
+    if (regData.phone && !isValidPhone(regData.phone)) {
+      setRegError("เบอร์โทรต้องขึ้นต้นด้วย 0 และมี 10 หลัก");
+      return;
+    }
+
+    setRegError("");
 
     const preparedUser = {
       name: regData.name || null,
@@ -84,21 +105,19 @@ export default function Login() {
       {showRegister && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl w-full max-w-md p-6">
+            {regError && (
+              <div className="text-sm text-red-600 bg-red-50 p-2 rounded mb-3">
+                {regError}
+              </div>
+            )}
+
             <h2 className="text-xl font-bold mb-4">สมัครสมาชิก</h2>
 
             <div className="space-y-3">
               <input
-                placeholder="ชื่อ (ไม่บังคับ)"
-                className="w-full border p-2 rounded"
-                value={regData.name}
-                onChange={(e) =>
-                  setRegData({ ...regData, name: e.target.value })
-                }
-              />
-
-              <input
                 placeholder="Email *"
                 className="w-full border p-2 rounded"
+                type="email"
                 value={regData.email}
                 onChange={(e) =>
                   setRegData({ ...regData, email: e.target.value })
@@ -116,12 +135,23 @@ export default function Login() {
               />
 
               <input
+                placeholder="ชื่อ (ไม่บังคับ)"
+                className="w-full border p-2 rounded"
+                value={regData.name}
+                onChange={(e) =>
+                  setRegData({ ...regData, name: e.target.value })
+                }
+              />
+
+              <input
                 placeholder="เบอร์โทร (ไม่บังคับ)"
                 className="w-full border p-2 rounded"
+                maxLength={10}
                 value={regData.phone}
-                onChange={(e) =>
-                  setRegData({ ...regData, phone: e.target.value })
-                }
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "");
+                  setRegData({ ...regData, phone: value });
+                }}
               />
 
               <textarea

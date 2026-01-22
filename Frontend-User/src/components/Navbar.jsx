@@ -1,18 +1,12 @@
 // src/components/Navbar.jsx
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-import { ShoppingCart, UserRound, TentTree, LogOut } from "lucide-react";
+import { ShoppingCart, UserRound, TentTree } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
-  const { user, logout } = useAuth(); // ✅ ใช้จาก context อย่างเดียว
+  const { user } = useAuth(); // ✅ ไม่ต้องใช้ logout แล้ว
   const { cartItems } = useCart();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();           // ลบ user + set state
-    navigate("/login"); // redirect
-  };
 
   return (
     <nav className="main-color-bg-brown text-white">
@@ -49,16 +43,9 @@ export default function Navbar() {
               <Link to="/login">เข้าสู่ระบบ</Link>
             </div>
           ) : (
-            <div className="flex flex-col items-center gap-1">
+            <div className="flex flex-col items-center">
               <UserRound />
               <Link to="/profile">โปรไฟล์</Link>
-              <button
-                onClick={handleLogout}
-                className="text-sm text-red-300 hover:text-red-500 flex items-center gap-1"
-              >
-                <LogOut size={16} />
-                ออกจากระบบ
-              </button>
             </div>
           )}
         </div>
