@@ -1,20 +1,23 @@
 import { useParams } from "react-router-dom";
 import products from "../data/products.json";
-import { Star, Check, X } from "lucide-react";
+import { Star, Check, X, ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 export default function ProductDetail() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const { user } = useAuth(); // ✅ reactive
 
   const tomorrow = new Date();
-  const afterTomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  afterTomorrow.setDate(tomorrow.getDate() + 2);
+
+  const afterTomorrow = new Date();
+  afterTomorrow.setDate(afterTomorrow.getDate() + 2);
+
   const minDate = tomorrow.toISOString().split("T")[0];
 
   const [blink, setBlink] = useState(false);
@@ -57,9 +60,16 @@ export default function ProductDetail() {
     return <p className="text-center mt-10">ไม่พบสินค้า</p>;
   }
 
+  useEffect(() => {
+  if (product?.images?.length) {
+    setImage(product.images[0]);
+  }
+}, [product]);
+
+
   return (
     <div className=" min-h-screen">
-      <div className="max-w-6xl mx-auto p-6 bg-white rounded-xl shadow grid md:grid-cols-2 gap-8 relative">
+      <div className="max-w-6xl mx-auto p-2 bg-white rounded-xl shadow grid md:grid-cols-2 gap-8 relative">
         {blink && <div className="blink-screen" />}
         {openModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -177,7 +187,13 @@ export default function ProductDetail() {
         )}
 
         {/* รูปสินค้า */}
-        <div>
+        <div className="relative">
+          <button
+            onClick={() => navigate(-1)}
+            className="absolute top-3 left-3 z-10 px-2 py-1 bg-white rounded-full shadow hover:bg-gray-100 transition"
+          >
+            <ArrowLeft size={20} />
+          </button>
           <img
             src={image}
             alt={product.name}
