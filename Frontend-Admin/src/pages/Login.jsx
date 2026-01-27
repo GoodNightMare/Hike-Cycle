@@ -35,14 +35,14 @@ export default function Login() {
     console.log("Login success:", userData);
 
     login(userData);
-    navigate("/dashboard"); // หรือ /products
+    navigate("/"); // หรือ /products
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="bg-white w-full max-w-sm rounded-xl shadow p-6">
         <h1 className="text-2xl font-bold text-center mb-6">
-          เข้าสู่ระบบ
+          Hike-Cycle Login
         </h1>
 
         {error && (

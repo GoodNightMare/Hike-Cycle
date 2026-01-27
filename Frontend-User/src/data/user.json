@@ -1,6 +1,7 @@
 [
   {
     "email": "a@gmail.com",
+    "name": "นายไข ต้ม",
     "password": "1",
     "phone": "0812345678",
     "role": "admin",
@@ -8,6 +9,7 @@
   },
   {
     "email": "u@gmail.com",
+    "name": "นายไข ต้ม",
     "password": "1",
     "phone": "0898765432",
     "role": "user",
@@ -15,6 +17,7 @@
   },
   {
     "email": "s@gmail.com",
+    "name": "นายไข ต้ม",
     "password": "1",
     "phone": "0923456789",
     "role": "staff",

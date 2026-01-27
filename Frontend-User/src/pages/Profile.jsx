@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { UserRound, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import users from "../data/user.json";
 
 export default function Profile() {
   const navigate = useNavigate();
   const { user, updateProfile, logout } = useAuth();
   const [showModal, setShowModal] = useState(false);
+  const [profileData, setProfileData] = useState(null);
 
   const [form, setForm] = useState({
     name: user?.name || "",
@@ -18,16 +20,37 @@ export default function Profile() {
     if (!user) navigate("/login");
   }, [user]);
 
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    const foundUser = users.find((u) => u.email === user.email);
+
+    if (foundUser) {
+      setProfileData(foundUser);
+      setForm({
+        name: foundUser.name,
+        phone: foundUser.phone,
+        address: foundUser.address,
+      });
+    }
+  }, [user]);
+
   const handleSave = () => {
     const payload = {
+      ...profileData,
       name: form.name,
       phone: form.phone,
       address: form.address,
     };
 
-    console.log("📦 PROFILE PAYLOAD:", payload);
+    console.log("📦 UPDATE TO JSON:", payload);
 
-    updateProfile(payload);
+    // ถ้าเป็น backend → ยิง API
+    // ตอนนี้เป็น mock → update state
+    setProfileData(payload);
     setShowModal(false);
   };
 
@@ -44,7 +67,7 @@ export default function Profile() {
         <div className="space-y-4 text-m">
           <div>
             <p className="text-gray-500">ชื่อ</p>
-            <p className="font-semibold">{user?.name || "-"}</p>
+            <p className="font-semibold">{profileData?.name || "-"}</p>
           </div>
 
           <div>
@@ -54,12 +77,12 @@ export default function Profile() {
 
           <div>
             <p className="text-gray-500">เบอร์โทร</p>
-            <p className="font-semibold">{user?.phone || "-"}</p>
+            <p className="font-semibold">{profileData?.phone || "-"}</p>
           </div>
 
           <div>
             <p className="text-gray-500">ที่อยู่</p>
-            <p className="font-semibold">{user?.address || "-"}</p>
+            <p className="font-semibold">{profileData?.address || "-"}</p>
           </div>
         </div>
 

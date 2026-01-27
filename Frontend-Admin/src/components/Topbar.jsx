@@ -14,9 +14,7 @@ export default function Topbar() {
   return (
     <header className="w-full h-16 bg-white border-b flex items-center justify-between px-6 shadow-sm">
       {/* ซ้าย */}
-      <div className="text-xl font-bold">
-        Admin Dashboard
-      </div>
+      <div></div>
 
       {/* ขวา */}
       <div className="flex items-center gap-4">
