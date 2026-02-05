@@ -2,6 +2,7 @@
 import { Flame } from "lucide-react";
 import { useEffect, useState } from "react";
 import promotionsData from "./../data/promotions.json";
+import routesRecommended from "./../data/routesRecommended.json";
 
 export default function Home() {
   const [promotions, setPromotions] = useState([]);
@@ -9,73 +10,9 @@ export default function Home() {
 
   const [current, setCurrent] = useState(0);
 
-  const routesRecommended = [
-    {
-      name: "ภูสอยดาว",
-      province: "อุตรดิตถ์",
-      duration: "4-6 ชั่วโมง",
-      distance: "6.5 กม.",
-      level: "ปานกลาง",
-      highlight: "ลานสนสามใบ, น้ำตกสายทิพย์",
-      season: "",
-      suitable: "มือใหม่ที่มีความพร้อมทางร่างกาย",
-    },
-    {
-      name: "เขาหลวงสุโขทัย",
-      province: "สุโขทัย",
-      duration: "3-5 ชั่วโมง",
-      distance: "3.7 กม.",
-      level: "มือใหม่",
-      highlight: "จุดชมวิวผานารายณ์, ลานพระบาท, ลานหินปุ่ม",
-      season: "",
-      suitable: "มือใหม่ที่มองหาความท้าทาย สวย สนุก",
-    },
-    {
-      name: "ดอยม่อนจอง",
-      province: "เชียงใหม่",
-      duration: "3-4 ชั่วโมง",
-      distance: "6 กม.",
-      level: "มือใหม่",
-      highlight: "วิวทะเลหมอก, จุดชมวิวหน้าผาหัวสิงห์",
-      season: "",
-      suitable:
-        "มือใหม่ที่ไม่ต้องการความยากเกินไป ต้องการเห็นธรรมาชาติแบบพรีเมียม",
-    },
-    {
-      name: "ดอยผ้าห่มปก",
-      province: "เชียงใหม่",
-      duration: "2-3 ชั่วโมง",
-      distance: "3 กม.",
-      level: "มือใหม่",
-      highlight: "ยอดดอยผ้าห่มปก, ทะเลหมอก",
-      season: "",
-      suitable: "คนที่อยากท้าทายความและสัมผัสธรรมชาติอันบริสุทธิ์",
-    },
-    {
-      name: "เลอกวาเดาะ",
-      province: "ตาก",
-      duration: "3-5 ชั่วโมง",
-      distance: "4-5 กม.",
-      level: "ปานกลาง",
-      highlight: "แนวป่าสนและป่าดิบชื้น, แนวสันเขาเลอกวาเดาะ, ยอดเลอกวาเดาะ",
-      season: "",
-      suitable: "มือใหม่ที่มองหาความท้าทาย สวย สนุก",
-    },
-    {
-      name: "ภูกระดึง",
-      province: "เลย",
-      duration: "4-7 ชั่วโมง",
-      distance: "9 กม.",
-      level: "มือใหม่ - มือโปร",
-      highlight:
-        "ชมพระอาทิตย์ขึ้นที่ผานกแอ่น, น้ำตกถ้ำใหญ่, พระอาทิตย์ตกที่ผาหล่มสัก",
-      season: "",
-      suitable: "มือใหม่ที่มองหาความท้าทาย สวย สนุก",
-    },
-  ];
-
   useEffect(() => {
     setPromotions(promotionsData);
+    
   }, []);
 
   useEffect(() => {

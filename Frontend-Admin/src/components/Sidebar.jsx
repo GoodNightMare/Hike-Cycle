@@ -3,9 +3,8 @@ import { useAuth } from "../context/AuthContext";
 
 export default function Sidebar() {
   const { user } = useAuth();
-  console.log(user);
   return (
-    <aside className="w-64 bg-gray-900 text-white p-4">
+    <aside className="lg:w-72 md:w-48 bg-gray-900 text-white p-4">
       <h1 className="text-xl font-bold mb-6">Hike-Cycle System</h1>
 
       <nav className="flex flex-col gap-3">
@@ -14,8 +13,7 @@ export default function Sidebar() {
             <Link to="/dashboard">Dashboard</Link>
             <Link to="/orders">Orders</Link>
             <Link to="/products">Products</Link>
-            <Link to="/customers">Customers</Link>
-            <Link to="/reports">Reports</Link>
+            <Link to="/users">Users</Link>
             <Link to="/settings">Settings</Link>
           </>
         )}

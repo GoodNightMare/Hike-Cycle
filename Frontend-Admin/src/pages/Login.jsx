@@ -13,9 +13,9 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleLogin = () => {
+  const handleLogin = (loginEmail = email, loginPassword = password) => {
     const foundUser = users.find(
-      (u) => u.email === email && u.password === password
+      (u) => u.email === loginEmail && u.password === loginPassword,
     );
 
     if (!foundUser) {
@@ -74,11 +74,29 @@ export default function Login() {
         </div>
 
         <button
-          onClick={handleLogin}
+          onClick={() => handleLogin()}
           className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 transition"
         >
           Login
         </button>
+        <div className="flex justify-end gap-2 m-2">
+          <button
+            onClick={() => {
+              handleLogin("a@gmail.com", "1");
+            }}
+            className="p-2 border-0 bg-amber-700 rounded-2xl"
+          >
+            admin
+          </button>
+          <button
+            onClick={() => {
+              handleLogin("s@gmail.com", "1");
+            }}
+            className="p-2 border-0 bg-emerald-500 rounded-2xl"
+          >
+            staff
+          </button>
+        </div>
       </div>
     </div>
   );

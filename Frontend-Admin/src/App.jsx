@@ -3,8 +3,10 @@ import AdminLayout from "./layouts/AdminLayout";
 import Dashboard from "./pages/DashBoard";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
-import OrderPage from "./pages/Order";
+import OrdersPage from "./pages/Orders";
 import RoleRedirect from "./pages/RoleRedirect";
+import UsersPage from "./pages/Users";
+import ProductsPage from "./pages/Products";
 
 export default function App() {
   return (
@@ -28,9 +30,9 @@ export default function App() {
       <Route
         path="/orders"
         element={
-          <ProtectedRoute role="staff">
+          <ProtectedRoute roles={["admin", "staff"]}>
             <AdminLayout>
-              <OrderPage />
+              <OrdersPage />
             </AdminLayout>
           </ProtectedRoute>
         }
@@ -41,18 +43,18 @@ export default function App() {
         element={
           <ProtectedRoute role="admin">
             <AdminLayout>
-              <h1>Products Page</h1>
+              <ProductsPage />
             </AdminLayout>
           </ProtectedRoute>
         }
       />
 
       <Route
-        path="/customers"
+        path="/users"
         element={
           <ProtectedRoute role="admin">
             <AdminLayout>
-              <h1>Customers Page</h1>
+              <UsersPage />
             </AdminLayout>
           </ProtectedRoute>
         }

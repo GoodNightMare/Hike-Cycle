@@ -1,23 +1,32 @@
 [
   {
+    "name": "Admin Admin",
     "email": "a@gmail.com",
     "password": "1",
     "phone": "0812345678",
     "role": "admin",
-    "address": "123 ถนนสุขุมวิท เขตคลองเตย กรุงเทพมหานคร 10110"
+    "address": "123 ถนนสุขุมวิท เขตคลองเตย กรุงเทพมหานคร 10110",
+    "createdAt": "2024-01-01",
+    "isActived": true
   },
   {
+    "name": "User User",
     "email": "u@gmail.com",
     "password": "1",
     "phone": "0898765432",
     "role": "user",
-    "address": "45 หมู่ 6 ตำบลสุเทพ อำเภอเมือง เชียงใหม่ 50200"
+    "address": "45 หมู่ 6 ตำบลสุเทพ อำเภอเมือง เชียงใหม่ 50200",
+    "createdAt": "2024-01-01",
+    "isActived": true
   },
   {
+    "name": "Staff Staff",
     "email": "s@gmail.com",
     "password": "1",
     "phone": "0923456789",
     "role": "staff",
-    "address": "78 ถนนมิตรภาพ ตำบลในเมือง อำเภอเมือง ขอนแก่น 40000"
+    "address": "78 ถนนมิตรภาพ ตำบลในเมือง อำเภอเมือง ขอนแก่น 40000",
+    "createdAt": "2024-01-01",
+    "isActived": false
   }
 ]
