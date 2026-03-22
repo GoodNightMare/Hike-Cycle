@@ -1,16 +1,20 @@
 import { useParams } from "react-router-dom";
-import products from "../data/products.json";
 import { Star, Check, X, ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
+import axios from "axios";
 
 export default function ProductDetail() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { id } = useParams();
+  const { user } = useAuth();
 
-  const { user } = useAuth(); // ✅ reactive
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -21,7 +25,6 @@ export default function ProductDetail() {
   const minDate = tomorrow.toISOString().split("T")[0];
 
   const [blink, setBlink] = useState(false);
-
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   const [startDate, setStartDate] = useState(
@@ -33,39 +36,73 @@ export default function ProductDetail() {
   const [time, setTime] = useState("08:00");
 
   const [openModal, setOpenModal] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-
   const [image, setImage] = useState(null);
   const [selectedSize, setSelectedSize] = useState("");
-  const { id } = useParams();
-  const product = products.find((p) => p.id === id);
+
+  const safeParse = (str, defaultValue = null) => {
+    try {
+      return str ? JSON.parse(str) : defaultValue;
+    } catch (e) {
+      console.error("JSON Parse Error:", e);
+      return defaultValue;
+    }
+  };
+
+  // ถอดรหัส JSON String จาก API ให้เป็น Object
+  const specs = safeParse(product?.specs);
+  const suitableFor = safeParse(product?.suitableFor, []);
+  const variants = safeParse(product?.variants, []);
+
+  // แก้ไข totalStock สำหรับรองเท้าให้ดึงจาก variants ที่ parse แล้ว
+  const totalStock =
+    product?.category === "shoes" && variants
+      ? variants.reduce((sum, v) => sum + v.stock, 0)
+      : (product?.stock ?? 0);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          `http://localhost:5279/api/products/${id}`,
+        );
+        setProduct(response.data);
+        if (
+          response.data.productImages &&
+          response.data.productImages.length > 0
+        ) {
+          setImage(response.data.productImages[0].imageUrl);
+        }
+        setError(null);
+      } catch (err) {
+        setError("ไม่สามารถโหลดข้อมูลสินค้าได้");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
 
   const isValidTime = time >= "08:00" && time <= "20:00";
-
-  const totalStock =
-    product?.category === "shoes" && product?.variants
-      ? product.variants.reduce((sum, v) => sum + v.stock, 0)
-      : (product?.stock ?? 0);
 
   const handleBlink = () => {
     setBlink(true);
     setTimeout(() => setBlink(false), 800);
   };
 
-  useEffect(() => {
-    setImage(product.images[0]);
-  }, [product]);
+  if (loading) {
+    return <p className="text-center mt-10">กำลังโหลด...</p>;
+  }
+
+  if (error) {
+    return <p className="text-center mt-10 text-red-500">{error}</p>;
+  }
 
   if (!product) {
     return <p className="text-center mt-10">ไม่พบสินค้า</p>;
   }
-
-  useEffect(() => {
-  if (product?.images?.length) {
-    setImage(product.images[0]);
-  }
-}, [product]);
-
 
   return (
     <div className=" min-h-screen">
@@ -75,7 +112,7 @@ export default function ProductDetail() {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <h2 className="text-xl font-bold mb-4">
-                จองสินค้า: {selectedProduct?.name}
+                จองสินค้า: {product?.name}
               </h2>
 
               <div className="space-y-4">
@@ -201,19 +238,19 @@ export default function ProductDetail() {
           />
 
           <div className="flex flex-wrap gap-3 mt-4">
-            {product.images.map((img, index) => (
+            {product.productImages?.map((img, index) => (
               <img
                 key={index}
-                src={img}
+                src={img.imageUrl}
                 alt=""
                 className={`w-20 h-20 object-contain rounded-lg cursor-pointer border
         ${
-          img === image
+          img.imageUrl === image
             ? "border-black"
             : "border-gray-200 hover:border-gray-400"
         }
       `}
-                onClick={() => setImage(img)}
+                onClick={() => setImage(img.imageUrl)}
               />
             ))}
           </div>
@@ -227,12 +264,12 @@ export default function ProductDetail() {
           <div className="flex items-center gap-2 mt-2 text-sm text-gray-600">
             <Star size={16} className="fill-yellow-400 text-yellow-400" />
             <span>
-              {product.rating} ({product.review_count} รีวิว)
+              {product.rating} ({product.reviewCount} รีวิว)
             </span>
           </div>
 
           <p className="text-4xl text-green-600 font-bold mt-5">
-            ฿{product.price.toLocaleString()}
+            ฿{product.pricePerDay?.toLocaleString() ?? "N/A"}
             <span className="text-sm text-gray-500 font-normal"> / วัน</span>
           </p>
 
@@ -247,63 +284,55 @@ export default function ProductDetail() {
             <h3 className="font-semibold text-lg mb-3">ข้อมูลทางเทคนิค</h3>
 
             <ul className="space-y-2 text-sm">
-              {product.specs?.capacity && (
+              {specs?.capacity && (
                 <li className="flex gap-2 items-center">
-                  <Check size={16} /> ความจุ: {product.specs.capacity}
+                  <Check size={16} /> ความจุ: {specs.capacity}
                 </li>
               )}
 
-              {product.specs?.weight_kg && (
+              {specs?.weight_kg && (
                 <li className="flex gap-2">
-                  <Check size={16} /> น้ำหนัก: {product.specs.weight_kg}{" "}
-                  กิโลกรัม
+                  <Check size={16} /> น้ำหนัก: {specs.weight_kg} กิโลกรัม
                 </li>
               )}
 
-              {product.specs?.material && (
+              {specs?.material && (
                 <li className="flex gap-2">
-                  <Check size={16} /> วัสดุ: {product.specs.material}
+                  <Check size={16} /> วัสดุ: {specs.material}
                 </li>
               )}
 
-              {product.specs?.waterproof !== undefined && (
+              {specs?.waterproof !== undefined && (
                 <li className="flex gap-2">
-                  {product.specs.waterproof ? (
-                    <Check size={16} />
-                  ) : (
-                    <X size={16} />
-                  )}{" "}
+                  {specs.waterproof ? <Check size={16} /> : <X size={16} />}{" "}
                   กันน้ำ:
                   {product.specs.waterproof ? " ได้" : " ไม่ได้"}
                 </li>
               )}
-              {product.specs?.brightness_lumen && (
+              {specs?.brightness_lumen && (
                 <li className="flex gap-2">
-                  <Check size={16} /> ความสว่าง:{" "}
-                  {product.specs.brightness_lumen} ลูเมน
+                  <Check size={16} /> ความสว่าง: {specs.brightness_lumen} ลูเมน
                 </li>
               )}
 
-              {product.specs?.dimensions_cm && (
+              {specs?.dimensions_cm && (
                 <li className="flex gap-2">
-                  <Check size={16} /> ขนาด (กxยxส):{" "}
-                  {product.specs.dimensions_cm} ซม.
+                  <Check size={16} /> ขนาด (กxยxส): {specs.dimensions_cm} ซม.
                 </li>
               )}
-              {product.specs?.adjustable && (
+              {specs?.adjustable && (
                 <li className="flex gap-2">
-                  <Check size={16} /> ปรับความยาวได้: {product.specs.adjustable}
+                  <Check size={16} /> ปรับความยาวได้: {specs.adjustable}
                 </li>
               )}
-              {product.specs?.mode && (
+              {specs?.mode && (
                 <li className="flex gap-2">
-                  <Check size={16} /> {product.specs.mode}
+                  <Check size={16} /> {specs.mode}
                 </li>
               )}
-              {product.specs?.battery_type && (
+              {specs?.battery_type && (
                 <li className="flex gap-2">
-                  <Check size={16} /> ประเภทแบตเตอรี่:{" "}
-                  {product.specs.battery_type}
+                  <Check size={16} /> ประเภทแบตเตอรี่: {specs.battery_type}
                 </li>
               )}
             </ul>
@@ -312,7 +341,7 @@ export default function ProductDetail() {
           <div className="mt-6">
             <h3 className="font-semibold text-lg mb-2">เหมาะสำหรับ</h3>
             <div className="flex flex-wrap gap-2">
-              {product.suitable_for.map((item, index) => (
+              {suitableFor?.map((item, index) => (
                 <span
                   key={index}
                   className="px-3 py-1 text-sm bg-gray-100 rounded-full"
@@ -334,34 +363,24 @@ export default function ProductDetail() {
           {product.category === "shoes" && (
             <div className="mt-6">
               <h3 className="font-semibold text-lg mb-2">ไซส์รองเท้า</h3>
-
               <div className="flex flex-wrap gap-2">
-                {product.variants.map((v) => (
+                {variants.map((v) => (
                   <button
                     key={v.size}
                     disabled={v.stock === 0}
                     onClick={() => setSelectedSize(v.size)}
-                    className={`px-4 py-2 rounded border text-sm
-            ${
-              v.stock === 0
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : selectedSize === v.size
-                  ? "bg-black text-white border-black"
-                  : "bg-white hover:bg-gray-100"
-            }
-          `}
+                    className={`px-4 py-2 rounded border text-sm ${
+                      v.stock === 0
+                        ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                        : selectedSize === v.size
+                          ? "bg-black text-white border-black"
+                          : "bg-white hover:bg-gray-100"
+                    }`}
                   >
-                    {v.size}
+                    {v.size}({v.stock})
                   </button>
                 ))}
               </div>
-
-              {/* แสดงสถานะ */}
-              {selectedSize && (
-                <p className="text-sm text-green-600 mt-2">
-                  เลือกไซส์: {selectedSize}
-                </p>
-              )}
             </div>
           )}
 
@@ -382,18 +401,10 @@ export default function ProductDetail() {
                 setShowLoginModal(true);
                 return;
               }
-
-              setSelectedProduct(product);
               setOpenModal(true);
             }}
           >
-            {product.category === "shoes"
-              ? selectedSize
-                ? "จองสินค้าเช่า"
-                : "กรุณาเลือกไซส์"
-              : totalStock === 0
-                ? "สินค้าหมด"
-                : "จองสินค้าเช่า"}
+            {totalStock === 0 ? "สินค้าหมด" : "จองสินค้าเช่า"}
           </button>
           <div className="flex justify-end text-sm mt-2">
             <p>พร้อมให้เช่า: {totalStock} ชิ้น</p>

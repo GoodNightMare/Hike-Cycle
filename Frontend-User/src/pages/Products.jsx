@@ -1,13 +1,25 @@
 // src/pages/Products.jsx
-import { useState } from "react";
-import productsData from "../data/products.json";
+import { useEffect, useState } from "react";
+// import productsData from "../data/products.json";
 import { Star,Search, SlidersHorizontal, Tag } from "lucide-react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 export default function Products() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [maxPrice, setMaxPrice] = useState("");
+  const [productsData, setProductsData] = useState([]);
+
+  useEffect(() => {
+    axios.get("http://localhost:5279/api/products")
+      .then((response) => {
+        setProductsData(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching products:", error);
+      });
+  }, []);
 
   const CATEGORY_LABEL = {
     all: "ทุกประเภท",
@@ -102,10 +114,16 @@ export default function Products() {
           )}
 
           {products.map((item) => {
-            const totalStock =
-              item.category === "shoes" && item.variants
-                ? item.variants.reduce((sum, v) => sum + v.stock, 0)
-                : item.stock;
+let variants = [];
+          try {
+            variants = item.variants ? JSON.parse(item.variants) : [];
+          } catch (e) {
+            variants = [];
+          }
+
+          const totalStock = item.category === "shoes" && variants.length > 0
+            ? variants.reduce((sum, v) => sum + v.stock, 0)
+            : (item.stock || 0);
             return (
               <Link
                 to={`/products/${item.id}`}
@@ -115,7 +133,7 @@ export default function Products() {
                 {/* Image */}
                 <div className="relative">
                   <img
-                    src={item.images[0]}
+                    src={item.productImages && item.productImages.length > 0 ? item.productImages[0].imageUrl : '/placeholder.jpg'}
                     alt={item.name}
                     className="h-72 m-auto object-cover rounded-lg"
                   />
@@ -148,7 +166,7 @@ export default function Products() {
                 {/* Footer */}
                 <div className="mt-4">
                   <p className="text-green-600 font-bold text-xl">
-                    ฿{item.price.toLocaleString()}
+                    ฿{item.pricePerDay.toLocaleString()}
                   </p>
 
                   <p
