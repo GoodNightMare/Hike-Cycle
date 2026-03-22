@@ -11,7 +11,7 @@ namespace HikeCycle.Mvc.Models
         public int Id { get; set; }
 
         [Column("product_id")]
-        public required string ProductId { get; set; }
+        public required int ProductId { get; set; }
 
         [Column("image_url")]
         public required string ImageUrl { get; set; }

@@ -28,34 +28,41 @@ namespace HikeCycle.Mvc.Controllers
 
             var productImagesGrouped = productImages.GroupBy(pi => pi.ProductId).ToDictionary(g => g.Key, g => g.ToList());
 
-            var productDtos = products.Select(p => new ProductDto
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Description = p.Description,
-                Category = p.Category,
-                Brand = p.Brand,
-                PricePerDay = p.PricePerDay,
-                Stock = p.Stock,
-                Status = p.Status,
-                Level = p.Level,
-                Rating = p.Rating,
-                ReviewCount = p.ReviewCount,
-                CreatedAt = p.CreatedAt,
-                Specs = p.Specs,
-                SuitableFor = p.SuitableFor,
-                Variants = p.Variants,
+            var allReviews = await _context.Reviews.ToListAsync();
 
-                ProductImages = productImagesGrouped.ContainsKey(p.Id)
-                    ? productImagesGrouped[p.Id].Select(pi => new ProductImageDto { ImageUrl = pi.ImageUrl }).ToList()
-                    : new List<ProductImageDto>()
+            var productDtos = products.Select(p =>
+            {
+                var productReviews = allReviews.Where(r => r.ProductId == p.Id).ToList();
+
+                return new ProductDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Description = p.Description,
+                    Category = p.Category,
+                    Brand = p.Brand,
+                    PricePerDay = p.PricePerDay,
+                    Stock = p.Stock,
+                    Status = p.Status,
+                    Level = p.Level,
+                    Rating = productReviews.Any() ? (decimal)productReviews.Average(r => r.Rating) : 0,
+                    ReviewCount = productReviews.Count,
+                    CreatedAt = p.CreatedAt,
+                    Specs = p.Specs,
+                    SuitableFor = p.SuitableFor,
+                    Variants = p.Variants,
+
+                    ProductImages = productImagesGrouped.ContainsKey(p.Id)
+                            ? productImagesGrouped[p.Id].Select(pi => new ProductImageDto { ImageUrl = pi.ImageUrl }).ToList()
+                            : new List<ProductImageDto>()
+                };
             }).ToList();
 
             return Ok(productDtos);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ProductDto>> GetProduct(string id)
+        public async Task<ActionResult<ProductDto>> GetProduct(int id)
         {
             var product = await _context.Products.FindAsync(id);
 
@@ -69,6 +76,10 @@ namespace HikeCycle.Mvc.Controllers
                 .Select(pi => new ProductImageDto { ImageUrl = pi.ImageUrl })
                 .ToListAsync();
 
+            var reviews = await _context.Reviews
+    .Where(r => r.ProductId == id)
+    .ToListAsync();
+
             var productDto = new ProductDto
             {
                 Id = product.Id,
@@ -80,8 +91,8 @@ namespace HikeCycle.Mvc.Controllers
                 Stock = product.Stock,
                 Status = product.Status,
                 Level = product.Level,
-                Rating = product.Rating,
-                ReviewCount = product.ReviewCount,
+                Rating = reviews.Any() ? Math.Round((decimal)reviews.Average(r => r.Rating), 2) : 0,
+                ReviewCount = reviews.Count,
                 CreatedAt = product.CreatedAt,
                 Specs = product.Specs,
                 SuitableFor = product.SuitableFor,
@@ -90,6 +101,27 @@ namespace HikeCycle.Mvc.Controllers
             };
 
             return Ok(productDto);
+        }
+
+        [HttpGet("{productId}/reviews")]
+        public async Task<ActionResult<IEnumerable<ReviewDto>>> GetProductReviews(int productId)
+        {
+            // ดึงรีวิวของสินค้านั้นๆ และอาจจะ Join กับ UserProfile เพื่อเอาชื่อมาโชว์
+           var reviews = await (from r in _context.Reviews
+                         join u in _context.UserProfiles on r.UserId equals u.UserId
+                         where r.ProductId == productId
+                         orderby r.CreatedAt descending
+                         select new ReviewDto
+                         {
+                             Id = r.Id,
+                             UserId = r.UserId,
+                             UserName = u.FullName, // ดึงชื่อจริงจากตาราง user_profiles มาใส่ใน DTO
+                             Rating = r.Rating,
+                             Comment = r.Comment,
+                             CreatedAt = r.CreatedAt
+                         }).ToListAsync();
+
+            return Ok(reviews);
         }
     }
 }
