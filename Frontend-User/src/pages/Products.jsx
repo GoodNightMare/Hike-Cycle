@@ -159,7 +159,7 @@ let variants = [];
                       className="text-yellow-400 fill-yellow-400"
                     />
                     <span>{item.rating}</span>
-                    <span className="text-gray-400">({item.review_count})</span>
+                    <span className="text-gray-400">({item.reviewCount})</span>
                   </div>
                 </div>
 
