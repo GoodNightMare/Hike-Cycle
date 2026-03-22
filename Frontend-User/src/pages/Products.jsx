@@ -158,7 +158,7 @@ let variants = [];
                       size={16}
                       className="text-yellow-400 fill-yellow-400"
                     />
-                    <span>{item.rating}</span>
+                    <span>{(item.rating).toFixed(2)}</span>
                     <span className="text-gray-400">({item.reviewCount})</span>
                   </div>
                 </div>

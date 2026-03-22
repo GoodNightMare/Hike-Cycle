@@ -261,9 +261,11 @@ export default function ProductDetail() {
           <h1 className="text-3xl font-bold">{product.name}</h1>
           <p className="text-gray-500 mt-1">{product.brand}</p>
 
-          <div className="flex items-center gap-2 mt-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 mt-2 text-sm text-gray-600 underline hover:text-red-500 cursor-pointer">
             <Star size={16} className="fill-yellow-400 text-yellow-400" />
-            <span>
+            <span
+              onClick={()=>navigate(`/products/${product.id}/reviews`)}
+            >
               {product.rating} ({product.reviewCount} รีวิว)
             </span>
           </div>

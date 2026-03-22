@@ -2,6 +2,7 @@ import { useState } from "react";
 import user from "./../data/user.json";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import axios from "axios";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -24,32 +25,37 @@ export default function Login() {
     address: "",
   });
 
-  const login = (email, password) => {
-    const foundUser = users.find(
-      (u) => u.email === email && u.password === password,
-    );
+  const login = async (email, password) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:5279/api/auth/login",
+        {
+          email,
+          password,
+        },
+      );
 
-    if (!foundUser) {
-      setError("Email หรือ Password ไม่ถูกต้อง");
+      const foundUser = response.data; // ข้อมูลที่ Backend ส่งกลับมา (เช่น id, email, role, fullName)
+
+      const userData = {
+        id: foundUser.id,
+        email: foundUser.email,
+        name: foundUser.fullName,
+        role: foundUser.role,
+        isLogin: true,
+      };
+
+      authLogin(userData);
+      setError("");
+      setSuccess(true);
+
+      setTimeout(() => {
+        navigate("/products");
+      }, 1200);
+    } catch (err) {
+      setError(err.response?.data?.message || "Email หรือ Password ไม่ถูกต้อง");
       setSuccess(false);
-      return;
     }
-
-    const userData = {
-      email: foundUser.email,
-      role: foundUser.role,
-      isLogin: true,
-    };
-
-    authLogin(userData);
-
-    setError("");
-    setSuccess(true);
-
-    // หน่วงนิดนึงให้เห็นข้อความ
-    setTimeout(() => {
-      navigate("/products");
-    }, 1200);
   };
 
   const isValidEmail = (email) => {
@@ -60,44 +66,41 @@ export default function Login() {
     return /^0\d{9}$/.test(phone);
   };
 
-  const register = () => {
-    if (!regData.email || !regData.password) {
-      setRegError("กรุณากรอก Email และ Password");
+const register = async () => {
+
+  if (!isValidEmail(regData.email)) {
+    setRegError("รูปแบบ Email ไม่ถูกต้อง");
+    return;
+  }
+  if (regData.phone && !isValidPhone(regData.phone)) {
+    setRegError("รูปแบบเบอร์โทรไม่ถูกต้อง (ต้องขึ้นต้นด้วย 0 และมี 10 หลัก)");
+    return;
+  }
+    // Validation เบื้องต้น
+    if (!regData.password) {
+      setRegError("กรุณากรอก Password");
       return;
     }
 
-    if (!isValidEmail(regData.email)) {
-      setRegError("รูปแบบ Email ไม่ถูกต้อง");
-      return;
+    try {
+      const payload = {
+        email: regData.email,
+        password: regData.password,
+        fullName: regData.name,
+        phone: regData.phone,
+        address: regData.address,
+      };
+
+      await axios.post("http://localhost:5279/api/auth/register", payload);
+
+      alert("สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ");
+      setShowRegister(false);
+      setRegError("");
+      // ล้างข้อมูลฟอร์ม
+      setRegData({ name: "", email: "", password: "", phone: "", address: "" });
+    } catch (err) {
+      setRegError(err.response?.data?.message || "ไม่สามารถสมัครสมาชิกได้");
     }
-
-    if (regData.phone && !isValidPhone(regData.phone)) {
-      setRegError("เบอร์โทรต้องขึ้นต้นด้วย 0 และมี 10 หลัก");
-      return;
-    }
-
-    setRegError("");
-
-    const preparedUser = {
-      name: regData.name || null,
-      email: regData.email,
-      password: regData.password,
-      phone: regData.phone || null,
-      address: regData.address || null,
-      role: "user",
-      createdAt: new Date().toISOString(),
-    };
-
-    console.log("REGISTER DATA:", preparedUser);
-
-    setShowRegister(false);
-    setRegData({
-      name: "",
-      email: "",
-      password: "",
-      phone: "",
-      address: "",
-    });
   };
 
   return (

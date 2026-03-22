@@ -53,7 +53,7 @@ export default function Cart() {
 
   const total = cartItems.reduce((sum, item) => {
     const days = calculateDays(item.startDate, item.endDate);
-    return sum + item.product.price * days;
+    return sum + item.product.pricePerDay * days;
   }, 0);
 
   const handleCheckout = async () => {
@@ -72,7 +72,7 @@ export default function Cart() {
       items: cartItems.map((item) => ({
         productId: item.product.id,
         name: item.product.name,
-        price: item.product.price,
+        price: item.product.pricePerDay,
         size: item.size || null,
         startDate: item.startDate,
         endDate: item.endDate,
@@ -178,7 +178,7 @@ export default function Cart() {
                 className="flex flex-col sm:flex-row gap-4 border rounded-lg p-4"
               >
                 <img
-                  src={item.product.images[0]}
+                  src={item.product.productImages?.[0]?.imageUrl}
                   className="w-24 h-24 object-contain bg-gray-50 rounded"
                 />
 
@@ -194,10 +194,10 @@ export default function Cart() {
 
                 <div className="text-right min-w-[140px]">
                   <p className="text-sm text-gray-500">
-                    {days} วัน × ฿{item.product.price}
+                    {days} วัน × ฿{item.product.pricePerDay}
                   </p>
                   <p className="font-bold text-green-600 text-lg">
-                    ฿{item.product.price * days}
+                    ฿{item.product.pricePerDay * days}
                   </p>
 
                   <button
