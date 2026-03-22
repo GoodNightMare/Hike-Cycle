@@ -1,6 +1,6 @@
 [
   {
-    "id": "promotion001",
+    "id": "1",
     "type": "discount",
     "title": "Early Bird Hiker",
     "description": "จองล่วงหน้า 30 วันลด 20%",
@@ -13,7 +13,7 @@
     "active": true
   },
   {
-    "id": "promotion002",
+    "id": "2",
     "type": "free_item",
     "title": "The more The Merrier",
     "description": "เช่าเต็นท์ 2 หลังขึ้นไป แถมฟรีเตาแก๊สและหม้อสนาม",
@@ -26,7 +26,7 @@
     "active": true
   },
   {
-    "id": "promotion003",
+    "id": "3",
     "type": "discount",
     "title": "Student Explorer",
     "description": "นักเรียนนักศึกษาโชว์บัตรรับส่วนลด 10%",
@@ -39,7 +39,7 @@
     "active": true
   },
   {
-    "id": "promotion004",
+    "id": "4",
     "type": "voucher",
     "title": "Clean Gear Reward",
     "description": "คืนอุปกรณ์สะอาด รับ Voucher ส่วนลด",
@@ -52,7 +52,7 @@
     "active": true
   },
   {
-    "id": "promotion005",
+    "id": "5",
     "type": "long_rent",
     "title": "Long Trip Deal",
     "description": "เช่ามากกว่า 5 วัน วันที่ 6 เป็นต้นไปคิดครึ่งราคา",
