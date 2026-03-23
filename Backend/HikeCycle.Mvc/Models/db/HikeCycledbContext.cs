@@ -18,6 +18,13 @@ namespace HikeCycle.Mvc.Models.db
         public DbSet<User> Users { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
 
+        // เพิ่มเข้าไปใน class HikeCycledbContext
+public DbSet<Promotion> Promotions { get; set; }
+public DbSet<PromotionCondition> PromotionConditions { get; set; }
+public DbSet<PromotionBenefit> PromotionBenefits { get; set; }
+
+public DbSet<RecommendedRoute> RecommendedRoutes { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -69,6 +76,102 @@ namespace HikeCycle.Mvc.Models.db
                     .HasCharSet("utf8mb3")
                     .HasCollation("utf8mb3_general_ci");
             });
+
+            // Configuration สำหรับ Promotion, PromotionCondition, PromotionBenefit
+            modelBuilder.Entity<Promotion>(entity =>
+            {
+                entity.ToTable("promotions");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Type)
+                    .HasMaxLength(50)
+                    .HasCharSet("utf8mb3")
+                    .HasCollation("utf8mb3_general_ci");
+
+                entity.Property(e => e.Title)
+                    .HasMaxLength(100)
+                    .HasCharSet("utf8mb3")
+                    .HasCollation("utf8mb3_general_ci");
+
+                entity.Property(e => e.Description)
+                    .HasColumnType("text")
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_general_ci");
+            });
+
+            modelBuilder.Entity<PromotionCondition>(entity =>
+            {
+                entity.ToTable("promotion_conditions");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.ConditionKey)
+                    .HasMaxLength(100)
+                    .HasCharSet("utf8mb3")
+                    .HasCollation("utf8mb3_general_ci");
+
+                entity.Property(e => e.ConditionValue)
+                    .HasMaxLength(100)
+                    .HasCharSet("utf8mb3")
+                    .HasCollation("utf8mb3_general_ci");
+            });
+
+            modelBuilder.Entity<PromotionBenefit>(entity =>
+            {
+                entity.ToTable("promotion_benefits");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.BenefitKey)
+                    .HasMaxLength(100)
+                    .HasCharSet("utf8mb3")
+                    .HasCollation("utf8mb3_general_ci");
+
+                entity.Property(e => e.BenefitValue)
+                    .HasMaxLength(100)
+                    .HasCharSet("utf8mb3")
+                    .HasCollation("utf8mb3_general_ci");
+            });
+
+            modelBuilder.Entity<RecommendedRoute>(entity =>
+            {
+                entity.ToTable("recommended_routes");
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Name)
+                    .HasMaxLength(100)
+                    .HasCharSet("utf8mb3")
+                    .HasCollation("utf8mb3_general_ci");
+
+                entity.Property(e => e.Province)
+                    .HasMaxLength(100)
+                    .HasCharSet("utf8mb3")
+                    .HasCollation("utf8mb3_general_ci");
+
+                entity.Property(e => e.Duration)
+                    .HasMaxLength(50)
+                    .HasCharSet("utf8mb3")
+                    .HasCollation("utf8mb3_general_ci");
+
+                entity.Property(e => e.Distance)
+                    .HasMaxLength(50)
+                    .HasCharSet("utf8mb3")
+                    .HasCollation("utf8mb3_general_ci");
+
+                entity.Property(e => e.Level)
+                    .HasMaxLength(50)
+                    .HasCharSet("utf8mb3")
+                    .HasCollation("utf8mb3_general_ci");
+
+                entity.Property(e => e.Highlight)
+                    .HasColumnType("text")
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_general_ci");
+
+                entity.Property(e => e.Suitable)
+                    .HasColumnType("text")
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_general_ci");
+            });
+
         }
     }
 }
