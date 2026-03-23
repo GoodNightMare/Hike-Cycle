@@ -1,30 +1,50 @@
 // src/pages/Home.jsx
 import { Flame } from "lucide-react";
 import { useEffect, useState } from "react";
-import promotionsData from "./../data/promotions.json";
-import routesRecommended from "./../data/routesRecommended.json";
+import axios from "axios";
 
 export default function Home() {
-  const [promotions, setPromotions] = useState([]);
   const [banners, setBanners] = useState([]);
+  const [routes, setRoutes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
-    setPromotions(promotionsData);
-    
+    const fetchData = async () => {
+      try {
+        // ✅ ดึงข้อมูลพร้อมกันทั้ง 2 API
+        const [promoRes, routeRes] = await Promise.all([
+          axios.get("http://localhost:5279/api/promotions"),
+          axios.get("http://localhost:5279/api/RecommendedRoutes"),
+        ]);
+
+        // 1. จัดการข้อมูล Banner
+        if (promoRes.data.length > 0) {
+          const formattedBanners = promoRes.data.map(
+            (p) => `${p.title} : ${p.description}`,
+          );
+          setBanners(formattedBanners);
+        } else {
+          setBanners(["Hike-Cycle : อุปกรณ์เดินป่าคุณภาพดี"]);
+        }
+
+        // 2. จัดการข้อมูล Routes
+        setRoutes(routeRes.data);
+
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setBanners(["ขออภัย ไม่สามารถดึงข้อมูลได้"]);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   useEffect(() => {
-    setBanners(
-      promotions.map((promotion) => {
-        return `${promotion.title} : ${promotion.description}`;
-      })
-    );
-  }, [promotions]);
-
-  useEffect(() => {
-    if (banners.length === 0) return;
+    if (banners.length <= 1) return;
 
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % banners.length);
@@ -36,27 +56,34 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Banner */}
-      <div className="relative h-96 mx-4 mt-4 rounded-xl overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0B6623] to-green-500 opacity-90" />
+      <div className="relative h-96 mx-4 mt-4 rounded-xl overflow-hidden shadow-lg">
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0B6623] to-green-600 opacity-90 transition-all" />
 
         <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
-          <h1 className="text-3xl md:text-4xl font-bold text-white max-w-3xl">
-            {banners[current]}
-          </h1>
-
-          <p className="mt-4 text-white/80">
-            เตรียมอุปกรณ์ให้พร้อม แล้วออกไปผจญภัยกับธรรมชาติ
-          </p>
+          {loading ? (
+            <div className="animate-pulse text-white">กำลังโหลดโปรโมชัน...</div>
+          ) : (
+            <>
+              <h1 className="text-3xl md:text-5xl font-bold text-white max-w-4xl leading-tight transition-all duration-500">
+                {banners[current]}
+              </h1>
+              <p className="mt-4 text-white/90 text-lg">
+                เตรียมอุปกรณ์ให้พร้อม แล้วออกไปผจญภัยกับธรรมชาติ
+              </p>
+            </>
+          )}
         </div>
 
         {/* Indicator */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-20">
           {banners.map((_, index) => (
             <span
               key={index}
               onClick={() => setCurrent(index)}
-              className={`w-3 h-3 rounded-full cursor-pointer transition ${
-                current === index ? "bg-white" : "bg-white/40"
+              className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 ${
+                current === index
+                  ? "bg-white scale-125"
+                  : "bg-white/40 hover:bg-white/60"
               }`}
             />
           ))}
@@ -71,7 +98,7 @@ export default function Home() {
         </h2>
 
         <div className="grid md:grid-cols-2 gap-6">
-          {routesRecommended.map((route, index) => (
+          {routes.map((route, index) => (
             <div
               key={index}
               className="bg-white rounded-xl p-5 shadow-sm hover:shadow-lg transition"
@@ -100,9 +127,9 @@ export default function Home() {
                 {route.suitable}
               </p>
 
-              <button className="mt-4 text-m text-green-700 font-semibold hover:underline">
+              {/* <button className="mt-4 text-m text-green-700 font-semibold hover:underline">
                 ดูรายละเอียด →
-              </button>
+              </button> */}
             </div>
           ))}
         </div>

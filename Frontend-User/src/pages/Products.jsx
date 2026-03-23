@@ -36,7 +36,7 @@ export default function Products() {
 
     const matchCategory = category === "all" || item.category === category;
 
-    const matchPrice = maxPrice === "" || item.price <= Number(maxPrice);
+    const matchPrice = maxPrice === "" || item.pricePerDay <= Number(maxPrice);
 
     return matchName && matchCategory && matchPrice;
   });
