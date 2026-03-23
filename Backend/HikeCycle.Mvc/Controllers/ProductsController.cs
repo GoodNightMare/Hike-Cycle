@@ -136,6 +136,10 @@ namespace HikeCycle.Mvc.Controllers
             existingProduct.PricePerDay = updatedProduct.PricePerDay;
             existingProduct.Stock = updatedProduct.Stock;
             existingProduct.Status = updatedProduct.Status;
+            existingProduct.Level = updatedProduct.Level;
+            existingProduct.Specs = updatedProduct.Specs;
+            existingProduct.SuitableFor = updatedProduct.SuitableFor;
+            existingProduct.Variants = updatedProduct.Variants;
 
             // ⚠️ ไม่ต้องแตะต้อง existingProduct.Rating หรือ CreatedAt 
             // ค่าเดิมใน DB จะยังคงอยู่เหมือนเดิม ไม่กลายเป็น NULL

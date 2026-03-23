@@ -19,11 +19,11 @@ namespace HikeCycle.Mvc.Models.db
         public DbSet<UserProfile> UserProfiles { get; set; }
 
         // เพิ่มเข้าไปใน class HikeCycledbContext
-public DbSet<Promotion> Promotions { get; set; }
-public DbSet<PromotionCondition> PromotionConditions { get; set; }
-public DbSet<PromotionBenefit> PromotionBenefits { get; set; }
+        public DbSet<Promotion> Promotions { get; set; }
+        public DbSet<PromotionCondition> PromotionConditions { get; set; }
+        public DbSet<PromotionBenefit> PromotionBenefits { get; set; }
 
-public DbSet<RecommendedRoute> RecommendedRoutes { get; set; }
+        public DbSet<RecommendedRoute> RecommendedRoutes { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

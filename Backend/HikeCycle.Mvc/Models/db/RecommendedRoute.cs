@@ -10,6 +10,7 @@ public class RecommendedRoute {
     public string? Level { get; set; }
     public string? Highlight { get; set; }
     public string? Suitable { get; set; }
+    
     [Column("is_active")]
     public bool IsActive { get; set; } = true;
 }

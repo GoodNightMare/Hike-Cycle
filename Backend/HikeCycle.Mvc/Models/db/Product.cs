@@ -8,7 +8,7 @@ namespace HikeCycle.Mvc.Models
     {
         [Key]
         [Column("id")]
-        public required int Id { get; set; }
+        public int Id { get; set; }
 
         [Column("name")]
         public required string Name { get; set; }

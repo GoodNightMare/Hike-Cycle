@@ -30,6 +30,10 @@ export default function ProductsPage() {
     stock: "",
     status: "active",
     description: "",
+    level: "",
+    specs: "",
+    suitableFor: "",
+    variants: "",
   };
 
   const [form, setForm] = useState(emptyForm);
@@ -67,43 +71,61 @@ export default function ProductsPage() {
       stock: product.stock ?? "",
       status: product.status,
       description: product.description,
+      level: product.level ?? "",
+      specs: product.specs ?? "",
+      suitableFor: product.suitableFor ?? "",
+      variants: product.variants ?? "",
     });
     setShowModal(true);
-
-    console.log("Editing product:", product);
-    console.log("Form data set to:", form);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("Form data before submit:", form);
+    const processedForm = { ...form };
+    for (const field of ["specs", "suitableFor", "variants"]) {
+      if (processedForm[field]) {
+        try {
+          const correctedJsonString = processedForm[field].replace(/'/g, '"');
+          JSON.parse(correctedJsonString);
+          processedForm[field] = correctedJsonString;
+        } catch (error) {
+          alert(
+            `Error: The value for '${field}' is not valid JSON. Please use double quotes for all keys and string values. Example: {"key": "value"}`
+          );
+          return;
+        }
+      }
+    }
 
-    const payload = {
-      ...form,
-      // id: parseInt(form.id),
-      price_per_day: parseFloat(form.pricePerDay || 0),
-      stock: parseInt(form.stock || 0),
+    console.log("Form data before submit:", processedForm);
 
-      specs: form.specs || null,
-      suitable_for: form.suitable_for || null,
-      variants: form.variants || null,
+    const basePayload = {
+      name: processedForm.name,
+      description: processedForm.description,
+      category: processedForm.category,
+      brand: processedForm.brand,
+      pricePerDay: parseFloat(processedForm.pricePerDay || 0),
+      stock: parseInt(processedForm.stock || 0),
+      status: processedForm.status,
+      level: processedForm.level || "ทั่วไป",
+      specs: processedForm.specs || null,
+      suitableFor: processedForm.suitableFor || null,
+      variants: processedForm.variants || null,
       rating: 0,
-      review_count: 0,
-      level: form.level || "ทั่วไป",
+      reviewCount: 0,
     };
-
-    console.log("Submitting product:", payload);
 
     try {
       if (mode === "add") {
-        // ✅ ยิง POST ไปที่ Backend
-        await axios.post("http://localhost:5279/api/products", payload);
+        console.log("Submitting product (add):", basePayload);
+        await axios.post("http://localhost:5279/api/products", basePayload);
       } else {
-        // ✅ ยิง PUT ไปที่ Backend ตาม ID
+        const updatePayload = { ...basePayload, id: parseInt(form.id, 10) };
+        console.log("Submitting product (edit):", updatePayload);
         await axios.put(
           `http://localhost:5279/api/products/${editingId}`,
-          payload,
+          updatePayload
         );
       }
 
@@ -289,6 +311,38 @@ export default function ProductsPage() {
                 name="description"
                 placeholder="รายละเอียดสินค้า"
                 value={form.description}
+                onChange={handleChange}
+                className="w-full border px-3 py-2 rounded"
+              />
+
+              <input
+                name="level"
+                placeholder="ระดับ"
+                value={form.level}
+                onChange={handleChange}
+                className="w-full border px-3 py-2 rounded"
+              />
+
+              <textarea
+                name="specs"
+                placeholder='e.g., {"material": "nylon"}'
+                value={form.specs}
+                onChange={handleChange}
+                className="w-full border px-3 py-2 rounded"
+              />
+
+              <input
+                name="suitableFor"
+                placeholder='e.g., ["hiking", "camping"]'
+                value={form.suitableFor}
+                onChange={handleChange}
+                className="w-full border px-3 py-2 rounded"
+              />
+
+              <textarea
+                name="variants"
+                placeholder='e.g., [{"color": "Red", "stock": 10}]'
+                value={form.variants}
                 onChange={handleChange}
                 className="w-full border px-3 py-2 rounded"
               />
