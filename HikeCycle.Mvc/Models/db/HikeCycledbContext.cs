@@ -25,6 +25,11 @@ namespace HikeCycle.Mvc.Models.db
 
         public DbSet<RecommendedRoute> RecommendedRoutes { get; set; }
 
+        public  DbSet<Booking> Bookings { get; set; }
+        public  DbSet<BookingItem> BookingItems { get; set; }
+        public  DbSet<Payment> Payments { get; set; } 
+        public  DbSet<Return> Returns { get; set; } 
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
