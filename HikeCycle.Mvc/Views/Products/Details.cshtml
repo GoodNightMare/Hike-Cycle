@@ -294,25 +294,50 @@
 
 @section Scripts {
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const confirmBtn = document.getElementById('confirmBtn');
 
-        function closeModal() {
-            // 🚩 เช็ค ID ให้ตรงกับ id="..." ของ <div> ที่เป็น Modal ของคุณ
-            const modal = document.getElementById('bookingModal'); 
-            if (modal) {
-                modal.classList.add('hidden');
+            function validateDates() {
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
+
+                if (startDate && endDate && startDate > endDate) {
+                    alert('วันที่คืนต้องไม่น้อยกว่าวันที่เริ่มเช่า');
+                    confirmBtn.disabled = true;
+                    endDateInput.classList.add('border-red-500', 'ring-red-500');
+                    endDateInput.focus();
+                } else {
+                    confirmBtn.disabled = false;
+                    endDateInput.classList.remove('border-red-500', 'ring-red-500');
+                }
             }
-        }
-        
+
+            if(startDateInput && endDateInput) {
+                startDateInput.addEventListener('change', function() {
+                    endDateInput.min = startDateInput.value;
+                    validateDates();
+                });
+
+                endDateInput.addEventListener('change', validateDates);
+            }
+
+            setTimeout(() => {
+                const alert = document.getElementById('statusAlert');
+                if (alert) alert.style.display = 'none';
+            }, 3000);
+        });
+
         // ฟังก์ชันเปลี่ยนรูปภาพหลัก
         function changeMainImage(element) {
             var mainImg = document.getElementById('mainProductImage');
             if (mainImg) {
                 mainImg.src = element.src;
                 
-                // เปลี่ยนเส้นขอบรูปที่เลือก
                 document.querySelectorAll('.thumb-img').forEach(img => {
                     img.classList.remove('border-black');
-                    img.classList.add('border-gray-200'); // คืนค่าสีขอบปกติ
+                    img.classList.add('border-gray-200');
                 });
                 element.classList.add('border-black');
                 element.classList.remove('border-gray-200');
@@ -323,11 +348,9 @@
         let currentSize = "";
         function selectSize(size) {
             currentSize = size;
-            // ส่งค่าไปที่ Hidden Input ใน Form เพื่อเอาไปใช้ใน Controller
             var sizeInput = document.getElementById('selectedSizeInput');
             if(sizeInput) sizeInput.value = size;
             
-            // UI: เปลี่ยนสีปุ่ม
             document.querySelectorAll('[id^="btn-size-"]').forEach(btn => {
                 btn.classList.remove('bg-black', 'text-white');
                 btn.classList.add('bg-white', 'text-black');
@@ -338,22 +361,20 @@
                 activeBtn.classList.add('bg-black', 'text-white');
                 activeBtn.classList.remove('bg-white', 'text-black');
             }
+            
+            // Enable booking button
+            const bookBtn = document.getElementById('btn-book');
+            if(bookBtn) {
+                bookBtn.classList.remove('opacity-50', 'pointer-events-none');
+            }
         }
 
-        // ฟังก์ชันเปิด/ปิด Modal (ถ้าต้องการให้กดจองแล้วเด้งหน้าต่างขึ้นมา)
-function handleBookingClick(event, isLoggedIn) {
-            // 🚩 สั่งหยุดการทำงานทุกอย่างไว้ก่อน
+        function handleBookingClick(event, isLoggedIn) {
             event.preventDefault();
-
-            console.log("Is User Logged In?:", isLoggedIn);
-
             if (!isLoggedIn) {
-                // ❌ ถ้าไม่ได้ Login ให้โชว์ Modal แจ้งเตือน และ "จบการทำงานตรงนี้"
                 toggleLoginModal(true); 
                 return false; 
             } 
-            
-            // ✅ ถ้า Login แล้ว ถึงจะให้เปิด Modal สำหรับเลือกวันที่จอง
             toggleBookingModal(true);
         }
 
@@ -365,7 +386,6 @@ function handleBookingClick(event, isLoggedIn) {
             }
         }
 
-        // 3. ฟังก์ชันเปิด-ปิด Modal จองสินค้า (ตัวที่มีปัญหา)
         function toggleBookingModal(show) {
             const modal = document.getElementById('bookingModal');
             if (modal) {
@@ -378,10 +398,5 @@ function handleBookingClick(event, isLoggedIn) {
             toggleBookingModal(false);
             toggleLoginModal(false);
         }
-
-        setTimeout(() => {
-        const alert = document.getElementById('statusAlert');
-        if (alert) alert.style.display = 'none';
-    }, 3000);
     </script>
 }
