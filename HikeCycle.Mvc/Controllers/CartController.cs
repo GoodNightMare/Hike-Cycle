@@ -18,7 +18,7 @@ namespace HikeCycle.Mvc.Controllers
         {
             _context = context;
         }
-
+        
         [HttpPost]
         public async Task<IActionResult> Add(int ProductId, string StartDate, string EndDate, string? Size)
         {
