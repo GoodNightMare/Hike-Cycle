@@ -26,7 +26,7 @@ namespace HikeCycle.Mvc.Controllers
         public async Task<IActionResult> Login(string email, string password)
         {
             string hashedInput = HashPassword(password);
-            
+
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == email && u.Password == hashedInput);
 
@@ -41,10 +41,23 @@ namespace HikeCycle.Mvc.Controllers
             // ตัวอย่าง: การเก็บชื่อไว้โชว์
             var profile = await _context.UserProfiles.FirstOrDefaultAsync(p => p.UserId == user.Id);
             HttpContext.Session.SetString("UserId", user.Id.ToString());
+            HttpContext.Session.SetString("UserEmail", user.Email);
             HttpContext.Session.SetString("UserName", profile?.FullName ?? "User");
             HttpContext.Session.SetString("UserRole", user.Role);
 
-            return RedirectToAction("Index", "Home");
+            // Role-based redirection
+            if (user.Role == "admin")
+            {
+                return RedirectToAction("Index", "AdminDashboard");
+            }
+            else if (user.Role == "staff")
+            {
+                return RedirectToAction("Index", "AdminOrders");
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
         }
 
         // POST: /Account/Register
@@ -58,7 +71,8 @@ namespace HikeCycle.Mvc.Controllers
                 return RedirectToAction("Login");
             }
 
-            var newUser = new User {
+            var newUser = new User
+            {
                 Email = request.Email,
                 Password = HashPassword(request.Password),
                 Role = "user",
@@ -68,7 +82,8 @@ namespace HikeCycle.Mvc.Controllers
             _context.Users.Add(newUser);
             await _context.SaveChangesAsync();
 
-            _context.UserProfiles.Add(new UserProfile {
+            _context.UserProfiles.Add(new UserProfile
+            {
                 UserId = newUser.Id,
                 FullName = request.FullName,
                 Phone = request.Phone,
@@ -80,27 +95,27 @@ namespace HikeCycle.Mvc.Controllers
             return RedirectToAction("Login");
         }
 
-[HttpGet]
-public async Task<IActionResult> Profile()
-{
-    // 🚩 จุดเช็คที่ 1: ชื่อ Key ในวงเล็บต้องตรงกับที่ Set ไว้ตอน Login
-    var userIdStr = HttpContext.Session.GetString("UserId"); 
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            // 🚩 จุดเช็คที่ 1: ชื่อ Key ในวงเล็บต้องตรงกับที่ Set ไว้ตอน Login
+            var userIdStr = HttpContext.Session.GetString("UserId");
 
-    if (string.IsNullOrEmpty(userIdStr)) 
-    {
-        // ถ้ามันวิ่งมาบรรทัดนี้ แสดงว่าดึงค่า "UserId" ไม่ได้ มันเลยส่งคุณไปหน้า Login
-        return RedirectToAction("Login"); 
-    }
+            if (string.IsNullOrEmpty(userIdStr))
+            {
+                // ถ้ามันวิ่งมาบรรทัดนี้ แสดงว่าดึงค่า "UserId" ไม่ได้ มันเลยส่งคุณไปหน้า Login
+                return RedirectToAction("Login");
+            }
 
-    int userId = int.Parse(userIdStr);
-    var user = await _context.Users.FindAsync(userId);
-    var profile = await _context.UserProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
+            int userId = int.Parse(userIdStr);
+            var user = await _context.Users.FindAsync(userId);
+            var profile = await _context.UserProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
 
-    ViewBag.Profile = profile;
-    return View(user);
-}
+            ViewBag.Profile = profile;
+            return View(user);
+        }
 
-public IActionResult Logout()
+        public IActionResult Logout()
         {
             HttpContext.Session.Clear();
             return RedirectToAction("Login", "Account");

@@ -13,6 +13,8 @@ builder.Services.AddDbContext<HikeCycledbContext>(options =>
         connectionString, 
         ServerVersion.AutoDetect(connectionString)));
 
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDistributedMemoryCache(); // 1. จำเป็นสำหรับการเก็บ Session ใน Memory
