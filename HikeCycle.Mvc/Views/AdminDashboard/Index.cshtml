@@ -1,0 +1,53 @@
+@model IEnumerable<HikeCycle.Mvc.Models.db.Reviews>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "แผงควบคุมหลัก";
+}
+
+<div class="space-y-8">
+    <div>
+        <h1 class="text-3xl font-black text-gray-900">Dashboard</h1>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-5">
+            <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-2xl">
+                <i class="fa-solid fa-boxes-stacked"></i>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500 font-bold uppercase tracking-wider">สินค้าทั้งหมด</p>
+                <h3 class="text-3xl font-black">@ViewBag.TotalProducts</h3>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-5">
+            <div class="w-14 h-14 bg-yellow-50 text-yellow-600 rounded-2xl flex items-center justify-center text-2xl">
+                <i class="fa-solid fa-box-open"></i>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500 font-bold uppercase tracking-wider">สต็อกต่ำกว่า 5</p>
+                <h3 class="text-3xl font-black text-yellow-600">@ViewBag.LowStock</h3>
+            </div>
+        </div>
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-5">
+            <div class="w-14 h-14 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center text-2xl">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500 font-bold uppercase tracking-wider">สต็อกหมด</p>
+                <h3 class="text-3xl font-black text-red-600">@ViewBag.OutOfStock</h3>
+            </div>
+        </div>
+
+
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-5">
+            <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-2xl">
+                <i class="fa-solid fa-star"></i>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500 font-bold uppercase tracking-wider">รีวิวจากลูกค้า</p>
+                <h3 class="text-3xl font-black">@ViewBag.TotalReviews</h3>
+            </div>
+        </div>
+    </div>
+</div>
