@@ -270,7 +270,6 @@ namespace HikeCycle.Mvc.Controllers
 
             if (existingProduct == null) return NotFound();
 
-            // 2. อัปเดตเฉพาะ Field ที่เรายอมให้แก้จากหน้าบ้าน
             existingProduct.Name = updatedProduct.Name;
             existingProduct.Description = updatedProduct.Description;
             existingProduct.Category = updatedProduct.Category;
@@ -282,9 +281,6 @@ namespace HikeCycle.Mvc.Controllers
             existingProduct.Specs = updatedProduct.Specs;
             existingProduct.SuitableFor = updatedProduct.SuitableFor;
             existingProduct.Variants = updatedProduct.Variants;
-
-            // ⚠️ ไม่ต้องแตะต้อง existingProduct.Rating หรือ CreatedAt 
-            // ค่าเดิมใน DB จะยังคงอยู่เหมือนเดิม ไม่กลายเป็น NULL
 
             try
             {

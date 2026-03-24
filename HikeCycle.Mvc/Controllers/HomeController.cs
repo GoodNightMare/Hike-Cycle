@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore; // ✅ ต้องมีเพื่อให้ใช้ ToListAsync ได้
-using HikeCycle.Models; // ✅ เปลี่ยนให้ตรงกับ Namespace ของคุณ เพื่อให้หา HomeViewModel เจอ
-using HikeCycle.Mvc.Models.db; // ✅ เปลี่ยนให้ตรงกับที่อยู่ของ HikeCycledbContext
+using Microsoft.EntityFrameworkCore; 
+using HikeCycle.Models;
+using HikeCycle.Mvc.Models.db; 
 
 namespace HikeCycle.Controllers
 {
