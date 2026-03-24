@@ -33,7 +33,6 @@ namespace HikeCycle.Mvc.Controllers
                 ? new List<CartSessionItem>()
                 : JsonSerializer.Deserialize<List<CartSessionItem>>(sessionData) ?? new List<CartSessionItem>();
 
-            // 1. หาจำนวนสต็อกที่ "มีอยู่จริง" (Current DB Stock)
             int availableStock = product.Stock ?? 0;
 
             if (product.Category?.ToLower() == "shoes" && !string.IsNullOrEmpty(product.Variants) && !string.IsNullOrEmpty(Size))
@@ -51,9 +50,6 @@ namespace HikeCycle.Mvc.Controllers
                 }
             }
 
-            // 2. 🚩 แก้ไขจุดนี้: นับจำนวนสินค้า "ตัวเดียวกัน" ที่มีอยู่แล้วในตะกร้า
-            // ถ้าคุณใช้ระบบ 1 Item = 1 ชิ้น (กด 2 รอบได้ 2 แถว) ให้ใช้ .Count
-            // แต่ถ้าในอนาคตมีฟิลด์ Quantity ให้ใช้ .Sum(i => i.Quantity)
             var amountInCart = cart.Count(i =>
                 i.ProductId == ProductId &&
                 (product.Category?.ToLower() != "shoes" || i.Size == Size)
