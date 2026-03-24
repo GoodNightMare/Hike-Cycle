@@ -1,0 +1,115 @@
+﻿@using Microsoft.AspNetCore.Http
+@using System.Text.Json
+@using HikeCycle.Mvc.Models
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HikeCycle</title>
+    
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+
+    <style>
+        .main-color-bg-brown {
+        background-color: #4A3728;
+        }
+
+        /* สีน้ำตาลเข้มแบบเดินป่า */
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <header>
+        <nav class="main-color-bg-brown text-white shadow-md">
+            <div class="container mx-auto flex justify-between items-center px-4 py-6">
+                <a asp-controller="Home" asp-action="Index"
+                       class="flex gap-4 items-center hover:text-green-200 transition">
+                    <span class="text-3xl font-bold">Hike-Cycle</span>
+                    <span class="text-sm self-end hidden md:block">เช่าอุปกรณ์เดินป่า</span>
+                </a>
+
+                <div class="flex gap-8 text-lg">
+                    <div class="flex flex-col items-center group">
+                        <i class="fa-solid fa-tent text-xl group-hover:scale-110 transition"></i>
+                        <a asp-controller="Products" asp-action="Index" class="text-sm">สินค้า</a>
+                    </div>
+
+                    @{
+                        // ดึงข้อมูลจาก Session มานับจำนวน
+                        var sessionData = Context.Session.GetString("UserCart");
+                        int cartCount = 0;
+
+                        if (!string.IsNullOrEmpty(sessionData))
+                        {
+                            var cart = JsonSerializer.Deserialize<List<CartSessionItem>>(sessionData);
+                            cartCount = cart?.Count ?? 0;
+                        }
+                    }
+
+                    <div class="flex flex-col items-center group">
+                        <div class="relative">
+                            <i class="fa-solid fa-cart-shopping text-xl group-hover:scale-110 transition"></i>
+                            @if (cartCount > 0)
+                            {
+                                <span id="cart-count"
+                                      class="absolute -top-2 -right-3 bg-red-600 text-white rounded-full px-1.5 text-xs font-bold animate-pulse">
+                                    @cartCount
+                                </span>
+                            }
+                        </div>
+                        <a asp-controller="Cart" asp-action="Index" class="text-sm">ตะกร้า</a>
+                    </div>
+@{
+        // ดึงข้อมูล UserId จาก Session เพื่อเช็คสถานะการ Login
+        var sessionName = Context.Session.GetString("UserName"); 
+    }
+
+@if (string.IsNullOrEmpty(sessionName))
+    {
+        @* ถ้าไม่มีข้อมูลใน Session ให้โชว์ "เข้าสู่ระบบ" *@
+        <div class="flex flex-col items-center group">
+            <i class="fa-solid fa-circle-user text-xl group-hover:scale-110 transition"></i>
+            <a asp-controller="Account" asp-action="Login" class="text-sm">เข้าสู่ระบบ</a>
+        </div>
+    }
+    else
+    {
+        @* ถ้ามีข้อมูลใน Session ให้โชว์ "โปรไฟล์" *@
+        <div class="flex flex-col items-center group">
+            <i class="fa-solid fa-user-gear text-xl group-hover:scale-110 transition"></i>
+            <a asp-controller="Account" asp-action="Profile" class="text-sm">โปรไฟล์</a>
+        </div>
+    }
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    @* Main Content *@
+    <div class="container mx-auto min-h-screen">
+        <main role="main" class="py-6">
+            @RenderBody()
+        </main>
+    </div>
+
+    @* Footer *@
+    <footer class="bg-white border-t py-8 mt-10">
+        <div class="container mx-auto px-4 text-center text-gray-500">
+            &copy; 2026 - HikeCycle - <a asp-area="" asp-controller="Home" asp-action="Privacy"
+                                         class="hover:underline">Privacy</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

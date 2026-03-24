@@ -1,0 +1,387 @@
+@model HikeCycle.Mvc.Models.ProductDetailViewModel
+
+<div className=" min-h-screen">
+    <div className="max-w-6xl mx-auto p-2 bg-white rounded-xl shadow grid md:grid-cols-2 gap-8 relative">
+
+        <div id="bookingModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl transition-all">
+        <form asp-action="Add" asp-controller="Cart" method="post">
+            @* ส่งข้อมูลสำคัญผ่าน Hidden Inputs *@
+            <input type="hidden" name="ProductId" value="@Model.Product.Id" />
+            <input type="hidden" id="selectedSizeInput" name="Size" value="" />
+
+            <h2 class="text-xl font-bold mb-4 text-gray-800">
+                <i class="fa-solid fa-calendar-check mr-2"></i>จองสินค้า: @Model.Product.Name
+            </h2>
+
+            <div class="space-y-4">
+                @* วันที่เริ่มเช่า *@
+                <div>
+                    <label class="block text-sm font-semibold mb-1 text-gray-600">วันที่เริ่มเช่า</label>
+                    <input type="date" name="StartDate" id="startDate"
+                           min="@Model.MinStartDate" value="@Model.MinStartDate"
+                           class="border p-2 rounded-lg w-full focus:ring-2 focus:ring-black outline-none" required />
+                </div>
+
+                @* วันที่คืน *@
+                <div>
+                    <label class="block text-sm font-semibold mb-1 text-gray-600">วันที่คืน</label>
+                    <input type="date" name="EndDate" id="endDate"
+                           min="@Model.MinStartDate" value="@Model.MinEndDate"
+                           class="border p-2 rounded-lg w-full focus:ring-2 focus:ring-black outline-none" required />
+                </div>
+
+                @* เวลาคืน *@
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-sm font-semibold text-gray-600">เวลาคืน</label>
+                        <span id="timeWarning" class="text-red-500 text-[10px] hidden">08:00 - 20:00 เท่านั้น</span>
+                    </div>
+                    <input type="time" name="PickupTime" id="bookingTime"
+                           value="08:00" min="08:00" max="20:00"
+                           class="border p-2 rounded-lg w-full focus:ring-2 focus:ring-black outline-none" required />
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 mt-8">
+                <button type="button" onclick="closeModal()" 
+                        class="px-4 py-2 rounded-xl border text-gray-600 hover:bg-gray-50 transition font-medium">
+                    ยกเลิก
+                </button>
+                <button type="submit" id="confirmBtn"
+                        class="px-4 py-2 rounded-xl bg-black text-white hover:bg-gray-800 transition font-medium">
+                    ยืนยันการจอง
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div id="statusAlert" class="fixed top-5 right-5 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg z-[100] animate-bounce">
+        <i class="fa-solid fa-circle-check mr-2"></i> @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div id="statusAlert" class="fixed top-5 right-5 bg-red-500 text-white px-6 py-3 rounded-xl shadow-lg z-[100]">
+        <i class="fa-solid fa-circle-exclamation mr-2"></i> @TempData["ErrorMessage"]
+    </div>
+}
+
+@* --- 2. Modal แจ้งเตือนเมื่อยังไม่ได้ Login --- *@
+<div id="loginModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+    <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl">
+        <div class="text-center mb-4">
+            <i class="fa-solid fa-circle-user text-4xl text-gray-300"></i>
+        </div>
+        <h2 class="text-xl font-bold mb-2 text-center text-gray-800">ยังไม่ได้เข้าสู่ระบบ</h2>
+        <p class="text-gray-500 mb-6 text-center text-sm">
+            คุณต้องเข้าสู่ระบบก่อนจึงจะสามารถจองสินค้าได้
+        </p>
+
+        <div class="flex flex-col gap-2">
+            <a asp-action="Login" asp-controller="Account" 
+               class="w-full py-3 bg-black text-white rounded-xl font-bold text-center hover:bg-gray-800 transition">
+                เข้าสู่ระบบตอนนี้
+            </a>
+            <button onclick="document.getElementById('loginModal').classList.add('hidden')"
+                    class="w-full py-3 text-gray-500 font-medium hover:text-black transition">
+                ไว้ทีหลัง
+            </button>
+        </div>
+    </div>
+</div>
+
+
+        <div class="relative">
+            @* 1. ปุ่มย้อนกลับ (Back Button) *@
+            <a asp-action="Index" asp-controller="Products" 
+   class="absolute top-3 left-3 z-10 px-2 py-1 bg-white rounded-full shadow hover:bg-gray-100 transition border border-gray-100 flex items-center justify-center">
+    <i class="fa-solid fa-arrow-left text-gray-700"></i>
+</a>
+
+            @* 2. รูปภาพหลัก (Main Image) *@
+            <div
+                class="rounded-lg w-full h-[480px] bg-gray-50 p-5 flex items-center justify-center border border-gray-100 overflow-hidden">
+                @if (Model.Product.ProductImages != null && Model.Product.ProductImages.Any())
+                {
+                    <img id="mainProductImage" src="@Model.Product.ProductImages.First().ImageUrl" alt="@Model.Product.Name"
+                         class="max-w-full max-h-full object-contain transition-opacity duration-300" />
+                }
+                else
+                {
+                    <div class="text-gray-400 flex flex-col items-center">
+                        <i class="fa-regular fa-image text-5xl mb-2"></i>
+                        <span>ไม่มีรูปภาพสินค้า</span>
+                    </div>
+                }
+            </div>
+
+            @* 3. รูป Thumbnail (Gallery) *@
+            <div class="flex flex-wrap gap-3 mt-4">
+                @if (Model.Product.ProductImages != null)
+                {
+                    foreach (var img in Model.Product.ProductImages)
+                    {
+                        <img src="@img.ImageUrl" alt="Thumbnail" onclick="changeMainImage(this)"
+                             class="thumb-img w-20 h-20 object-contain rounded-lg cursor-pointer border-2 border-gray-200 hover:border-gray-400 transition-all bg-white p-1" />
+                    }
+                }
+            </div>
+        </div>
+
+
+        <div>
+
+            @* 1. ชื่อและแบรนด์ *@
+            <h1 class="text-3xl font-bold text-gray-900">@Model.Product.Name</h1>
+            <p class="text-gray-500 mt-1">@Model.Product.Brand</p>
+
+            @* 2. Rating และ รีวิว *@
+            <div class="flex items-center gap-2 mt-2 text-sm text-gray-600 underline hover:text-red-500 cursor-pointer">
+                <i class="fa-solid fa-star text-yellow-400"></i>
+                <a asp-action="Index" asp-controller="Reviews" asp-route-id="@Model.Product.Id">
+                    @Model.Rating.ToString("F2") (@Model.ReviewCount รีวิว)
+                </a>
+            </div>
+
+            @* 3. ราคา *@
+            <p class="text-4xl text-green-600 font-bold mt-5">
+                ฿@Model.Product.PricePerDay.GetValueOrDefault().ToString("N0")
+                <span class="text-sm text-gray-500 font-normal"> / วัน</span>
+            </p>
+
+            @* 4. คำอธิบาย *@
+            <div class="mt-8 border-t pt-6">
+                <h3 class="font-semibold text-lg mb-2">คำอธิบาย</h3>
+                <p class="text-gray-700 leading-relaxed">
+                    @Model.Product.Description
+                </p>
+            </div>
+
+            @* 5. ข้อมูลทางเทคนิค (Specs) - ดึงจาก ViewModel ที่ Controller Parse ไว้แล้ว *@
+            @if (Model.Specs.HasValue)
+            {
+                var s = Model.Specs.Value;
+                <div class="mt-8 bg-gray-50 rounded-lg p-4">
+                    <h3 class="font-semibold text-lg mb-3">ข้อมูลทางเทคนิค</h3>
+                    <ul class="space-y-2 text-sm">
+                        @if (s.TryGetProperty("capacity", out var cap))
+                        {
+                            <li class="flex gap-2 items-center"><i class="fa-solid fa-check text-green-600"></i> ความจุ:
+                                @cap.GetString()</li>
+                            }
+                            @if (s.TryGetProperty("weight_kg", out var weight))
+                            {
+                                <li class="flex gap-2"><i class="fa-solid fa-check text-green-600"></i> น้ำหนัก:
+                                    @weight.GetRawText()
+                                    กิโลกรัม</li>
+                                }
+                                @if (s.TryGetProperty("material", out var mat))
+                                {
+                                    <li class="flex gap-2"><i class="fa-solid fa-check text-green-600"></i> วัสดุ: @mat.GetString()</li>
+                                }
+                                @if (s.TryGetProperty("waterproof", out var wp))
+                                {
+                                    <li class="flex gap-2">
+                                        <i
+                                        class="fa-solid @(wp.GetBoolean() ? "fa-check text-green-600" : "fa-xmark text-red-500")"></i>
+                                        กันน้ำ: @(wp.GetBoolean() ? "ได้" : "ไม่ได้")
+                                    </li>
+                                }
+                                @* --- 5. ความสว่าง (ไฟฉาย) --- *@
+            @if (s.TryGetProperty("brightness_lumen", out var bright)) {
+                <li class="flex gap-2 items-center"><i class="fa-solid fa-check text-green-600"></i> ความสว่าง: @bright.GetRawText() ลูเมน</li>
+            }
+
+            @* --- 6. ขนาด (Dimensions) --- *@
+            @if (s.TryGetProperty("dimensions_cm", out var dim)) {
+                <li class="flex gap-2 items-center"><i class="fa-solid fa-check text-green-600"></i> ขนาด (กxยxส): @dim.GetString() ซม.</li>
+            }
+
+            @* --- 7. การปรับระดับ --- *@
+            @if (s.TryGetProperty("adjustable", out var adj)) {
+                <li class="flex gap-2 items-center"><i class="fa-solid fa-check text-green-600"></i> ปรับความยาวได้: @adj.GetString()</li>
+            }
+
+            @* --- 8. โหมดการใช้งาน --- *@
+            @if (s.TryGetProperty("mode", out var mode)) {
+                <li class="flex gap-2 items-center"><i class="fa-solid fa-check text-green-600"></i> โหมด: @mode.GetString()</li>
+            }
+
+            @* --- 9. ประเภทแบตเตอรี่ --- *@
+            @if (s.TryGetProperty("battery_type", out var batt)) {
+                <li class="flex gap-2 items-center"><i class="fa-solid fa-check text-green-600"></i> ประเภทแบตเตอรี่: @batt.GetString()</li>
+            }
+                            </ul>
+                        </div>
+                    }
+
+                    @* 6. เหมาะสำหรับ (Suitable For) *@
+                    <div class="mt-6">
+                        <h3 class="font-semibold text-lg mb-2">เหมาะสำหรับ</h3>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach (var tag in Model.SuitableFor)
+                            {
+                                <span class="px-3 py-1 text-sm bg-gray-100 rounded-full text-gray-700">@tag</span>
+                            }
+                        </div>
+                    </div>
+
+                    @* 7. ระดับผู้ใช้งาน *@
+                    <div class="mt-4">
+                        <h3 class="font-semibold text-lg mb-1 text-gray-800">ระดับผู้ใช้งาน</h3>
+                        <span class="inline-block px-3 py-1 text-sm bg-green-100 text-green-700 rounded-full font-medium">
+                            @Model.Product.Level
+                        </span>
+                    </div>
+
+                    @* 8. เลือกไซส์รองเท้า (เฉพาะหมวดรองเท้า) *@
+                    @if (Model.Product.Category == "shoes" && Model.Variants != null && Model.Variants.Any())
+                    {
+                        <div class="mt-6">
+                            <h3 class="font-semibold text-lg mb-2 text-gray-800">ไซส์รองเท้า</h3>
+                            <div class="flex flex-wrap gap-2">
+                                @foreach (var v in Model.Variants)
+                                {
+                                    // ใช้ GetRawText() เพื่อรองรับทั้งไซส์ 36 (Int) หรือ "S/M" (String)
+                                    var size = v.GetProperty("size").GetRawText().Replace("\"", ""); 
+                                    var stock = v.GetProperty("stock").GetInt32();
+                                    
+                                    <button type="button" 
+                                            id="btn-size-@size" 
+                                            onclick="selectSize('@size')" 
+                                            @(stock == 0 ? "disabled" : "")
+                                            class="px-4 py-2 rounded border text-sm font-bold transition-all
+                                            @(stock == 0 ? "bg-gray-100 text-gray-300 cursor-not-allowed border-gray-100" : "bg-white border-gray-200 hover:border-black")">
+                                        @size (@stock)
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @{
+    // เช็คจาก Session ที่เราทำไว้ใน Layout
+    var sessionUser = Context.Session.GetString("UserId");
+    bool isLoggedIn = !string.IsNullOrEmpty(sessionUser);
+    
+    // ถ้าเป็นรองเท้า ให้ปิดปุ่มไว้ก่อนจนกว่าจะเลือกไซส์ (ใช้ CSS class 'opacity-50' และ 'pointer-events-none')
+    bool isInitialDisabled = Model.TotalStock == 0 || Model.Product.Category == "shoes";
+}
+
+<button type="button"
+        id="btn-book"
+        onclick="handleBookingClick(event,@(isLoggedIn ? 1 : 0))"
+        @(Model.TotalStock == 0 ? "disabled" : "")
+        class="mt-6 w-full py-3 rounded text-white font-bold transition-all
+        @(Model.TotalStock == 0 ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-800")
+        @(Model.Product.Category == "shoes" ? "opacity-50 pointer-events-none" : "")
+        ">
+    
+    @(Model.TotalStock == 0 ? "สินค้าหมด" : "จองสินค้าเช่า")
+</button>
+
+<div class="flex justify-end text-sm mt-3 text-gray-500">
+    <p>พร้อมให้เช่า: <span class="font-bold text-black" id="display-stock">@Model.TotalStock</span> ชิ้น</p>
+</div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+
+        function closeModal() {
+            // 🚩 เช็ค ID ให้ตรงกับ id="..." ของ <div> ที่เป็น Modal ของคุณ
+            const modal = document.getElementById('bookingModal'); 
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        }
+        
+        // ฟังก์ชันเปลี่ยนรูปภาพหลัก
+        function changeMainImage(element) {
+            var mainImg = document.getElementById('mainProductImage');
+            if (mainImg) {
+                mainImg.src = element.src;
+                
+                // เปลี่ยนเส้นขอบรูปที่เลือก
+                document.querySelectorAll('.thumb-img').forEach(img => {
+                    img.classList.remove('border-black');
+                    img.classList.add('border-gray-200'); // คืนค่าสีขอบปกติ
+                });
+                element.classList.add('border-black');
+                element.classList.remove('border-gray-200');
+            }
+        }
+
+        // ฟังก์ชันเลือกไซส์
+        let currentSize = "";
+        function selectSize(size) {
+            currentSize = size;
+            // ส่งค่าไปที่ Hidden Input ใน Form เพื่อเอาไปใช้ใน Controller
+            var sizeInput = document.getElementById('selectedSizeInput');
+            if(sizeInput) sizeInput.value = size;
+            
+            // UI: เปลี่ยนสีปุ่ม
+            document.querySelectorAll('[id^="btn-size-"]').forEach(btn => {
+                btn.classList.remove('bg-black', 'text-white');
+                btn.classList.add('bg-white', 'text-black');
+            });
+            
+            const activeBtn = document.getElementById('btn-size-' + size);
+            if(activeBtn) {
+                activeBtn.classList.add('bg-black', 'text-white');
+                activeBtn.classList.remove('bg-white', 'text-black');
+            }
+        }
+
+        // ฟังก์ชันเปิด/ปิด Modal (ถ้าต้องการให้กดจองแล้วเด้งหน้าต่างขึ้นมา)
+function handleBookingClick(event, isLoggedIn) {
+            // 🚩 สั่งหยุดการทำงานทุกอย่างไว้ก่อน
+            event.preventDefault();
+
+            console.log("Is User Logged In?:", isLoggedIn);
+
+            if (!isLoggedIn) {
+                // ❌ ถ้าไม่ได้ Login ให้โชว์ Modal แจ้งเตือน และ "จบการทำงานตรงนี้"
+                toggleLoginModal(true); 
+                return false; 
+            } 
+            
+            // ✅ ถ้า Login แล้ว ถึงจะให้เปิด Modal สำหรับเลือกวันที่จอง
+            toggleBookingModal(true);
+        }
+
+        function toggleLoginModal(show) {
+            const modal = document.getElementById('loginModal');
+            if (modal) {
+                if (show) modal.classList.remove('hidden');
+                else modal.classList.add('hidden');
+            }
+        }
+
+        // 3. ฟังก์ชันเปิด-ปิด Modal จองสินค้า (ตัวที่มีปัญหา)
+        function toggleBookingModal(show) {
+            const modal = document.getElementById('bookingModal');
+            if (modal) {
+                if (show) modal.classList.remove('hidden');
+                else modal.classList.add('hidden');
+            }
+        }
+
+        function closeModal() {
+            toggleBookingModal(false);
+            toggleLoginModal(false);
+        }
+
+        setTimeout(() => {
+        const alert = document.getElementById('statusAlert');
+        if (alert) alert.style.display = 'none';
+    }, 3000);
+    </script>
+}

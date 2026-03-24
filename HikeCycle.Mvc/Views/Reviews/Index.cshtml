@@ -1,0 +1,83 @@
+@model IEnumerable<HikeCycle.Mvc.Models.Dto.ReviewDto>
+@{
+    var product = ViewBag.Product as HikeCycle.Mvc.Models.db.Product;
+    ViewData["Title"] = "รีวิวสินค้า - " + product.Name;
+
+    // คำนวณค่าสถิติ
+    int total = Model.Count();
+    double avgRating = total > 0 ? Model.Average(r => r.Rating) : 0;
+}
+
+<div class="max-w-3xl mx-auto p-6">
+    @* ปุ่มย้อนกลับ *@
+    <a href="javascript:history.back()" class="flex items-center text-gray-500 hover:text-black mb-6 transition-colors group">
+        <i class="fa-solid fa-chevron-left mr-2 group-hover:-translate-x-1 transition-transform"></i>
+        <span>ย้อนกลับไปหน้าสินค้า</span>
+    </a>
+
+    <h1 class="text-3xl font-bold mb-2">รีวิวจากผู้เช่าจริง</h1>
+    <p class="text-gray-500 mb-8">@product.Name</p>
+
+    @* ส่วนสรุปคะแนน (Rating Summary Card) *@
+    <div class="bg-white border rounded-3xl p-8 mb-10 shadow-sm flex flex-col md:flex-row gap-10 items-center">
+        <div class="text-center">
+            <p class="text-6xl font-black mb-2">@avgRating.ToString("0.00")</p>
+            <div class="flex justify-center mb-1 text-yellow-400">
+                @for (int i = 1; i <= 5; i++) {
+                    <i class="fa-solid fa-star @(i <= Math.Round(avgRating) ? "" : "text-gray-200")"></i>
+                }
+            </div>
+            <p class="text-gray-400 text-sm">@total รีวิว</p>
+        </div>
+
+        @* กราฟแท่งคะแนน *@
+        <div class="flex-1 w-full space-y-2">
+            @foreach (int star in new int[] { 5, 4, 3, 2, 1 }) {
+                int count = Model.Count(r => r.Rating == star);
+                double percent = total > 0 ? (double)count / total * 100 : 0;
+                
+                <div class="flex items-center gap-4">
+                    <span class="text-sm font-medium w-4">@star</span>
+                    <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-yellow-400 rounded-full" style="width: @(percent)%"></div>
+                    </div>
+                    <span class="text-sm text-gray-400 w-8">@count</span>
+                </div>
+            }
+        </div>
+    </div>
+
+    @* รายการรีวิว *@
+    <div class="space-y-8">
+        @if (Model.Any()) {
+            @foreach (var rev in Model) {
+                <div class="border-b border-gray-100 pb-8">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 text-xl">
+                            <i class="fa-solid fa-circle-user"></i>
+                        </div>
+                        <div>
+                            @* สมมติว่าใน Model Review มี property ชื่อ UserName *@
+                            <h4 class="font-bold text-gray-900">@rev.UserName</h4>
+                            <div class="flex gap-1 text-xs">
+                                @for (int i = 1; i <= 5; i++) {
+                                    <i class="fa-solid fa-star @(i <= rev.Rating ? "text-yellow-400" : "text-gray-200")"></i>
+                                }
+                            </div>
+                        </div>
+                        <span class="ml-auto text-sm text-gray-400">
+                            @(rev.CreatedAt.HasValue ? rev.CreatedAt.Value.ToString("dd MMMM yyyy", new System.Globalization.CultureInfo("th-TH")) : "")
+                        </span>
+                    </div>
+                    <p class="text-gray-600 leading-relaxed pl-16">
+                        @rev.Comment
+                    </p>
+                </div>
+            }
+        } else {
+            <div class="text-center py-20 text-gray-400">
+                ยังไม่มีรีวิวสำหรับสินค้านี้
+            </div>
+        }
+    </div>
+</div>
