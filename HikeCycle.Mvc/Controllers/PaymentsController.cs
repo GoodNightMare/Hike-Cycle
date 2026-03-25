@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using HikeCycle.Mvc.Models;
 using HikeCycle.Mvc.Models.db;
+using HikeCycle.Mvc.Models.Dto;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json; // 🚩 ต้องใช้ตัวนี้เพื่อจัดการ JSON
 using System.Linq;
@@ -17,52 +18,33 @@ namespace HikeCycle.Mvc.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(decimal originalTotal, decimal totalDiscount, decimal finalTotal)
         {
-            // ดึงค่า String จาก Session ตรงๆ
-            var cartJson = HttpContext.Session.GetString("UserCart");
-            var cartItems = string.IsNullOrEmpty(cartJson) 
-                ? new List<CartSessionItem>() 
-                : JsonSerializer.Deserialize<List<CartSessionItem>>(cartJson);
-
-            decimal originalTotal = 0;
-    if (cartItems != null)
-    {
-        foreach (var item in cartItems)
-        {
-            if (item.IsFree) continue;
-            var start = DateTime.Parse(item.StartDate);
-            var end = DateTime.Parse(item.EndDate);
-            int days = (end - start).Days;
-            if (days <= 0) days = 1;
-            originalTotal += item.PricePerDay * days;
-        }
-    }
-
-    // สมมติว่าดึงค่าส่วนลดมา (หรือถ้าคุณเก็บก้อน CalculationResult ไว้ใน Session ก็ดึงมาใช้ได้เลย)
-    // ในที่นี้ผมจะคำนวณแบบง่ายๆ หรือถ้าคุณมี Service คำนวณให้เรียกใช้ตรงนี้ครับ
-    decimal finalTotal = originalTotal; 
-    // ตัวอย่าง: ถ้าเป็นนักศึกษาลด 10% (ตาม Logic โปรเจกต์คุณ)
-    // finalTotal = originalTotal * 0.9m; 
-
-    var model = new PaymentViewModel { 
-        Amount = finalTotal // 🚩 ส่งค่าที่คำนวณสุทธิแล้วไป
-    };
-    return View(model);
+            var model = new PaymentViewModel { 
+                OriginalTotal = originalTotal,
+                TotalDiscount = totalDiscount,
+                Amount = finalTotal
+            };
+            return View(model);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(PaymentViewModel model)
         {
-            // 1. ดึงข้อมูลจากตะกร้าแบบ Manual
-            var cartJson = HttpContext.Session.GetString("Cart");
+            var userIdStr = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userIdStr))
+            {
+                return RedirectToAction("Login", "Account"); // User not logged in
+            }
+            int userId = int.Parse(userIdStr);
+
+            var cartJson = HttpContext.Session.GetString("UserCart");
             if (string.IsNullOrEmpty(cartJson))
             {
                 return RedirectToAction("Index", "Cart");
             }
 
             var cartItems = JsonSerializer.Deserialize<List<CartSessionItem>>(cartJson);
-
             if (cartItems == null || !cartItems.Any())
             {
                 return RedirectToAction("Index", "Cart");
@@ -72,37 +54,72 @@ namespace HikeCycle.Mvc.Controllers
             {
                 try
                 {
-                    // 2. สร้าง Booking
+                    var validCartItems = cartItems.Where(i => !i.IsFree && !string.IsNullOrEmpty(i.StartDate)).ToList();
+                    var minDate = validCartItems.Min(i => DateTime.Parse(i.StartDate));
+                    var maxDate = validCartItems.Max(i => DateTime.Parse(i.EndDate));
+
                     var newBooking = new Booking
                     {
-                        UserId = 1, // สมมติ User ID
-                        StartDate = DateTime.Parse(cartItems.First().StartDate),
-                        EndDate = DateTime.Parse(cartItems.First().EndDate),
-                        TotalAmount = model.Amount,
+                        UserId = userId,
+                        StartDate = minDate,
+                        EndDate = maxDate,
+                        TotalAmount = model.OriginalTotal,
+                        DiscountAmount = model.TotalDiscount,
                         FinalAmount = model.Amount,
                         Status = "Confirmed",
                         CreatedAt = DateTime.Now
                     };
                     _context.Bookings.Add(newBooking);
-                    await _context.SaveChangesAsync(); 
+                    await _context.SaveChangesAsync();
 
-                    // 3. สร้าง BookingItems
                     foreach (var item in cartItems)
                     {
                         var bookingItem = new BookingItem
                         {
                             BookingId = newBooking.Id,
-                            ProductId = item.ProductId, 
+                            ProductId = item.ProductId,
                             Size = item.Size,
-                            Quantity = 1,
+                            Quantity = 1, // Each cart item is one quantity
                             PricePerDay = item.PricePerDay,
-                            ItemTotal = item.PricePerDay * (newBooking.EndDate - newBooking.StartDate).Days,
                             IsFree = item.IsFree
                         };
+
+                        if (!item.IsFree)
+                        {
+                            var itemStartDate = DateTime.Parse(item.StartDate);
+                            var itemEndDate = DateTime.Parse(item.EndDate);
+                            var itemDays = (itemEndDate - itemStartDate).Days;
+                            if (itemDays <= 0) itemDays = 1;
+                            bookingItem.ItemTotal = item.PricePerDay * itemDays;
+                        }
+                        else
+                        {
+                            bookingItem.ItemTotal = 0;
+                        }
+
                         _context.BookingItems.Add(bookingItem);
+
+                        // Update Stock
+                        var product = await _context.Products.FindAsync(item.ProductId);
+                        if (product != null)
+                        {
+                            if (product.Category?.ToLower() == "shoes" && !string.IsNullOrEmpty(item.Size) && !string.IsNullOrEmpty(product.Variants))
+                            {
+                                var variants = JsonSerializer.Deserialize<List<ProductVariantDto>>(product.Variants) ?? new List<ProductVariantDto>();
+                                var variant = variants.FirstOrDefault(v => v.Size == item.Size);
+                                if (variant != null)
+                                {
+                                    variant.Stock -= 1; // Decrease stock by 1
+                                }
+                                product.Variants = JsonSerializer.Serialize(variants);
+                            }
+                            else
+                            {
+                                product.Stock = (product.Stock ?? 1) - 1; // Decrease stock by 1
+                            }
+                        }
                     }
 
-                    // 4. สร้าง Payment
                     var payment = new Payment
                     {
                         BookingId = newBooking.Id,
@@ -114,17 +131,17 @@ namespace HikeCycle.Mvc.Controllers
                     _context.Payments.Add(payment);
 
                     await _context.SaveChangesAsync();
-                    await transaction.CommitAsync(); 
+                    await transaction.CommitAsync();
 
-                    // ล้าง Session
-                    HttpContext.Session.Remove("Cart");
+                    HttpContext.Session.Remove("UserCart");
 
-                    return RedirectToAction("Success", new { id = newBooking.Id });
+                    // Redirect to a success page, passing the new booking ID
+                    return RedirectToAction("Success", "Bookings", new { id = newBooking.Id });
                 }
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    ModelState.AddModelError("", "เกิดข้อผิดพลาด: " + ex.Message);
+                    ModelState.AddModelError("", "An error occurred during the checkout process: " + ex.Message);
                     return View("Index", model);
                 }
             }
