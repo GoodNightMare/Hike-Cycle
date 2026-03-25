@@ -3,21 +3,26 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HikeCycle.Mvc.Models.db
 {
+    [Table("payments")] // 🚩 ระบุชื่อตารางให้เป็นตัวเล็กตามใน MySQL
     public class Payment
     {
         [Key]
+        [Column("id")] // 🚩 ระบุชื่อคอลัมน์ให้ตรงกับ SQL
         public int Id { get; set; }
 
+        [Column("booking_id")] // 🚩 ตรงกับ booking_id ใน SQL
         public int BookingId { get; set; }
 
-        [Column(TypeName = "decimal(18,2)")]
+        [Column("amount", TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
 
-        // เก็บเป็น Enum เพื่อให้เขียน C# ง่าย (เช่น if(p.Method == PaymentMethod.Bank))
+        [Column("method")]
         public PaymentMethod Method { get; set; }
 
+        [Column("status")]
         public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
 
+        [Column("created_at")] // 🚩 ตรงกับ created_at ใน SQL
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         // Navigation Property
