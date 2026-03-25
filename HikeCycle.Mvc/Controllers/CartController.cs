@@ -22,6 +22,12 @@ namespace HikeCycle.Mvc.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(int ProductId, string StartDate, string EndDate, string? Size)
         {
+            if (DateTime.Parse(StartDate) > DateTime.Parse(EndDate))
+            {
+                TempData["ErrorMessage"] = "วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่มต้น";
+                return RedirectToAction("Details", "Products", new { id = ProductId });
+            }
+
             var product = await _context.Products
                 .Include(p => p.ProductImages)
                 .FirstOrDefaultAsync(p => p.Id == ProductId);
@@ -240,6 +246,120 @@ namespace HikeCycle.Mvc.Controllers
                     HttpContext.Session.SetString(CartSessionKey, JsonSerializer.Serialize(cartItems));
                 }
             }
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult UpdateDate(string id, string startDate, string endDate)
+        {
+            if (DateTime.Parse(startDate) > DateTime.Parse(endDate))
+            {
+                TempData["ErrorMessage"] = "วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่มต้น";
+                return RedirectToAction("Index");
+            }
+
+            var sessionData = HttpContext.Session.GetString(CartSessionKey);
+            if (string.IsNullOrEmpty(sessionData))
+            {
+                return RedirectToAction("Index");
+            }
+
+            var cartItems = JsonSerializer.Deserialize<List<CartSessionItem>>(sessionData);
+            var itemToUpdate = cartItems.FirstOrDefault(item => item.Id == id);
+
+            if (itemToUpdate != null)
+            {
+                itemToUpdate.StartDate = startDate;
+                itemToUpdate.EndDate = endDate;
+                HttpContext.Session.SetString(CartSessionKey, JsonSerializer.Serialize(cartItems));
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public IActionResult DecreaseQuantity(string id)
+        {
+            var sessionData = HttpContext.Session.GetString(CartSessionKey);
+            if (string.IsNullOrEmpty(sessionData))
+            {
+                return RedirectToAction("Index");
+            }
+
+            var cartItems = JsonSerializer.Deserialize<List<CartSessionItem>>(sessionData);
+            var itemToRemove = cartItems.FirstOrDefault(item => item.Id == id);
+
+            if (itemToRemove != null && itemToRemove.IsRemovable)
+            {
+                cartItems.Remove(itemToRemove);
+                HttpContext.Session.SetString(CartSessionKey, JsonSerializer.Serialize(cartItems));
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> IncreaseQuantity(string id)
+        {
+            var sessionData = HttpContext.Session.GetString(CartSessionKey);
+            if (string.IsNullOrEmpty(sessionData))
+            {
+                return RedirectToAction("Index");
+            }
+
+            var cartItems = JsonSerializer.Deserialize<List<CartSessionItem>>(sessionData);
+            var existingItem = cartItems.FirstOrDefault(item => item.Id == id);
+
+            if (existingItem == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            var product = await _context.Products.FindAsync(existingItem.ProductId);
+            if (product == null) return NotFound();
+
+            int availableStock = product.Stock ?? 0;
+
+            if (product.Category?.ToLower() == "shoes" && !string.IsNullOrEmpty(product.Variants) && !string.IsNullOrEmpty(existingItem.Size))
+            {
+                using (var doc = JsonDocument.Parse(product.Variants))
+                {
+                    var variant = doc.RootElement.EnumerateArray()
+                        .FirstOrDefault(v => v.GetProperty("size").GetRawText().Replace("\"", "") == existingItem.Size);
+
+                    if (variant.ValueKind != JsonValueKind.Undefined)
+                        availableStock = variant.GetProperty("stock").GetInt32();
+                    else
+                        availableStock = 0;
+                }
+            }
+
+            var amountInCart = cartItems.Count(i =>
+                i.ProductId == existingItem.ProductId &&
+                (product.Category?.ToLower() != "shoes" || i.Size == existingItem.Size)
+            );
+
+            if (amountInCart + 1 > availableStock)
+            {
+                TempData["ErrorMessage"] = $"ไม่สามารถเพิ่มได้ เนื่องจากสต็อกสินค้า (รวมในตะกร้า) มีเพียง {availableStock} ชิ้น";
+                return RedirectToAction("Index");
+            }
+
+            cartItems.Add(new CartSessionItem
+            {
+                ProductId = existingItem.ProductId,
+                ProductName = existingItem.ProductName,
+                ImageUrl = existingItem.ImageUrl,
+                PricePerDay = existingItem.PricePerDay,
+                Category = existingItem.Category,
+                Size = existingItem.Size,
+                StartDate = existingItem.StartDate,
+                EndDate = existingItem.EndDate,
+                Id = Guid.NewGuid().ToString() // New Id for the new item
+            });
+
+            HttpContext.Session.SetString(CartSessionKey, JsonSerializer.Serialize(cartItems));
 
             return RedirectToAction("Index");
         }
