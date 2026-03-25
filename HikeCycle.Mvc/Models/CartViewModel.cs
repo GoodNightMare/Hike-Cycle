@@ -10,5 +10,7 @@ namespace HikeCycle.Mvc.Models
         public List<Promotion> Promotions { get; set; }
         public CartCalculationResult CalculationResult { get; set; }
         public bool IsStudent { get; set; }
+
+        public int? BookingId { get; set; }
     }
 }
