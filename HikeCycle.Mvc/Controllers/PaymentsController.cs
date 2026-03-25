@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json; // 🚩 ต้องใช้ตัวนี้เพื่อจัดการ JSON
 using System.Linq;
 using System.Threading.Tasks;
+using System.Globalization; // 🚩 เพิ่มบรรทัดนี้
 
 namespace HikeCycle.Mvc.Controllers
 {
@@ -18,12 +19,14 @@ namespace HikeCycle.Mvc.Controllers
             _context = context;
         }
 
-        public IActionResult Index(decimal originalTotal, decimal totalDiscount, decimal finalTotal)
+        public IActionResult Index(decimal originalTotal, decimal totalDiscount, decimal finalTotal, string shippingAddress)
         {
-            var model = new PaymentViewModel { 
+            var model = new PaymentViewModel
+            {
                 OriginalTotal = originalTotal,
                 TotalDiscount = totalDiscount,
-                Amount = finalTotal
+                Amount = finalTotal,
+                ShippingAddress = shippingAddress
             };
             return View(model);
         }
@@ -54,9 +57,22 @@ namespace HikeCycle.Mvc.Controllers
             {
                 try
                 {
+                    // --- ส่วนที่ต้องแก้ไข ---
                     var validCartItems = cartItems.Where(i => !i.IsFree && !string.IsNullOrEmpty(i.StartDate)).ToList();
-                    var minDate = validCartItems.Min(i => DateTime.Parse(i.StartDate));
-                    var maxDate = validCartItems.Max(i => DateTime.Parse(i.EndDate));
+
+                    if (!validCartItems.Any())
+                    {
+                        ModelState.AddModelError("", "ไม่พบรายการสินค้าที่ระบุวันที่จอง");
+                        return View("Index", model);
+                    }
+
+                    var userProfile = await _context.UserProfiles.AsNoTracking()
+                                        .FirstOrDefaultAsync(p => p.UserId == userId);
+
+                    // 🚩 ใช้ ParseExact เพื่อให้อ่านรูปแบบ "2026-03-26" ได้ถูกต้อง
+                    var minDate = validCartItems.Min(i => DateTime.ParseExact(i.StartDate, "yyyy-MM-dd", CultureInfo.InvariantCulture));
+                    var maxDate = validCartItems.Max(i => DateTime.ParseExact(i.EndDate, "yyyy-MM-dd", CultureInfo.InvariantCulture));
+                    // ----------------------
 
                     var newBooking = new Booking
                     {
@@ -67,6 +83,7 @@ namespace HikeCycle.Mvc.Controllers
                         DiscountAmount = model.TotalDiscount,
                         FinalAmount = model.Amount,
                         Status = "Confirmed",
+                        ShippingAddress = model.ShippingAddress,
                         CreatedAt = DateTime.Now
                     };
                     _context.Bookings.Add(newBooking);
@@ -86,8 +103,9 @@ namespace HikeCycle.Mvc.Controllers
 
                         if (!item.IsFree)
                         {
-                            var itemStartDate = DateTime.Parse(item.StartDate);
-                            var itemEndDate = DateTime.Parse(item.EndDate);
+                            var itemStartDate = DateTime.ParseExact(item.StartDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                            var itemEndDate = DateTime.ParseExact(item.EndDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+
                             var itemDays = (itemEndDate - itemStartDate).Days;
                             if (itemDays <= 0) itemDays = 1;
                             bookingItem.ItemTotal = item.PricePerDay * itemDays;
@@ -103,19 +121,49 @@ namespace HikeCycle.Mvc.Controllers
                         var product = await _context.Products.FindAsync(item.ProductId);
                         if (product != null)
                         {
-                            if (product.Category?.ToLower() == "shoes" && !string.IsNullOrEmpty(item.Size) && !string.IsNullOrEmpty(product.Variants))
+                            try
                             {
-                                var variants = JsonSerializer.Deserialize<List<ProductVariantDto>>(product.Variants) ?? new List<ProductVariantDto>();
-                                var variant = variants.FirstOrDefault(v => v.Size == item.Size);
-                                if (variant != null)
+                                if (product.Category?.ToLower() == "shoes" && !string.IsNullOrEmpty(product.Variants))
                                 {
-                                    variant.Stock -= 1; // Decrease stock by 1
+                                    // 🚩 ใช้ JsonDocument เพื่อความยืดหยุ่นในการอ่านค่า "size" ที่เป็นได้ทั้ง Int และ String
+                                    using (JsonDocument doc = JsonDocument.Parse(product.Variants))
+                                    {
+                                        var updatedVariants = new List<object>();
+                                        bool isFound = false;
+
+                                        foreach (var v in doc.RootElement.EnumerateArray())
+                                        {
+                                            // อ่านค่าจาก JSON เดิม
+                                            string vSize = v.GetProperty("size").ToString();
+                                            int vStock = v.GetProperty("stock").GetInt32();
+
+                                            // ถ้าเจอ Size ที่ตรงกัน ให้ลดสต็อก
+                                            if (!isFound && vSize == item.Size)
+                                            {
+                                                vStock = Math.Max(0, vStock - 1);
+                                                isFound = true;
+                                            }
+
+                                            // เก็บค่ากลับเข้า List โดยรักษา Data Type เดิมของ size ไว้
+                                            updatedVariants.Add(new
+                                            {
+                                                size = v.GetProperty("size").ValueKind == JsonValueKind.Number ? (object)v.GetProperty("size").GetInt32() : vSize,
+                                                stock = vStock
+                                            });
+                                        }
+                                        // Serialize กลับเป็น JSON string ลงฐานข้อมูล
+                                        product.Variants = JsonSerializer.Serialize(updatedVariants);
+                                    }
                                 }
-                                product.Variants = JsonSerializer.Serialize(variants);
+
+                                // ลดสต็อกรวมของสินค้าทุกประเภทด้วย
+                                product.Stock = Math.Max(0, (product.Stock ?? 1) - 1);
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                product.Stock = (product.Stock ?? 1) - 1; // Decrease stock by 1
+                                // ถ้า JSON พัง ให้ลดแค่สต็อกหลักและปล่อยผ่าน เพื่อให้ Transaction ไม่ล่ม
+                                System.Diagnostics.Debug.WriteLine("Stock Update Error: " + ex.Message);
+                                product.Stock = Math.Max(0, (product.Stock ?? 1) - 1);
                             }
                         }
                     }

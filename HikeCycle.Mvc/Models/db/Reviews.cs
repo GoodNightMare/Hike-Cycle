@@ -16,6 +16,9 @@ namespace HikeCycle.Mvc.Models.db
         [Column("product_id")]
         public required int ProductId { get; set; }
 
+        [Column("booking_id")]
+        public int BookingId { get; set; }
+
         [Column("rating")]
         public required int Rating { get; set; }
 

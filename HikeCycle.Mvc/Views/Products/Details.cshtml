@@ -4,58 +4,47 @@
     <div className="max-w-6xl mx-auto p-2 bg-white rounded-xl shadow grid md:grid-cols-2 gap-8 relative">
 
         <div id="bookingModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl transition-all">
-        <form asp-action="Add" asp-controller="Cart" method="post">
-            @* ส่งข้อมูลสำคัญผ่าน Hidden Inputs *@
-            <input type="hidden" name="ProductId" value="@Model.Product.Id" />
-            <input type="hidden" id="selectedSizeInput" name="Size" value="" />
+            <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl transition-all">
+                <form asp-action="Add" asp-controller="Cart" method="post">
+                    @* ส่งข้อมูลสำคัญผ่าน Hidden Inputs *@
+                    <input type="hidden" name="ProductId" value="@Model.Product.Id" />
+                    <input type="hidden" id="selectedSizeInput" name="Size" value="" />
 
-            <h2 class="text-xl font-bold mb-4 text-gray-800">
-                <i class="fa-solid fa-calendar-check mr-2"></i>จองสินค้า: @Model.Product.Name
-            </h2>
+                    <h2 class="text-xl font-bold mb-4 text-gray-800">
+                        <i class="fa-solid fa-calendar-check mr-2"></i>จองสินค้า: @Model.Product.Name
+                    </h2>
 
-            <div class="space-y-4">
-                @* วันที่เริ่มเช่า *@
-                <div>
-                    <label class="block text-sm font-semibold mb-1 text-gray-600">วันที่เริ่มเช่า</label>
-                    <input type="date" name="StartDate" id="startDate"
-                           min="@Model.MinStartDate" value="@Model.MinStartDate"
-                           class="border p-2 rounded-lg w-full focus:ring-2 focus:ring-black outline-none" required />
-                </div>
+                    <div class="space-y-4">
+                        @* วันที่เริ่มเช่า *@
+                        <div>
+                            <label class="block text-sm font-semibold mb-1 text-gray-600">วันที่เริ่มเช่า</label>
+                            <input type="date" name="StartDate" id="startDate"
+                                min="@Model.MinStartDate" value="@Model.MinStartDate"
+                                class="border p-2 rounded-lg w-full focus:ring-2 focus:ring-black outline-none" required />
+                        </div>
 
-                @* วันที่คืน *@
-                <div>
-                    <label class="block text-sm font-semibold mb-1 text-gray-600">วันที่คืน</label>
-                    <input type="date" name="EndDate" id="endDate"
-                           min="@Model.MinStartDate" value="@Model.MinEndDate"
-                           class="border p-2 rounded-lg w-full focus:ring-2 focus:ring-black outline-none" required />
-                </div>
-
-                @* เวลาคืน *@
-                <div>
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="block text-sm font-semibold text-gray-600">เวลาคืน</label>
-                        <span id="timeWarning" class="text-red-500 text-[10px] hidden">08:00 - 20:00 เท่านั้น</span>
+                        @* วันที่คืน *@
+                        <div>
+                            <label class="block text-sm font-semibold mb-1 text-gray-600">วันที่คืน</label>
+                            <input type="date" name="EndDate" id="endDate"
+                                min="@Model.MinStartDate" value="@Model.MinEndDate"
+                                class="border p-2 rounded-lg w-full focus:ring-2 focus:ring-black outline-none" required />
+                        </div>
                     </div>
-                    <input type="time" name="PickupTime" id="bookingTime"
-                           value="08:00" min="08:00" max="20:00"
-                           class="border p-2 rounded-lg w-full focus:ring-2 focus:ring-black outline-none" required />
-                </div>
-            </div>
 
-            <div class="flex justify-end gap-2 mt-8">
-                <button type="button" onclick="closeModal()" 
-                        class="px-4 py-2 rounded-xl border text-gray-600 hover:bg-gray-50 transition font-medium">
-                    ยกเลิก
-                </button>
-                <button type="submit" id="confirmBtn"
-                        class="px-4 py-2 rounded-xl bg-black text-white hover:bg-gray-800 transition font-medium">
-                    ยืนยันการจอง
-                </button>
+                    <div class="flex justify-end gap-2 mt-8">
+                        <button type="button" onclick="closeModal()" 
+                                class="px-4 py-2 rounded-xl border text-gray-600 hover:bg-gray-50 transition font-medium">
+                            ยกเลิก
+                        </button>
+                        <button type="submit" id="confirmBtn"
+                                class="px-4 py-2 rounded-xl bg-black text-white hover:bg-gray-800 transition font-medium">
+                            ยืนยันการจอง
+                        </button>
+                    </div>
+                </form>
             </div>
-        </form>
-    </div>
-</div>
+        </div>
 
 @if (TempData["SuccessMessage"] != null)
 {

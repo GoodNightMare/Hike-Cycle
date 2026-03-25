@@ -144,6 +144,15 @@ namespace HikeCycle.Mvc.Controllers
                 IsStudent = isStudent
             };
 
+            var userIdStr = HttpContext.Session.GetString("UserId");
+    if (!string.IsNullOrEmpty(userIdStr))
+    {
+        var profile = await _context.UserProfiles.AsNoTracking()
+                        .FirstOrDefaultAsync(p => p.UserId == int.Parse(userIdStr));
+        // 🚩 ส่งไปที่หน้า View
+        ViewBag.UserAddress = profile?.Address;
+    }
+
             return View(viewModel);
         }
 

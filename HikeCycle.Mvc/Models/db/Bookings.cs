@@ -31,6 +31,9 @@ namespace HikeCycle.Mvc.Models.db
         [Column("status")]
         public string Status { get; set; } = "Pending";
 
+        [Column("shipping_address")]
+        public string? ShippingAddress { get; set; }
+
         [Column("created_at")] // 🚩 ตรงกับ created_at ใน SQL
         public DateTime? CreatedAt { get; set; }
 
@@ -40,5 +43,10 @@ namespace HikeCycle.Mvc.Models.db
         
         public virtual ICollection<BookingItem> BookingItems { get; set; } = new List<BookingItem>();
         public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+
+        public virtual ICollection<Return> Returns { get; set; } = new List<Return>();
+
+        // ในไฟล์ Models/db/Booking.cs
+public virtual ICollection<Reviews> Reviews { get; set; } = new List<Reviews>();
     }
 }

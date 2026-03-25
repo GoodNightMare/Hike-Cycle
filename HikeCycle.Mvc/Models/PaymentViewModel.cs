@@ -7,5 +7,6 @@ namespace HikeCycle.Mvc.Models
         public string Method { get; set; }
         public decimal OriginalTotal { get; set; }
         public decimal TotalDiscount { get; set; }
+        public string ShippingAddress { get; set; }
     }
 }

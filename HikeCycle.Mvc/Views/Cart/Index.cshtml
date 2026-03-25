@@ -78,14 +78,9 @@
                     </div>
                     <div class="text-right">
                         <p class="text-xs text-gray-400 uppercase">รวมของชิ้นนี้</p>
-                        <p class="font-black text-2xl text-gray-900">฿@itemTotal.ToString("N0")</p>
-                        <p class="text-[10px] text-gray-400">(฿@item.PricePerDay.ToString("N0") / วัน)</p>
+                        <p class="font-black text-2xl text-gray-900">฿@itemTotal.ToString("F2")</p>
+                        <p class="text-[10px] text-gray-400">(฿@item.PricePerDay.ToString("F2") / วัน)</p>
                     </div>
-                    <form asp-controller="Cart" asp-action="Remove" asp-route-id="@item.Id" method="post" class="ml-4">
-                        <button type="submit" class="text-gray-400 hover:text-red-600 transition-colors duration-200">
-                            <i class="fa-solid fa-xmark fa-lg"></i>
-                        </button>
-                    </form>
                 </div>
             }
 
@@ -134,28 +129,85 @@
             }
         </div>
 
+
+        @* --- ส่วนเลือกที่อยู่จัดส่ง --- *@
+        <div class="mt-8 p-8 bg-white border-2 border-gray-100 rounded-3xl shadow-sm">
+            <h2 class="text-2xl font-black mb-6 flex items-center gap-2">
+                <i class="fa-solid fa-truck-fast text-red-500"></i> วิธีการจัดส่ง
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                @* 1. รับที่ร้าน *@
+                <label class="relative flex flex-col p-4 border-2 rounded-2xl cursor-pointer hover:bg-gray-50 transition"
+                       id="label-shop">
+                    <input type="radio" name="addrType" value="Shop"
+                           class="absolute top-4 right-4 w-4 h-4 text-black focus:ring-black" checked
+                           onchange="updateCartAddr('Shop')">
+                    <i class="fa-solid fa-store text-xl mb-2 text-gray-400"></i>
+                    <span class="font-bold text-gray-800">รับที่ร้าน</span>
+                    <span class="text-[10px] text-gray-400 uppercase font-black"></span>
+                </label>
+
+                @* 2. ตามโปรไฟล์ *@
+                <label class="relative flex flex-col p-4 border-2 rounded-2xl cursor-pointer hover:bg-gray-50 transition"
+                       id="label-profile">
+                    <input type="radio" name="addrType" value="Profile"
+                           class="absolute top-4 right-4 w-4 h-4 text-black focus:ring-black"
+                           onchange="updateCartAddr('Profile')">
+                    <i class="fa-solid fa-house-user text-xl mb-2 text-gray-400"></i>
+                    <span class="font-bold text-gray-800">ที่อยู่ในโปรไฟล์</span>
+                    <span class="text-[10px] text-gray-400 uppercase font-black"></span>
+                </label>
+
+                @* 3. กรอกเอง *@
+                <label class="relative flex flex-col p-4 border-2 rounded-2xl cursor-pointer hover:bg-gray-50 transition"
+                       id="label-custom">
+                    <input type="radio" name="addrType" value="Custom"
+                           class="absolute top-4 right-4 w-4 h-4 text-black focus:ring-black"
+                           onchange="updateCartAddr('Custom')">
+                    <i class="fa-solid fa-pen-to-square text-xl mb-2 text-gray-400"></i>
+                    <span class="font-bold text-gray-800">ระบุที่อยู่</span>
+                    <span class="text-[10px] text-gray-400 uppercase font-black">กรอกที่อยู่</span>
+                </label>
+            </div>
+
+            @* ช่องกรอกที่อยู่ (แสดงเมื่อเลือก Profile หรือ Custom) *@
+            <div id="cartAddrSection" class="hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                <textarea id="displayShippingAddress" rows="3"
+                          class="w-full border-2 border-gray-100 p-4 rounded-2xl text-sm focus:border-black outline-none bg-gray-50 transition-all"
+                          placeholder="กรุณาระบุที่อยู่จัดส่งโดยละเอียด..."></textarea>
+            </div>
+        </div>
+
         <div class="mt-12 bg-gray-50 p-8 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-6">
             <a href="/Products" class="text-gray-600 font-bold hover:underline order-2 md:order-1">
                 <i class="fa-solid fa-arrow-left mr-2"></i> เลือกสินค้าเพิ่ม
             </a>
 
+            
+
             <div class="flex flex-col md:flex-row items-center gap-6 md:gap-12 order-1 md:order-2 w-full md:w-auto">
                 <div class="text-center md:text-right">
                     <p class="text-gray-500 text-sm">ราคารวม</p>
                     <p class="text-xl font-bold text-gray-500 line-through">
-                        ฿@Model.CalculationResult.OriginalTotal.ToString("N0")</p>
+                        ฿@Model.CalculationResult.OriginalTotal.ToString("F2")</p>
             
                         <p class="text-gray-500 text-sm mt-2">ส่วนลด</p>
-                        <p class="text-xl font-bold text-red-500">-฿@Model.CalculationResult.TotalDiscount.ToString("N0")</p>
+                        <p class="text-xl font-bold text-red-500">-฿@Model.CalculationResult.TotalDiscount.ToString("F2")</p>
 
                         <p class="text-gray-500 text-sm uppercase tracking-widest mt-2">ยอดชำระรวมทั้งหมด</p>
-                        <p class="text-4xl font-black text-green-600">฿@Model.CalculationResult.FinalTotal.ToString("N0")</p>
+                        <p class="text-4xl font-black text-green-600">฿@Model.CalculationResult.FinalTotal.ToString("F2")</p>
                     </div>
         
-                    <form asp-controller="Payments" asp-action="Index" method="get">
+                    <form asp-controller="Payments" asp-action="Index" method="get" id="checkoutForm" onsubmit="return validateCheckout()">
                         <input type="hidden" name="originalTotal" value="@Model.CalculationResult.OriginalTotal" />
                         <input type="hidden" name="totalDiscount" value="@Model.CalculationResult.TotalDiscount" />
                         <input type="hidden" name="finalTotal" value="@Model.CalculationResult.FinalTotal" />
+        
+                        @* 🚩 Input ลับเพื่อส่งที่อยู่จัดส่งไปยังหน้า Payment *@
+                        <input type="hidden" name="shippingAddress" id="finalShippingAddress"
+                               value="รับที่ร้าน (Self-Pickup)" />
+
                         <button type="submit"
                                 class="w-full md:w-auto px-10 py-4 bg-black text-white rounded-2xl font-black text-lg hover:scale-105 transition shadow-lg flex items-center justify-center">
                             ชำระเงิน <i class="fa-solid fa-chevron-right ml-2"></i>
@@ -198,5 +250,85 @@
                     updateEndDateMin();
                 });
             });
+
+
+            const profileAddress = "@Html.Raw(ViewBag.UserAddress ?? "ไม่ได้ระบุที่อยู่จัดส่งในโปรไฟล์")";
+
+            function updateCartAddr(type) {
+                const section = document.getElementById('cartAddrSection');
+                const displayInput = document.getElementById('displayShippingAddress');
+                const hiddenInput = document.getElementById('finalShippingAddress');
+    
+                // รีเซ็ตขอบ Border ของ Label
+                ['label-shop', 'label-profile', 'label-custom'].forEach(id => {
+                    document.getElementById(id).classList.remove('border-black', 'bg-gray-50');
+                    document.getElementById(id).classList.add('border-gray-100');
+                });
+
+                if (type === 'Shop') {
+                    section.classList.add('hidden');
+                    const shopVal = "รับที่ร้าน (Self-Pickup)";
+                    hiddenInput.value = shopVal;
+                    document.getElementById('label-shop').classList.add('border-black', 'bg-gray-50');
+                }
+                else if (type === 'Profile') {
+                    section.classList.remove('hidden');
+                    displayInput.value = profileAddress;
+                    displayInput.readOnly = true;
+                    displayInput.classList.add('bg-gray-100');
+                    hiddenInput.value = profileAddress;
+                    document.getElementById('label-profile').classList.add('border-black', 'bg-gray-50');
+                }
+                else if (type === 'Custom') {
+                    section.classList.remove('hidden');
+                    displayInput.value = "";
+                    displayInput.readOnly = false;
+                    displayInput.classList.remove('bg-gray-100');
+                    displayInput.focus();
+                    hiddenInput.value = ""; // จะถูกอัปเดตเมื่อมีการพิมพ์
+                    document.getElementById('label-custom').classList.add('border-black', 'bg-gray-50');
+                }
+            }
+
+            function validateCheckout() {
+    // 1. ดึงค่าจาก Hidden Input ที่จะส่งไปจริง
+    const finalAddr = document.getElementById('finalShippingAddress').value.trim();
+    
+    // 2. ดึงประเภทที่เลือก (เพื่อเอามาแสดง Alert ให้ถูกจุด)
+    const addrType = document.querySelector('input[name="addrType"]:checked').value;
+
+    // เงื่อนไขการตรวจสอบ
+    // - ถ้าค่าว่าง
+    // - หรือถ้าค่าเป็น "ไม่ได้ระบุที่อยู่จัดส่งในโปรไฟล์" (กรณีเลือก Profile แต่โปรไฟล์ไม่มีข้อมูล)
+    if (!finalAddr || finalAddr === "" || finalAddr === "ไม่ได้ระบุที่อยู่จัดส่งในโปรไฟล์") {
+        
+        let errorMsg = "";
+        if (addrType === 'Profile') {
+            errorMsg = "⚠️ โปรไฟล์ของคุณยังไม่ได้ระบุที่อยู่ กรุณาเลือก 'ระบุที่อยู่'";
+        } else if (addrType === 'Custom') {
+            errorMsg = "⚠️ กรุณากรอกที่อยู่สำหรับจัดส่งสินค้าด้วยครับ";
+        } else {
+            errorMsg = "⚠️ กรุณาระบุข้อมูลที่อยู่จัดส่งให้ครบถ้วน";
+        }
+
+        // แสดง SweetAlert2 (ถ้าคุณมี) หรือ Alert ธรรมดา
+        alert(errorMsg);
+        
+        // ถ้าเป็น Custom ให้ Focus ที่ช่องกรอกทันที
+        if (addrType === 'Custom') {
+            document.getElementById('displayShippingAddress').focus();
+        }
+        
+        return false; // หยุดการส่งฟอร์ม
+    }
+
+    return true; // อนุญาตให้ส่งฟอร์มไปหน้า Payment
+}
+
+// เพิ่มเติม: อัปเดตค่า Hidden Input ทุกครั้งที่พิมพ์ในช่อง Custom Address
+document.getElementById('displayShippingAddress').addEventListener('input', function() {
+    document.getElementById('finalShippingAddress').value = this.value;
+});
+
         </script>
     }

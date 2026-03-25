@@ -3,53 +3,95 @@
     ViewData["Title"] = "Payment";
 }
 
-<div class="max-w-2xl mx-auto p-10">
-    <h1 class="text-3xl font-black mb-8">Payment</h1>
+<div class="max-w-2xl mx-auto p-4 md:p-10 bg-white">
 
-    <div class="bg-gray-50 p-6 rounded-2xl mb-8">
-        <h2 class="text-xl font-bold mb-4">สรุปยอดชำระ</h2>
-        <div class="space-y-2">
-            <div class="flex justify-between">
-                <span class="text-gray-600">ราคารวม</span>
-                <span class="font-semibold">฿@Model.OriginalTotal.ToString("N0")</span>
+    <h1 class="text-2xl font-black mb-8 text-gray-900">ชำระเงิน</h1>
+
+    <div class="grid gap-8">
+        @* --- 2. Shipping Info Card (เน้นสีขาว สะอาด) --- *@
+        <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+            <div class="flex items-center gap-2 mb-4">
+                <div class="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center">
+                    <i class="fa-solid fa-location-dot text-red-500 text-xs"></i>
+                </div>
+                <h4 class="font-bold text-xs uppercase tracking-widest text-gray-400">ที่อยู่จัดส่ง</h4>
             </div>
-            <div class="flex justify-between text-red-500">
-                <span class="text-gray-600">ส่วนลด</span>
-                <span class="font-semibold">-฿@Model.TotalDiscount.ToString("N0")</span>
-            </div>
-            <div class="flex justify-between font-black text-2xl text-green-600">
-                <span>ยอดชำระรวมทั้งหมด</span>
-                <span>฿@Model.Amount.ToString("N0")</span>
-            </div>
+            <p class="text-gray-700 font-medium text-md leading-relaxed ml-10">
+                @(!string.IsNullOrEmpty(Model.ShippingAddress) ? Model.ShippingAddress : "ไม่ได้ระบุที่อยู่")
+            </p>
         </div>
-    </div>
 
-    <form asp-controller="Payments" asp-action="Create" method="post">
-        <input type="hidden" asp-for="BookingId" />
-        <input type="hidden" asp-for="Amount" />
-        <input type="hidden" asp-for="OriginalTotal" />
-        <input type="hidden" asp-for="TotalDiscount" />
-
-        <div class="space-y-6">
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Payment Method</label>
-                <div class="mt-2 space-y-2">
-                    <div class="flex items-center">
-                        <input id="method_bank" name="Method" type="radio" value="Bank" checked class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
-                        <label for="method_bank" class="ml-3 block text-sm font-medium text-gray-700">Bank Transfer</label>
-                    </div>
-                    <div class="flex items-center">
-                        <input id="method_promptpay" name="Method" type="radio" value="PromptPay" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
-                        <label for="method_promptpay" class="ml-3 block text-sm font-medium text-gray-700">PromptPay</label>
-                    </div>
+        @* --- 3. Order Summary Card (เปลี่ยนจากดำเป็นขาว-เทาอ่อน) --- *@
+        <div class="bg-gray-50 border border-gray-100 p-8 rounded-3xl">
+            <h2 class="text-lg font-bold mb-6 text-gray-800 flex items-center gap-2">
+                <i class="fa-solid fa-receipt text-gray-400"></i> สรุปรายการ
+            </h2>
+            <div class="space-y-4">
+                <div class="flex justify-between text-gray-500 text-sm">
+                    <span>ราคารวมสินค้า</span>
+                    <span class="font-semibold text-gray-700">฿@Model.OriginalTotal.ToString("N2")</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">ส่วนลด</span>
+                    <span class="font-semibold text-red-500">-฿@Model.TotalDiscount.ToString("N2")</span>
+                </div>
+                <div class="pt-4 mt-4 border-t border-gray-200 flex justify-between items-center">
+                    <span class="font-bold text-gray-800">ยอดชำระสุทธิ</span>
+                    <span class="text-3xl font-black text-green-600">฿@Model.Amount.ToString("N2")</span>
                 </div>
             </div>
         </div>
 
-        <div class="mt-8">
-            <button type="submit" class="w-full bg-black text-white rounded-2xl font-black text-lg hover:scale-105 transition shadow-lg flex items-center justify-center px-10 py-4">
-                Confirm Payment
-            </button>
-        </div>
-    </form>
+        @* --- 4. Payment Method Form --- *@
+        <form asp-controller="Payments" asp-action="Create" method="post" class="space-y-8">
+            <input type="hidden" asp-for="BookingId" />
+            <input type="hidden" asp-for="Amount" />
+            <input type="hidden" asp-for="OriginalTotal" />
+            <input type="hidden" asp-for="TotalDiscount" />
+            <input type="hidden" asp-for="ShippingAddress" />
+
+            <div class="space-y-4">
+                <label class="block text-xs font-black text-gray-400 uppercase tracking-widest">เลือกช่องทางชำระเงิน</label>
+                
+                <div class="grid grid-cols-1 gap-3">
+                    @* Option 1 *@
+                    <label class="group relative flex items-center p-4 border border-gray-200 rounded-2xl cursor-pointer hover:border-black transition-all has-[:checked]:border-black has-[:checked]:ring-1 has-[:checked]:ring-black">
+                        <input id="method_bank" name="Method" type="radio" value="Bank" checked class="w-4 h-4 text-black border-gray-300 focus:ring-black">
+                        <div class="ml-4 flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center group-hover:bg-white transition-colors">
+                                <i class="fa-solid fa-building-columns text-gray-400 group-has-[:checked]:text-black"></i>
+                            </div>
+                            <div>
+                                <span class="block text-sm font-bold text-gray-800">โอนเงินผ่านบัญชีธนาคาร</span>
+                                @* <span class="block text-[10px] text-gray-400 font-medium">รอตรวจสอบยอดภายใน 24 ชม.</span> *@
+                            </div>
+                        </div>
+                    </label>
+
+                    @* Option 2 *@
+                    <label class="group relative flex items-center p-4 border border-gray-200 rounded-2xl cursor-pointer hover:border-black transition-all has-[:checked]:border-black has-[:checked]:ring-1 has-[:checked]:ring-black">
+                        <input id="method_promptpay" name="Method" type="radio" value="PromptPay" class="w-4 h-4 text-black border-gray-300 focus:ring-black">
+                        <div class="ml-4 flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center group-hover:bg-white transition-colors">
+                                <i class="fa-solid fa-qrcode text-gray-400 group-has-[:checked]:text-black"></i>
+                            </div>
+                            <div>
+                                <span class="block text-sm font-bold text-gray-800">พร้อมเพย์ (PromptPay)</span>
+                                @* <span class="block text-[10px] text-gray-400 font-medium">ยืนยันยอดอัตโนมัติ</span> *@
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="pt-4">
+                <button type="submit" class="w-full bg-black text-white rounded-2xl font-bold text-md hover:bg-gray-800 transition-all flex items-center justify-center py-5 shadow-lg shadow-gray-200">
+                    ยืนยันการชำระเงิน
+                </button>
+                <a asp-action="Index" asp-controller="Cart" class="block text-center mt-6 text-xs font-bold text-gray-400 hover:text-gray-600 transition">
+                   <i class="fa-solid fa-chevron-left mr-1"></i> ย้อนกลับไปตะกร้า
+                </a>
+            </div>
+        </form>
+    </div>
 </div>

@@ -8,16 +8,19 @@ namespace HikeCycle.Mvc.Models.db
         [Key]
         public int Id { get; set; }
 
+        [Column("booking_id")]
         public int BookingId { get; set; }
-
+        
+        [Column("return_date")]
         public DateTime ReturnDate { get; set; } = DateTime.Now;
 
         // ใช้ Enum เพื่อให้โค้ดอ่านง่าย (Good, Dirty, Damaged, Lost)
         public ReturnCondition Condition { get; set; }
 
-        [Column(TypeName = "decimal(10,2)")]
+        [Column("extra_fee", TypeName = "decimal(10,2)")]
         public decimal ExtraFee { get; set; }
 
+        [Column("is_extra_fee_paid")]
         public bool IsExtraFeePaid { get; set; }
 
         public string? Note { get; set; }

@@ -118,6 +118,8 @@ namespace HikeCycle.Mvc.Controllers
                                      .Where(b => b.UserId == userId)
                                      .Include(b => b.BookingItems)
                                      .ThenInclude(bi => bi.Product)
+                                     .Include(b => b.Returns)
+                                     .Include(b => b.Reviews)
                                      .OrderByDescending(b => b.StartDate)
                                      .ToListAsync();
 
@@ -131,6 +133,37 @@ namespace HikeCycle.Mvc.Controllers
 
             return View(viewModel);
         }
+
+        [HttpPost]
+public async Task<IActionResult> UpdateProfile(string fullName, string phone, string address)
+{
+    var userIdStr = HttpContext.Session.GetString("UserId");
+    if (string.IsNullOrEmpty(userIdStr)) return RedirectToAction("Login");
+
+    int userId = int.Parse(userIdStr);
+    
+    // หาโปรไฟล์เดิมในตาราง UserProfiles
+    var profile = await _context.UserProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
+    
+    if (profile == null)
+    {
+        // ถ้ายังไม่มีก้อนโปรไฟล์ ให้สร้างใหม่
+        profile = new UserProfile { UserId = userId };
+        _context.UserProfiles.Add(profile);
+    }
+
+    // อัปเดตเฉพาะฟิลด์ที่อนุญาต
+    profile.FullName = fullName;
+    profile.Phone = phone;
+    profile.Address = address;
+
+    await _context.SaveChangesAsync();
+    
+    // อัปเดต Session ชื่อ (ถ้าต้องการให้ชื่อบน Nav เปลี่ยนทันที)
+    HttpContext.Session.SetString("UserName", fullName ?? "User");
+
+    return RedirectToAction("Profile");
+}
 
         public IActionResult Logout()
         {
