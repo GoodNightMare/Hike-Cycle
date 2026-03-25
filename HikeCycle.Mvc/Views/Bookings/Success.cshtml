@@ -1,0 +1,91 @@
+@model HikeCycle.Mvc.Models.db.Booking
+
+@{
+    ViewData["Title"] = "Booking Successful";
+}
+
+<div class="max-w-4xl mx-auto p-10 text-center">
+    <h1 class="text-3xl font-black text-green-600 mb-4">Booking Successful!</h1>
+    <p class="text-lg text-gray-700 mb-8">Thank you for your order. Here are your booking details.</p>
+
+    <div class="bg-white shadow-lg rounded-2xl p-8 border border-gray-200">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800">Booking Confirmation #${model.Id}</h2>
+
+        <div class="text-left space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <p class="font-semibold text-gray-600">Booking Date:</p>
+                    <p class="text-gray-800">@Model.CreatedAt?.ToString("dd MMM yyyy, hh:mm tt")</p>
+                </div>
+                <div>
+                    <p class="font-semibold text-gray-600">Customer:</p>
+                    <p class="text-gray-800">@Model.User.Email</p>
+                </div>
+                <div>
+                    <p class="font-semibold text-gray-600">Rental Period:</p>
+                    <p class="text-gray-800">@Model.StartDate.ToString("dd MMM yyyy") - @Model.EndDate.ToString("dd MMM yyyy")</p>
+                </div>
+            </div>
+
+            <hr class="my-6">
+
+            <h3 class="text-xl font-bold text-gray-800">Booked Items</h3>
+            <div class="flow-root">
+                <ul role="list" class="-my-6 divide-y divide-gray-200">
+                    @foreach (var item in Model.BookingItems)
+                    {
+                        <li class="flex py-6">
+                            <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                                @if (item.Product.ProductImages != null && item.Product.ProductImages.Any())
+                                {
+                                    <img src="@item.Product.ProductImages.First().ImageUrl" alt="@item.Product.Name" class="h-full w-full object-cover object-center">
+                                }
+                            </div>
+
+                            <div class="ml-4 flex flex-1 flex-col">
+                                <div>
+                                    <div class="flex justify-between text-base font-medium text-gray-900">
+                                        <h3>
+                                            <a href="#">@item.Product.Name</a>
+                                        </h3>
+                                        <p class="ml-4">฿@item.ItemTotal.ToString("F2")</p>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(item.Size))
+                                    {
+                                        <p class="mt-1 text-sm text-gray-500">Size: @item.Size</p>
+                                    }
+                                </div>
+                                <div class="flex flex-1 items-end justify-between text-sm">
+                                    <p class="text-gray-500">Qty @item.Quantity</p>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            <hr class="my-6">
+            
+            <div class="text-right space-y-2">
+                 <div class="flex justify-end">
+                    <span class="text-gray-600 w-48 text-left">Total</span>
+                    <span class="font-semibold w-24">฿@Model.TotalAmount.ToString(format: "F2")</span>
+                </div>
+                <div class="flex justify-end text-red-500">
+                    <span class="text-gray-600 w-48 text-left">Discount</span>
+                    <span class="font-semibold w-24">-฿@Model.DiscountAmount.ToString(format: "F2")</span>
+                </div>
+                <div class="flex justify-end font-black text-2xl text-green-600">
+                    <span class="w-48 text-left">Final Amount</span>
+                    <span class="w-24">฿@Model.FinalAmount.ToString("F2")</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="mt-8">
+        <a href="@Url.Action("Index", "Home")" class="text-white bg-black rounded-2xl px-6 py-3 font-bold hover:bg-gray-800 transition">
+            Back to Home
+        </a>
+    </div>
+</div>

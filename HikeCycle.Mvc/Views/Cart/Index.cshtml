@@ -153,6 +153,9 @@
                     </div>
         
                     <form asp-controller="Payments" asp-action="Index" method="get">
+                        <input type="hidden" name="originalTotal" value="@Model.CalculationResult.OriginalTotal" />
+                        <input type="hidden" name="totalDiscount" value="@Model.CalculationResult.TotalDiscount" />
+                        <input type="hidden" name="finalTotal" value="@Model.CalculationResult.FinalTotal" />
                         <button type="submit"
                                 class="w-full md:w-auto px-10 py-4 bg-black text-white rounded-2xl font-black text-lg hover:scale-105 transition shadow-lg flex items-center justify-center">
                             ชำระเงิน <i class="fa-solid fa-chevron-right ml-2"></i>
