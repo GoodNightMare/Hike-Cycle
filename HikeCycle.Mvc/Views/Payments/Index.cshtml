@@ -1,0 +1,43 @@
+@model HikeCycle.Mvc.Models.PaymentViewModel
+@{
+    ViewData["Title"] = "Payment";
+}
+
+<div class="max-w-2xl mx-auto p-10">
+    <h1 class="text-3xl font-black mb-8">Payment</h1>
+
+    <form asp-controller="Payments" asp-action="Create" method="post">
+        @* 🚩 สำคัญ: เก็บ BookingId ไว้ส่งกลับไปตอนบันทึก *@
+        <input type="hidden" asp-for="BookingId" />
+
+        <div class="space-y-6">
+            <div>
+                <label asp-for="Amount" class="block text-sm font-medium text-gray-700">Amount</label>
+                <div class="mt-1">
+                    @* 🚩 ใช้ asp-for เพื่อให้ผูกข้อมูลกับ Model ได้แม่นยำ *@
+                    <input asp-for="Amount" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md bg-gray-50" readonly>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Payment Method</label>
+                <div class="mt-2 space-y-2">
+                    <div class="flex items-center">
+                        <input id="method_bank" name="Method" type="radio" value="Bank" checked class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
+                        <label for="method_bank" class="ml-3 block text-sm font-medium text-gray-700">Bank Transfer</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input id="method_promptpay" name="Method" type="radio" value="PromptPay" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
+                        <label for="method_promptpay" class="ml-3 block text-sm font-medium text-gray-700">PromptPay</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8">
+            <button type="submit" class="w-full bg-black text-white rounded-2xl font-black text-lg hover:scale-105 transition shadow-lg flex items-center justify-center px-10 py-4">
+                Confirm Payment
+            </button>
+        </div>
+    </form>
+</div>
