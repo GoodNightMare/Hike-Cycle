@@ -1,24 +1,22 @@
-@using HikeCycle.Mvc.Models.db
-@model User
+@using HikeCycle.Mvc.Models
+@model AccountProfileViewModel
 @{
     ViewData["Title"] = "โปรไฟล์ของฉัน";
-    // เช็คชื่อคลาสในไฟล์ UserProfile.cs ของคุณว่ามี s ไหม ถ้ามีให้เติม s หลัง UserProfile ตรงนี้ครับ
-    UserProfile? profile = ViewBag.Profile as UserProfile;
 }
 
-<div class="max-w-4xl mx-auto p-6 md:p-10">
+<div class="max-w-7xl mx-auto p-6 md:p-10">
     <div class="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-gray-100">
-        
+
         @* Header Section *@
         <div class="main-color-bg-brown p-10 text-white relative">
             <div class="flex flex-col md:flex-row items-center gap-8 relative z-10">
-                <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center text-5xl text-gray-800 border-4 border-white/20 shadow-lg">
+                <div
+                    class="w-32 h-32 bg-white rounded-full flex items-center justify-center text-5xl text-gray-800 border-4 border-white/20 shadow-lg">
                     <i class="fa-solid fa-user"></i>
                 </div>
                 <div class="text-center md:text-left">
-                    @* แก้ไข: @( ต้องติดกัน *@
-                    <h1 class="text-4xl font-black tracking-tight">@(profile?.FullName ?? "")</h1>
-                    @* <p class="text-white/60 mt-1 font-medium">สมาชิกหมายเลข #@Model.Id</p> *@
+                    <h1 class="text-4xl font-black tracking-tight">@(Model.Profile?.FullName ?? "")</h1>
+                    <p class="text-white/60 mt-1 font-medium">สมาชิกหมายเลข #@Model.User.Id</p>
                 </div>
             </div>
         </div>
@@ -30,21 +28,19 @@
                 <div class="grid gap-6">
                     <div>
                         <label class="text-gray-400 uppercase font-black">อีเมล</label>
-                        <p class="text-lg font-semibold text-gray-700">@Model.Email</p>
+                        <p class="text-lg font-semibold text-gray-700">@Model.User.Email</p>
                     </div>
                     <div>
                         <label class="text-gray-400 uppercase font-black">เบอร์โทรศัพท์</label>
-                        @* แก้ไข: @( ต้องติดกัน *@
-                        <p class="text-lg font-semibold text-gray-700">@(profile?.Phone ?? "ยังไม่ได้ระบุ")</p>
+                        <p class="text-lg font-semibold text-gray-700">@(Model.Profile?.Phone ?? "ยังไม่ได้ระบุ")</p>
                     </div>
                 </div>
             </div>
 
             <div class="space-y-8">
                 <div class="p-6 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-                    @* แก้ไข: @( ต้องติดกัน *@
-                                            <label class="text-gray-400 uppercase font-black">ที่อยู่</label>
-                    <p class="text-gray-600 font-medium">@(profile?.Address ?? "ยังไม่ได้ระบุที่อยู่")</p>
+                    <label class="text-gray-400 uppercase font-black">ที่อยู่</label>
+                    <p class="text-gray-600 font-medium">@(Model.Profile?.Address ?? "ยังไม่ได้ระบุที่อยู่")</p>
                 </div>
             </div>
         </div>
@@ -53,5 +49,57 @@
             <a asp-action="Logout" class="px-6 py-3 text-red-500 font-bold hover:underline">ออกจากระบบ</a>
             <button class="px-8 py-3 bg-black text-white rounded-2xl font-bold shadow-xl">แก้ไขข้อมูล</button>
         </div>
+    </div>
+
+    @* Booking History Section *@
+    <div class="mt-12">
+        <h2 class="text-3xl font-black mb-8">ประวัติการเช่า</h2>
+
+        @if (Model.AllBookings.Any())
+        {
+            <div class="grid grid-cols-1 gap-6">
+                @foreach (var booking in Model.AllBookings)
+                {
+                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-lg">Booking ID: #@booking.Id</h4>
+                                <p class="text-sm text-gray-500">
+                                    @booking.StartDate.ToString("dd MMM yyyy") - @booking.EndDate.ToString("dd MMM yyyy")
+                                </p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-bold text-xl">฿@booking.FinalAmount.ToString("N0")</p>
+                                <span
+                                    class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium @(booking.Status == "Completed" ? "bg-blue-100 text-blue-800" : (booking.Status == "Confirmed" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"))">
+                                    @booking.Status
+                                </span>
+                                <a asp-controller="Bookings" asp-action="Success" asp-route-id="@booking.Id" class="text-sm text-blue-500 hover:underline mt-2 inline-block">ดูรายละเอียด</a>
+                            </div>
+                        </div>
+                        <hr class="my-4" />
+                        <ul class="space-y-3">
+                            @foreach (var item in booking.BookingItems)
+                            {
+                                <li class="flex items-center justify-between">
+                                    <span class="font-medium">
+                                        @item.Product.Name
+                                        @if (!string.IsNullOrEmpty(item.Size))
+                                        {
+                                            <span class="ml-1 text-sm text-gray-500">(Size: @item.Size)</span>
+                                        }
+                                    </span>
+                                    <span class="text-gray-600">x @item.Quantity</span>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-gray-500">ไม่มีประวัติการเช่า</p>
+        }
     </div>
 </div>

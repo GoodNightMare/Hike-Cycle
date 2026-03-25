@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HikeCycle.Mvc.Models;
@@ -98,21 +99,37 @@ namespace HikeCycle.Mvc.Controllers
         [HttpGet]
         public async Task<IActionResult> Profile()
         {
-            // 🚩 จุดเช็คที่ 1: ชื่อ Key ในวงเล็บต้องตรงกับที่ Set ไว้ตอน Login
             var userIdStr = HttpContext.Session.GetString("UserId");
-
             if (string.IsNullOrEmpty(userIdStr))
             {
-                // ถ้ามันวิ่งมาบรรทัดนี้ แสดงว่าดึงค่า "UserId" ไม่ได้ มันเลยส่งคุณไปหน้า Login
                 return RedirectToAction("Login");
             }
 
             int userId = int.Parse(userIdStr);
+
             var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
             var profile = await _context.UserProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
 
-            ViewBag.Profile = profile;
-            return View(user);
+            var bookings = await _context.Bookings
+                                     .Where(b => b.UserId == userId)
+                                     .Include(b => b.BookingItems)
+                                     .ThenInclude(bi => bi.Product)
+                                     .OrderByDescending(b => b.StartDate)
+                                     .ToListAsync();
+
+            var now = DateTime.Now;
+            var viewModel = new AccountProfileViewModel
+            {
+                User = user,
+                Profile = profile,
+                AllBookings = bookings,
+            };
+
+            return View(viewModel);
         }
 
         public IActionResult Logout()

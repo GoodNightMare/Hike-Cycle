@@ -26,6 +26,7 @@ namespace HikeCycle.Mvc.Controllers
                 .Include(b => b.User)
                 .Include(b => b.BookingItems)
                 .ThenInclude(bi => bi.Product)
+                .ThenInclude(p => p.ProductImages)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (booking == null)
