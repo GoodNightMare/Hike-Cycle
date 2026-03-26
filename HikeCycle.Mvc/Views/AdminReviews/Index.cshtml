@@ -1,4 +1,64 @@
+@model IEnumerable<HikeCycle.Mvc.Models.db.Reviews>
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "รีวิว";
+    var userEmails = ViewBag.Users as Dictionary<int, string>;
+    var productNames = ViewBag.Products as Dictionary<int, string>;
 }
+
+
+<div class="">
+    <div class="mb-8">
+        <h1 class="text-2xl font-black text-gray-900 uppercase tracking-tight">รีวิวจากผู้ใช้งาน</h1>
+        <p class="text-sm text-gray-500">ความคิดเห็นจากลูกค้าเพื่อไปพัฒนาต่อ</p>
+    </div>
+
+    <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-4">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px]">ID</th>
+                    <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px]">User</th>
+                    <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px]">Product Name</th>
+                    <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px] text-center">Rating</th>
+                    <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px]">Comment</th>
+                    <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px] text-center">Date</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                @foreach (var item in Model)
+                {
+                    <tr class="group hover:bg-gray-50/50 transition-colors">
+                        <td class="py-4 px-6 font-mono text-xs text-gray-400">#@item.Id</td>
+                        <td class="py-4 px-6">
+                            <div class="font-bold text-gray-900">@(userEmails.ContainsKey(item.UserId) ?
+                                                                                            userEmails[item.UserId] : "Unknown User")</div>
+                                <div class="text-[10px] text-gray-400 font-medium uppercase">Booking ID: @item.BookingId</div>
+                            </td>
+                            <td class="py-4 px-6">
+                                <div class="flex items-center gap-2">
+                                    <div class="font-bold text-gray-700">@(productNames.ContainsKey(item.ProductId) ?
+                                                                                                                productNames[item.ProductId] : "Unknown Product")</div>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6 text-center">
+                                    <div class="flex justify-center items-center gap-0.5 text-orange-400">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <i class="@(i <= item.Rating ? "fa-solid" : "fa-regular") fa-star text-[10px]"></i>
+                                        }
+                                    </div>
+                                    <span class="text-[10px] font-bold text-orange-600">(@item.Rating/5)</span>
+                                </td>
+                                <td class="py-4 px-6 max-w-xs">
+                                    <p class="text-gray-600 line-clamp-2 italic">"@item.Comment"</p>
+                                </td>
+                                <td class="py-4 px-6 text-center text-gray-400 text-xs">
+                                    @item.CreatedAt?.ToString("dd MMM yyyy, HH:mm", new System.Globalization.CultureInfo("th-TH"))
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>

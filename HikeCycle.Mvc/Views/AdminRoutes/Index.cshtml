@@ -6,7 +6,7 @@
     ViewData["Title"] = "Routes";
 }
 
-<div class="p-4">
+<div class="">
     @Html.AntiForgeryToken()
     <h1 class="text-2xl font-bold mb-4">จัดการเส้นทาง</h1>
 
@@ -32,7 +32,7 @@
             @foreach (var item in Model)
             {
                 <tr data-id="@item.Id">
-                    <td class="py-4 px-6">@item.Id</td>
+                    <td class="py-4 px-6">#@item.Id</td>
                     <td class="py-4 px-6" data-prop="Name">@item.Name</td>
                     <td class="py-4 px-6" data-prop="Province">@item.Province</td>
                     <td class="py-4 px-6" data-prop="Duration">@item.Duration</td>
@@ -172,7 +172,6 @@
                 showModal('แก้ไขเส้นทาง');
         
                 $('#route-id').val(id);
-                console.log(id)
                 row.find('td[data-prop]').each(function () {
                     var prop = $(this).data('prop');
                     var val = $(this).text().trim();

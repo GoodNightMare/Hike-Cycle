@@ -1,4 +1,177 @@
+@model IEnumerable<HikeCycle.Mvc.Models.db.User>
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "ผู้ใช้งาน";
+    var profiles = ViewBag.Profiles as List<HikeCycle.Mvc.Models.db.UserProfile>;
 }
+
+<div class="">
+    <div id="user-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" onclick="hideUserModal()"></div>
+
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg p-8 transform transition-all">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-black text-gray-900 uppercase tracking-tight">แก้ไขข้อมูลผู้ใช้งาน</h2>
+                <button type="button" onclick="hideUserModal()" class="text-gray-400 hover:text-gray-900 transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <form id="user-form" method="post" asp-action="UpdateUser" class="space-y-4">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="edit-id" name="Id">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Email Address</label>
+                        <input type="email" name="Email" id="edit-email"
+                               class="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:ring-1 focus:ring-black transition"
+                               required>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Role</label>
+                        <select name="Role" id="edit-role"
+                                class="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:ring-1 focus:ring-black">
+                            <option value="user">USER</option>
+                            <option value="staff">STAFF</option>
+                            <option value="admin">ADMIN</option>
+                        </select>
+                    </div>
+
+                    <div class="md:col-span-2 border-t pt-4 mt-2">
+                        <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1 text-blue-600">Full
+                            Name</label>
+                            <input type="text" name="FullName" id="edit-fullname"
+                                   class="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:ring-1 focus:ring-blue-600">
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Phone</label>
+                            <input type="text" name="Phone" id="edit-phone"
+                                   class="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:ring-1 focus:ring-black">
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Address</label>
+                            <textarea name="Address" id="edit-address" rows="2"
+                                      class="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:ring-1 focus:ring-black"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-3 mt-8">
+                        <button type="button" onclick="hideUserModal()"
+                                class="text-gray-400 font-bold px-4 hover:text-gray-600 transition">Cancel</button>
+                        <button type="submit"
+                                class="bg-black text-white px-8 py-2.5 rounded-xl font-bold shadow-lg hover:bg-gray-800 transition transform hover:scale-105 active:scale-95">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-2xl font-black text-gray-900 uppercase tracking-tight">จัดการผู้ใช้งาน</h1>
+                <p class="text-sm text-gray-500">จัดการข้อมูลผู้ใช้งาน</p>
+            </div>
+        </div>
+
+        <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-4">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px]">ID</th>
+                        <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px]">Email</th>
+                        <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px]">Full Name</th>
+                        <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px]">Phone</th>
+                        <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px]">Address</th>
+                        <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px] text-center">Role</th>
+                        <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px] text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="users-tbody" class="divide-y divide-gray-50">
+                    @foreach (var user in Model)
+                    {
+                        var profile = profiles?.FirstOrDefault(p => p.UserId == user.Id);
+                        <tr data-id="@user.Id" class="group hover:bg-gray-50/50 transition-colors">
+                            <td class="py-4 px-6 font-mono text-xs text-gray-400">#@user.Id</td>
+                            <td class="py-4 px-6">
+                                <div class="font-bold text-gray-900">@user.Email</div>
+                            </td>
+                            <td class="py-4 px-6 text-gray-600">@(profile?.FullName ?? "-")</td>
+                            <td class="py-4 px-6 text-gray-600">@(profile?.Phone ?? "-")</td>
+                            <td class="py-4 px-6 text-gray-600">@(profile?.Address ?? "-")</td>
+                            <td class="py-4 px-6 text-center">
+                                @{
+                                    // กำหนดสีตาม Role
+                                    var roleClass = user.Role.ToLower() switch
+                                    {
+                                        "admin" => "bg-red-50 text-red-600 border-red-100",
+                                        "staff" => "bg-orange-50 text-orange-600 border-orange-100",
+                                        "user" => "bg-blue-50 text-blue-600 border-blue-100",
+                                        _ => "bg-gray-50 text-gray-600 border-gray-100"
+                                    };
+                                }
+
+                                <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border @roleClass">
+                                    @user.Role
+                                </span>
+                            </td>
+                            <td class="py-4 px-6 text-right">
+                                <div class="flex justify-end gap-2 ">
+                                    <button type="button"
+                                            class="p-2 hover:bg-white hover:shadow-sm rounded-lg text-blue-600 edit-btn transition-all"
+                                            onclick="showUserModal(@user.Id, '@user.Email', '@user.Role', '@(profile?.FullName ?? "")', '@(profile?.Phone ?? "")', '@(profile?.Address ?? "")')">
+                                        <i class="fa-solid fa-user-gear"></i>
+                                    </button>
+                                    <button
+                                        class="p-2 hover:bg-white hover:shadow-sm rounded-lg text-red-600 delete-btn transition-all"
+                                        onclick="deleteUser(@user.Id)">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script>
+            // ฟังก์ชันลบ User
+            function deleteUser(id) {
+                if (confirm('ยืนยันการลบผู้ใช้งานรายนี้? ข้อมูลโปรไฟล์จะถูกลบไปด้วย')) {
+                    $.post('@Url.Action("DeleteUser")', { id: id }, function () {
+                        $(`tr[data-id="${id}"]`).fadeOut(300, function () { $(this).remove(); });
+                    }).fail(function () {
+                        alert('เกิดข้อผิดพลาดในการลบข้อมูล');
+                    });
+                }
+            }
+
+            // ฟังก์ชันแก้ไข (เปิด Modal หรือไปหน้าอื่น)
+            function editUser(id) {
+                // โค้ดสำหรับเปิด Modal แก้ไขข้อมูล
+                console.log("Editing user:", id);
+            }
+
+            function showUserModal(id, email, role, fullName, phone, address) {
+                // โยนค่าที่ส่งมาจากการคลิก เข้าไปใน Input ของ Modal
+                $('#edit-id').val(id);
+                $('#edit-email').val(email);
+                $('#edit-role').val(role.toLowerCase());
+                $('#edit-fullname').val(fullName);
+                $('#edit-phone').val(phone);
+                $('#edit-address').val(address);
+
+                $('#user-modal').removeClass('hidden').addClass('flex');
+            }
+
+            function hideUserModal() {
+                $('#user-modal').addClass('hidden').removeClass('flex');
+            }
+        </script>
+    }

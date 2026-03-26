@@ -12,7 +12,13 @@ namespace HikeCycle.Mvc.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View();
+            var reviews = await _context.Reviews
+                                .OrderBy(r => r.Id)
+                                .ToListAsync();
+
+            ViewBag.Users = await _context.Users.ToDictionaryAsync(u => u.Id, u => u.Email);
+            ViewBag.Products = await _context.Products.ToDictionaryAsync(p => p.Id, p => p.Name);
+            return View(reviews);
         }
     }
 }
