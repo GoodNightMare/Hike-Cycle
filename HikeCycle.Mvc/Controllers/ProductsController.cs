@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using HikeCycle.Mvc.Models.db;
 using HikeCycle.Mvc.Models;
-using HikeCycle.Mvc.Models.Dto;
 using System.Text.Json;
+using HikeCycle.Mvc.ViewModels;
 
 namespace HikeCycle.Mvc.Controllers
 {
@@ -163,7 +163,7 @@ namespace HikeCycle.Mvc.Controllers
         }
 
         [HttpGet("api/all")]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts()
+        public async Task<ActionResult<IEnumerable<dynamic>>> GetProducts()
         {
             var products = await _context.Products.ToListAsync();
             var productImages = await _context.ProductImages.ToListAsync();
@@ -176,7 +176,7 @@ namespace HikeCycle.Mvc.Controllers
             {
                 var productReviews = allReviews.Where(r => r.ProductId == p.Id).ToList();
 
-                return new ProductDto
+                return (dynamic)new 
                 {
                     Id = p.Id,
                     Name = p.Name,
@@ -195,8 +195,8 @@ namespace HikeCycle.Mvc.Controllers
                     Variants = p.Variants,
 
                     ProductImages = productImagesGrouped.ContainsKey(p.Id)
-                            ? productImagesGrouped[p.Id].Select(pi => new ProductImageDto { ImageUrl = pi.ImageUrl }).ToList()
-                            : new List<ProductImageDto>()
+                            ? productImagesGrouped[p.Id].Select(pi => (dynamic)new { ImageUrl = pi.ImageUrl }).ToList()
+                            : new List<dynamic>()
                 };
             }).ToList();
 
@@ -204,7 +204,7 @@ namespace HikeCycle.Mvc.Controllers
         }
 
         [HttpGet("api/{id}")]
-        public async Task<ActionResult<ProductDto>> GetProduct(int id)
+        public async Task<ActionResult<dynamic>> GetProduct(int id)
         {
             var product = await _context.Products.FindAsync(id);
 
@@ -215,14 +215,14 @@ namespace HikeCycle.Mvc.Controllers
 
             var productImages = await _context.ProductImages
                 .Where(pi => pi.ProductId == id)
-                .Select(pi => new ProductImageDto { ImageUrl = pi.ImageUrl })
+                .Select(pi => new { ImageUrl = pi.ImageUrl })
                 .ToListAsync();
 
             var reviews = await _context.Reviews
     .Where(r => r.ProductId == id)
     .ToListAsync();
 
-            var productDto = new ProductDto
+            var productDto = new 
             {
                 Id = product.Id,
                 Name = product.Name,
@@ -316,14 +316,14 @@ namespace HikeCycle.Mvc.Controllers
         }
 
         [HttpGet("api/{productId}/reviews")]
-        public async Task<ActionResult<IEnumerable<ReviewDto>>> GetProductReviews(int productId)
+        public async Task<ActionResult<IEnumerable<dynamic>>> GetProductReviews(int productId)
         {
             // ดึงรีวิวของสินค้านั้นๆ และอาจจะ Join กับ UserProfile เพื่อเอาชื่อมาโชว์
             var reviews = await (from r in _context.Reviews
                                  join u in _context.UserProfiles on r.UserId equals u.UserId
                                  where r.ProductId == productId
                                  orderby r.CreatedAt descending
-                                 select new ReviewDto
+                                 select new 
                                  {
                                      Id = r.Id,
                                      UserId = r.UserId,

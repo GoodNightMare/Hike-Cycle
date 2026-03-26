@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HikeCycle.Mvc.Models.db;
-using HikeCycle.Mvc.Models.Dto; // Import the DTO namespace
 
 namespace HikeCycle.Mvc.Controllers
 {
@@ -27,7 +26,7 @@ namespace HikeCycle.Mvc.Controllers
                                  join u in _context.UserProfiles on r.UserId equals u.UserId into userGroup
                                  from u in userGroup.DefaultIfEmpty() // Left Join
                                  orderby r.CreatedAt descending
-                                 select new ReviewDto
+                                 select new 
                                  {
                                      Id = r.Id,
                                      UserId = r.UserId,

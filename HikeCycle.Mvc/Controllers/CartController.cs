@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using HikeCycle.Mvc.Models;
+using HikeCycle.Mvc.ViewModels;
 using HikeCycle.Mvc.Models.db;
 using Microsoft.EntityFrameworkCore;
 using System;

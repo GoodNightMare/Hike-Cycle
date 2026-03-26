@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HikeCycle.Mvc.Models.db;
-using HikeCycle.Mvc.Models.Dto;
 
 namespace HikeCycle.Mvc.Controllers
 {

@@ -2,6 +2,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HikeCycle.Mvc.Models;
+using HikeCycle.Mvc.ViewModels;
 using HikeCycle.Mvc.Models.db;
 using System.Security.Cryptography;
 using System.Text;
@@ -64,7 +65,7 @@ namespace HikeCycle.Mvc.Controllers
         // POST: /Account/Register
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterRequest request)
+        public async Task<IActionResult> Register(RegisterViewModel request)
         {
             if (await _context.Users.AnyAsync(u => u.Email == request.Email))
             {

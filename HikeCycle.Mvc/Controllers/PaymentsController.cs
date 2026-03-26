@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using HikeCycle.Mvc.Models;
 using HikeCycle.Mvc.Models.db;
-using HikeCycle.Mvc.Models.Dto;
+using HikeCycle.Mvc.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json; // 🚩 ต้องใช้ตัวนี้เพื่อจัดการ JSON
 using System.Linq;

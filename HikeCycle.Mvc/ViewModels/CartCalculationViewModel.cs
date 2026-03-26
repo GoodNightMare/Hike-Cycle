@@ -1,4 +1,4 @@
-namespace HikeCycle.Mvc.Models
+namespace HikeCycle.Mvc.ViewModels
 {
     public class AppliedPromotion
     {

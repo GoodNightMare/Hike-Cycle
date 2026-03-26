@@ -2,7 +2,7 @@ using HikeCycle.Mvc.Models.db;
 using HikeCycle.Mvc.Controllers;
 using System.Collections.Generic;
 
-namespace HikeCycle.Mvc.Models
+namespace HikeCycle.Mvc.ViewModels
 {
     public class CartViewModel
     {

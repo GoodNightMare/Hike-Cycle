@@ -1,4 +1,7 @@
-namespace HikeCycle.Models
+using System.Collections.Generic;
+using HikeCycle.Mvc.Models.db;
+
+namespace HikeCycle.Mvc.ViewModels
 {
     public class HomeViewModel
     {

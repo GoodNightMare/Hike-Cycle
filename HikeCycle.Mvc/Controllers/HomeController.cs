@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore; 
-using HikeCycle.Models;
+using HikeCycle.Mvc.ViewModels;
 using HikeCycle.Mvc.Models.db; 
 
 namespace HikeCycle.Controllers

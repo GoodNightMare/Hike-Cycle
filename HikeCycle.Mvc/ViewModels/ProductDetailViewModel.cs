@@ -1,7 +1,7 @@
 using System.Text.Json;
 using HikeCycle.Mvc.Models.db;
 
-namespace HikeCycle.Mvc.Models
+namespace HikeCycle.Mvc.ViewModels
 {
     public class ProductDetailViewModel
     {
