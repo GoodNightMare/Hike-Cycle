@@ -53,7 +53,7 @@ namespace HikeCycle.Mvc.Controllers
             }
             else if (user.Role == "staff")
             {
-                return RedirectToAction("Index", "AdminOrders");
+                return RedirectToAction("Index", "AdminBookings");
             }
             else
             {
