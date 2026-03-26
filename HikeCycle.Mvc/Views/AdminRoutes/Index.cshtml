@@ -1,4 +1,268 @@
+@using HikeCycle.Mvc.Models.db
+@model IEnumerable<RecommendedRoute>
+
 @{
     Layout = "_AdminLayout";
-    ViewData["Title"] = "เส้นทาง";
+    ViewData["Title"] = "Routes";
+}
+
+<div class="p-4">
+    @Html.AntiForgeryToken()
+    <h1 class="text-2xl font-bold mb-4">จัดการเส้นทาง</h1>
+
+    <button id="add-route-btn"
+            class="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">เพิ่มเส้นทาง</button>
+
+    <!-- Routes Table -->
+    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-4">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+                <th scope="col" class="py-3 px-6">Id</th>
+                <th scope="col" class="py-3 px-6">Name</th>
+                <th scope="col" class="py-3 px-6">Province</th>
+                <th scope="col" class="py-3 px-6">Duration</th>
+                <th scope="col" class="py-3 px-6">Distance</th>
+                <th scope="col" class="py-3 px-6">Level</th>
+                <th scope="col" class="py-3 px-6">Highlight</th>
+                <th scope="col" class="py-3 px-6">Suitable</th>
+                <th scope="col" class="py-3 px-6">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="routes-tbody">
+            @foreach (var item in Model)
+            {
+                <tr data-id="@item.Id">
+                    <td class="py-4 px-6">@item.Id</td>
+                    <td class="py-4 px-6" data-prop="Name">@item.Name</td>
+                    <td class="py-4 px-6" data-prop="Province">@item.Province</td>
+                    <td class="py-4 px-6" data-prop="Duration">@item.Duration</td>
+                    <td class="py-4 px-6" data-prop="Distance">@item.Distance</td>
+                    <td class="py-4 px-6" data-prop="Level">@item.Level</td>
+                    <td class="py-4 px-6" data-prop="Highlight">@item.Highlight</td>
+                    <td class="py-4 px-6" data-prop="Suitable">@item.Suitable</td>
+                    <td class="py-4 px-6">
+                        <button class="font-medium text-blue-600 dark:text-blue-500 hover:underline edit-btn">Edit</button>
+                        |
+                        <button
+                        class="font-medium text-red-600 dark:text-red-500 hover:underline delete-btn">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal -->
+<div id="route-modal" class="fixed inset-0 z-[100] hidden justify-center">
+    @* Backdrop *@
+    <div id="modal-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"></div>
+    
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-auto p-8 z-[110]">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="modal-title" class="text-xl font-black text-gray-900"></h2>
+                @* ปุ่ม X *@
+                <button type="button" onclick="hideModal()" class="text-gray-400 hover:text-gray-900">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <form id="route-form" class="space-y-4">
+                <input type="hidden" id="route-id" name="Id">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Route Name</label>
+                        <input type="text" id="route-name" name="Name" placeholder="สถานที่"
+                               class="form-control bg-gray-100 p-2 rounded-lg" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Province</label>
+                        <input type="text" id="route-province" name="Province" placeholder="จังหวัด"
+                               class="form-control bg-gray-100 p-2 rounded-lg" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Duration</label>
+                        <input type="text" id="route-duration" name="Duration" placeholder="ระยะเวลา"
+                               class="form-control bg-gray-100 p-2 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Distance</label>
+                        <input type="text" id="route-distance" name="Distance" placeholder="ระยะทาง"
+                               class="form-control  bg-gray-100 p-2 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Level</label>
+                        <input type="text" id="route-level" name="Level" placeholder="ระดับที่เหมาะกับผู้เดิน"
+                               class="form-control bg-gray-100 p-2 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Highlight</label>
+                        <input type="text" id="route-highlight" name="Highlight" placeholder="ไฮไลท์"
+                               class="form-control bg-gray-100 p-2 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Suitable For</label>
+                        <input type="text" id="route-suitable" name="Suitable" placeholder="เหมาะกับ..."
+                               class="form-control bg-gray-100 p-2 rounded-lg">
+                    </div>
+                </div>
+                
+                <div class="mt-8 flex justify-end gap-3">
+                    <button type="button" onclick="hideModal()"
+                            class="px-5 py-2.5 text-sm font-bold text-gray-500 hover:text-gray-800 transition">Cancel</button>
+                    <button type="submit" id="save-route-btn"
+                            class="text-white bg-black hover:bg-gray-800 font-bold rounded-xl text-sm px-8 py-2.5 shadow-lg transition transform hover:scale-105">
+                        Save Route
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            // 🚩 เปลี่ยนเป็น window. เพื่อให้เรียกใช้จาก onclick ใน HTML ได้
+            window.showModal = function (title) {
+                console.log("Opening Modal...")
+                $('#modal-title').text(title);
+                $('#route-modal').removeClass('hidden').css('display', 'flex');
+                $('body').addClass('overflow-hidden'); // กันเลื่อนหน้าจอข้างหลัง
+            }
+
+            window.hideModal = function () {
+                console.log("Attempting to hide modal...");
+    
+                // 1. สั่งซ่อนด้วยวิธีต่างๆ ทั้งลบคลาสและสั่ง CSS ตรงๆ
+                $('#route-modal').addClass('hidden').removeClass('flex').hide();
+    
+                // 2. ปลดล็อก Scrollbar
+                $('body').removeClass('overflow-hidden');
+    
+                // 3. ล้างฟอร์ม (ใส่ Try-Catch กันพัง)
+                try {
+                    $('#route-form')[0].reset();
+                    $('#route-id').val('');
+                } catch (e) {
+                    console.error("Reset form failed", e);
+                }
+            }
+
+            $('#add-route-btn').on('click', function () {
+                showModal('เพิ่มเส้นทางใหม่');
+            });
+
+            $('#close-modal').on('click', function () {
+                hideModal();
+            });
+
+            // ปิด Modal เมื่อคลิกพื้นหลังสีดำ
+            $('#route-modal > div:first-child').on('click', function () {
+                hideModal();
+            });
+
+            // ส่วนของ Edit ให้ดึงค่ามาใส่ Form
+            $('#routes-tbody').on('click', '.edit-btn', function () {
+                var row = $(this).closest('tr');
+                var id = row.data('id');
+                showModal('แก้ไขเส้นทาง');
+        
+                $('#route-id').val(id);
+                console.log(id)
+                row.find('td[data-prop]').each(function () {
+                    var prop = $(this).data('prop');
+                    var val = $(this).text().trim();
+                    $(`[name="${prop}"]`).val(val);
+                });
+            });
+
+            $('#route-form').on('submit', function (e) {
+                e.preventDefault();
+                var id = $('#route-id').val();
+
+                var formData = $(this).serializeArray().reduce(function (obj, item) {
+                    // 🚩 ถ้าชื่อฟิลด์คือ Id และค่าเป็นว่าง (ตอน Create) ให้ข้ามไป ไม่ต้องส่งไปใน JSON
+                    if (item.name === "Id" && !item.value) {
+                        return obj;
+                    }
+                    obj[item.name] = item.value;
+                    return obj;
+                }, {});
+
+                var url = id ? '@Url.Action("UpdateRoute")' : '@Url.Action("CreateRoute")';
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
+                    success: function (route) {
+                        hideModal();
+                        if (id) {
+                            var row = $(`#routes-tbody tr[data-id="${id}"]`);
+                            row.find('td[data-prop="Name"]').text(route.name);
+                            row.find('td[data-prop="Province"]').text(route.province);
+                            row.find('td[data-prop="Duration"]').text(route.duration);
+                            row.find('td[data-prop="Distance"]').text(route.distance);
+                            row.find('td[data-prop="Level"]').text(route.level);
+                            row.find('td[data-prop="Highlight"]').text(route.highlight);
+                            row.find('td[data-prop="Suitable"]').text(route.suitable);
+                        } else {
+                            var newRow = `
+                                                <tr data-id="${route.id}">
+                                                    <td class="py-4 px-6">${route.id}</td>
+                                                    <td class="py-4 px-6" data-prop="Name">${route.name}</td>
+                                                    <td class="py-4 px-6" data-prop="Province">${route.province}</td>
+                                                    <td class="py-4 px-6" data-prop="Duration">${route.duration}</td>
+                                                    <td class="py-4 px-6" data-prop="Distance">${route.distance}</td>
+                                                    <td class="py-4 px-6" data-prop="Level">${route.level}</td>
+                                                    <td class="py-4 px-6" data-prop="Highlight">${route.highlight}</td>
+                                                    <td class="py-4 px-6" data-prop="Suitable">${route.suitable}</td>
+                                                    <td class="py-4 px-6">
+                                                        <button class="font-medium text-blue-600 dark:text-blue-500 hover:underline edit-btn">Edit</button> |
+                                                        <button class="font-medium text-red-600 dark:text-red-500 hover:underline delete-btn">Delete</button>
+                                                    </td>
+                                                </tr>`;
+                            $('#routes-tbody').append(newRow);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error:", status, error);
+                        alert('Error saving route.');
+                    }
+                });
+            });
+
+            // Delete
+            $('#routes-tbody').on('click', '.delete-btn', function () {
+                var row = $(this).closest('tr');
+                var id = row.data('id');
+
+                if (confirm('ต้องการลบเส้นทางนี้ใช่หรือไม่')) {
+                    $.ajax({
+                        url: '@Url.Action("DeleteRoute", "AdminRoutes")',
+                        type: 'POST',
+                        data: { id: id },
+                        headers: {
+                            'RequestVerificationToken': token
+                        },
+                        success: function () {
+                            row.remove();
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error deleting route:", status, error);
+                            alert('Error deleting route.');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 }
