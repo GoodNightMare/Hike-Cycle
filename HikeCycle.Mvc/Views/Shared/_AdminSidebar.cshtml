@@ -36,17 +36,18 @@
                 <span class="font-medium">Dashboard</span>
             </a>
 
+            <a asp-controller="AdminProducts" asp-action="Index"
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl transition @IsActive("AdminProducts")">
+                <i class="fa-solid fa-boxes-stacked w-5 text-purple-400"></i>
+                <span class="font-medium">Products</span>
+            </a>
+
             <a asp-controller="AdminBookings" asp-action="Index"
                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition @IsActive("AdminBookings")">
                 <i class="fa-solid fa-calendar-check w-5 text-emerald-400"></i>
                 <span class="font-medium">Bookings</span>
             </a>
 
-            <a asp-controller="AdminProducts" asp-action="Index"
-                   class="flex items-center gap-3 px-4 py-3 rounded-xl transition @IsActive("AdminProducts")">
-                <i class="fa-solid fa-boxes-stacked w-5 text-purple-400"></i>
-                <span class="font-medium">Products</span>
-            </a>
 
             <a asp-controller="AdminReturns" asp-action="Index"
                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition @IsActive("AdminReturns")">
@@ -77,15 +78,6 @@
                 <i class="fa-solid fa-map-location-dot w-5 text-green-600"></i>
                 <span class="font-medium">Routes</span>
             </a>
-
-
-            <div class="my-4 border-t border-gray-800"></div>
-
-            <a asp-controller="AdminSettings" asp-action="Index"
-                   class="flex items-center gap-3 px-4 py-3 rounded-xl transition @IsActive("AdminSettings")">
-                <i class="fa-solid fa-gears w-5"></i>
-                <span class="font-medium">Settings</span>
-            </a>
         }
         
         @* --- เมนูสำหรับ Staff --- *@
@@ -93,17 +85,18 @@
         {
             <p class="px-2 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">Main Menu</p>
             
+            <a asp-controller="AdminProducts" asp-action="Index"
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl transition @IsActive("AdminProducts")">
+                <i class="fa-solid fa-boxes-stacked w-5 text-purple-400"></i>
+                <span class="font-medium">Products</span>
+            </a>
+            
             <a asp-controller="AdminBookings" asp-action="Index"
                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition @IsActive("AdminBookings")">
                 <i class="fa-solid fa-calendar-check w-5 text-emerald-400"></i>
                 <span class="font-medium">Bookings</span>
             </a>
 
-            <a asp-controller="AdminProducts" asp-action="Index"
-                   class="flex items-center gap-3 px-4 py-3 rounded-xl transition @IsActive("AdminProducts")">
-                <i class="fa-solid fa-boxes-stacked w-5 text-purple-400"></i>
-                <span class="font-medium">Products</span>
-            </a>
 
             <a asp-controller="AdminReturns" asp-action="Index"
                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition @IsActive("AdminReturns")">

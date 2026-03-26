@@ -8,15 +8,11 @@
 
 <header class="w-full h-16 bg-white border-b flex items-center justify-between px-6 shadow-sm sticky top-0 z-40">
     @* ซ้าย: (ว่างไว้เผื่อใส่ปุ่ม Toggle Sidebar ในอนาคต) *@
-    <div>
-        @* สามารถใส่ชื่อร้านหรือ Breadcrumbs ตรงนี้ได้ *@
-        <span class="text-gray-400 text-sm">HikeCycle Dashboard</span>
-    </div>
 
     @* ขวา: ข้อมูลผู้ใช้และปุ่ม Logout *@
-    <div class="flex items-center gap-6">
+    <div class="flex items-center gap-6 w-full">
         @* User info *@
-        <div class="flex items-center gap-3 text-sm text-gray-700">
+        <div class="flex flex-1  items-center gap-3 text-sm text-gray-700">
             <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
                 <i class="fa-solid fa-user-circle text-gray-400 text-xl"></i>
             </div>
@@ -28,15 +24,15 @@
             </div>
         </div>
 
-        <div class="h-6 w-[1px] bg-gray-200"></div>
-
         @* Logout *@
-        <form asp-controller="Account" asp-action="Logout" method="post">
-            <button type="submit"
-                    class="flex items-center gap-2 text-red-500 hover:text-red-700 text-sm font-bold transition-colors group">
-                <i class="fa-solid fa-arrow-right-from-bracket group-hover:translate-x-1 transition-transform"></i>
-                <span>ออกจากระบบ</span>
-            </button>
-        </form>
+        <div class="flex-1 flex justify-end">
+            <form asp-controller="Account" asp-action="Logout" method="post">
+                <button type="submit"
+                        class="flex items-center gap-2 text-red-500 hover:text-red-700 text-sm font-bold transition-colors group">
+                    <i class="fa-solid fa-arrow-right-from-bracket group-hover:translate-x-1 transition-transform"></i>
+                    <span>ออกจากระบบ</span>
+                </button>
+            </form>
+        </div>
     </div>
 </header>
