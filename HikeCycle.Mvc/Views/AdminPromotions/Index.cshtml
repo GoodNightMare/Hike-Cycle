@@ -1,4 +1,60 @@
+@model IEnumerable<HikeCycle.Mvc.Models.db.Promotion>
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "โปรโมชั่น";
 }
+
+<div class="p-8">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-2xl font-black text-gray-900 uppercase tracking-tight">Promotions</h1>
+            <p class="text-sm text-gray-500">จัดการส่วนลดและสิทธิพิเศษสำหรับลูกค้า</p>
+        </div>
+        <button id="add-promo-btn"
+                class="bg-black hover:bg-gray-800 text-white font-bold py-2.5 px-6 rounded-xl transition-all shadow-lg flex items-center gap-2">
+            <i class="fa-solid fa-plus text-xs"></i>
+            Create Promotion
+        </button>
+    </div>
+
+    <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+        <table class="w-full text-sm text-left">
+            <thead class="bg-gray-50/50 border-b border-gray-100">
+                <tr>
+                    <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px]">ID</th>
+                    <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px]">Title</th>
+                    <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px]">Description</th>
+                    <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px] text-center">Type</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                @foreach (var item in Model)
+                {
+                    <tr class="group hover:bg-gray-50/50 transition-colors">
+                        <td class="py-4 px-6 font-mono text-xs text-gray-400">#@item.Id</td>
+                        <td class="py-4 px-6">
+                            <div class="font-bold text-gray-900">@item.Title</div>
+                        </td>
+                        <td class="py-4 px-6">
+                            <div class="text-xs text-gray-500">@item.Description</div>
+                        </td>
+                        <td class="py-4 px-6 text-center">
+                            @{
+                                var typeColor = item.Type switch
+                                {
+                                    "Discount" => "bg-blue-50 text-blue-600 border-blue-100",
+                                    "FreeDay" => "bg-purple-50 text-purple-600 border-purple-100",
+                                    "Cashback" => "bg-orange-50 text-orange-600 border-orange-100",
+                                    _ => "bg-gray-50 text-gray-600 border-gray-100"
+                                };
+                            }
+                            <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border @typeColor">
+                                @item.Type
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

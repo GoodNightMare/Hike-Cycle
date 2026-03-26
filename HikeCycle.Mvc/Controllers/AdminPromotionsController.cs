@@ -12,7 +12,10 @@ namespace HikeCycle.Mvc.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View();
+            var promotions = await _context.Promotions
+                                   .OrderBy(p => p.Id)
+                                   .ToListAsync();
+            return View(promotions);
         }
     }
 }
