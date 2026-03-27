@@ -3,17 +3,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HikeCycle.Mvc.Models.db
 {
-    [Table("booking_items")] // 🚩 ระบุชื่อตารางให้ตรงกับ MySQL (มีขีดล่าง)
+    [Table("booking_items")] 
     public class BookingItem
     {
         [Key]
-        [Column("id")] // 🚩 ระบุชื่อคอลัมน์ให้ตรงกับ SQL
+        [Column("id")]
         public int Id { get; set; }
 
-        [Column("booking_id")] // 🚩 ตรงกับ booking_id ใน SQL
+        [Column("booking_id")]
         public int BookingId { get; set; }
 
-        [Column("product_id")] // 🚩 ตรงกับ product_id ใน SQL
+        [Column("product_id")]
         public int ProductId { get; set; }
 
         [Column("size")]
@@ -23,16 +23,15 @@ namespace HikeCycle.Mvc.Models.db
         [Column("quantity")]
         public int Quantity { get; set; }
 
-        [Column("is_free")] // 🚩 ตรงกับ is_free ใน SQL
+        [Column("is_free")] 
         public bool IsFree { get; set; }
 
-        [Column("price_per_day", TypeName = "decimal(10,2)")] // 🚩 ตรงกับ price_per_day
+        [Column("price_per_day", TypeName = "decimal(10,2)")] 
         public decimal PricePerDay { get; set; }
 
-        [Column("item_total", TypeName = "decimal(10,2)")] // 🚩 ตรงกับ item_total
+        [Column("item_total", TypeName = "decimal(10,2)")] 
         public decimal ItemTotal { get; set; }
 
-        // Navigation Properties
         [ForeignKey("BookingId")]
         public virtual Booking Booking { get; set; } = null!;
 
