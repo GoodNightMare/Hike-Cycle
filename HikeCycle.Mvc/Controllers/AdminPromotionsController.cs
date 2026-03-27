@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HikeCycle.Mvc.Models.db;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HikeCycle.Mvc.Controllers
 {
+    [Authorize(Roles = "admin,staff")]
     public class AdminPromotionsController : Controller
     {
         private readonly HikeCycledbContext _context;
