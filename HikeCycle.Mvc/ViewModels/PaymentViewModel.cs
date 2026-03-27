@@ -8,5 +8,8 @@ namespace HikeCycle.Mvc.ViewModels
         public decimal OriginalTotal { get; set; }
         public decimal TotalDiscount { get; set; }
         public string ShippingAddress { get; set; }
+
+        public string? VoucherCode { get; set; }
+        public decimal VoucherDiscount { get; set; }
     }
 }

@@ -8,6 +8,7 @@ public class RecommendedRoute {
     public string? Duration { get; set; }
     public string? Distance { get; set; }
     public string? Level { get; set; }
+    public string? Season { get; set; }
     public string? Highlight { get; set; }
     public string? Suitable { get; set; }
     

@@ -50,4 +50,140 @@
             </div>
         </div>
     </div>
-</div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+        <div class="chart-container" style="position: relative; height:40vh; width:100%;">
+            <h3 class="text-lg font-black text-gray-900 uppercase tracking-tight">รายได้รวม (7 วันล่าสุด)</h3>
+            <canvas id="revenueChart"></canvas>
+        </div>
+
+        <div class="chart-container" style="position: relative; height:300px; width:100%; margin-top: 20px;">
+            <h3 class="text-lg font-black text-gray-900 uppercase tracking-tight">จำนวนการจอง (7 วันล่าสุด)</h3>
+            <canvas id="bookingChart"></canvas>
+        </div>
+        <div class="mt-8 bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-black text-gray-900 uppercase tracking-tight">5 อันดับสินค้าเช่ายอดฮิต</h3>
+                <span class="text-[10px] font-bold bg-amber-50 text-amber-600 px-3 py-1 rounded-full uppercase">Most
+                    Rented</span>
+                </div>
+                <div style="position: relative; height:350px; width:100%;">
+                    <canvas id="topProductsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+
+        @section Scripts {
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                // ดึงข้อมูลจาก ViewBag (แปลงเป็น JSON)
+                const labels = @Html.Raw(Json.Serialize(ViewBag.ChartLabels));
+                const revenues = @Html.Raw(Json.Serialize(ViewBag.ChartRevenues));
+                const counts = @Html.Raw(Json.Serialize(ViewBag.ChartCounts));
+
+                // 📊 กราฟรายได้ (Line Chart)
+                new Chart(document.getElementById('revenueChart'), {
+                type: 'line',
+                data: {
+                labels: labels,
+                datasets: [{
+                label: 'รายได้ (บาท)',
+                data: revenues,
+                borderColor: '#10b981', // green-500
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderWidth: 4,
+                pointBackgroundColor: '#fff',
+                pointBorderWidth: 2,
+                fill: true,
+                tension: 0.4
+                }]
+                },
+                options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                y: { beginAtZero: true, grid: { display: false } },
+                x: { grid: { display: false } }
+                }
+                }
+                });
+
+                // 📊 กราฟจำนวนการจอง (Bar Chart)
+                new Chart(document.getElementById('bookingChart'), {
+                type: 'bar',
+                data: {
+                labels: labels,
+                datasets: [{
+                label: 'จำนวนการจอง',
+                data: counts,
+                backgroundColor: '#3b82f6', // blue-500
+                borderRadius: 10,
+                }]
+                },
+                options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { display: false } },
+                x: { grid: { display: false } }
+                }
+                }
+                });
+
+
+
+
+                // ดึงข้อมูลจาก ViewBag
+                const topNames = @Html.Raw(Json.Serialize(ViewBag.TopProductNames));
+                const topCounts = @Html.Raw(Json.Serialize(ViewBag.TopProductCounts));
+
+                // 📊 กราฟสินค้าเช่าบ่อย (Vertical Bar Chart)
+                new Chart(document.getElementById('topProductsChart'), {
+                type: 'bar',
+                data: {
+                labels: topNames,
+                datasets: [{
+                label: 'จำนวนชิ้นที่ถูกเช่า',
+                data: topCounts,
+                backgroundColor: [
+                '#8b5cf6', // Purple
+                '#3b82f6', // Blue
+                '#10b981', // Green
+                '#f59e0b', // Amber
+                '#ef4444'  // Red
+                ],
+                borderRadius: 12, // ทำมุมมนให้สวยเข้ากับ UI
+                barThickness: 40  // ปรับความหนาของแท่ง
+                }]
+                },
+                options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                legend: { display: false } // ปิด Legend เพราะเราใช้สีแยกตามแท่งอยู่แล้ว
+                },
+                scales: {
+                y: {
+                beginAtZero: true,
+                ticks: { stepSize: 1 },
+                grid: { display: false } // ปิดเส้นตารางเพื่อให้ดูคลีน
+                },
+                x: {
+                grid: { display: false },
+                ticks: {
+                // 💡 ทริค: ถ้าชื่อสินค้ายาวเกินไป ให้ตัดคำหรือย่อ
+                callback: function (value) {
+                const label = this.getLabelForValue(value);
+                return label.length > 15 ? label.substr(0, 15) + '...' : label;
+                },
+                font: { size: 11, weight: '600' }
+                }
+                }
+                }
+                }
+                });
+            </script>
+        }

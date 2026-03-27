@@ -27,18 +27,18 @@
 
 <body class="bg-gray-50">
     <header>
-        <nav class="main-color-bg-brown text-white shadow-md">
-            <div class="container mx-auto flex justify-between items-center px-4 py-6">
+        <nav class="main-color-bg-brown text-white shadow-md h-36">
+            <div class="container h-full m-auto flex justify-between items-center px-4 py-6">
                 <a asp-controller="Home" asp-action="Index"
                        class="flex gap-4 items-center hover:text-green-200 transition">
-                    <span class="text-3xl font-bold">Hike-Cycle</span>
-                    <span class="text-sm self-end hidden md:block">เช่าอุปกรณ์เดินป่า</span>
+                    <span class="text-5xl font-bold">Hike-Cycle</span>
+                    <span class="text-m self-end hidden md:block">เช่าอุปกรณ์เดินป่า</span>
                 </a>
 
                 <div class="flex gap-8 text-lg">
                     <div class="flex flex-col items-center group">
-                        <i class="fa-solid fa-tent text-xl group-hover:scale-110 transition"></i>
-                        <a asp-controller="Products" asp-action="Index" class="text-sm">สินค้า</a>
+                        <i class="fa-solid fa-tent text-3xl group-hover:scale-110 transition"></i>
+                        <a asp-controller="Products" asp-action="Index" class="text-xl">สินค้า</a>
                     </div>
 
                     @{
@@ -53,9 +53,9 @@
                         }
                     }
 
-                    <div class="flex flex-col items-center group">
+                    <div class="flex flex-col items-center group mx-8">
                         <div class="relative">
-                            <i class="fa-solid fa-cart-shopping text-xl group-hover:scale-110 transition"></i>
+                            <i class="fa-solid fa-cart-shopping text-3xl group-hover:scale-110 transition"></i>
                             @if (cartCount > 0)
                             {
                                 <span id="cart-count"
@@ -64,7 +64,7 @@
                                 </span>
                             }
                         </div>
-                        <a asp-controller="Cart" asp-action="Index" class="text-sm">ตะกร้า</a>
+                        <a asp-controller="Cart" asp-action="Index" class="text-lg">ตะกร้า</a>
                     </div>
 @{
         // ดึงข้อมูล UserId จาก Session เพื่อเช็คสถานะการ Login
@@ -75,16 +75,16 @@
     {
         @* ถ้าไม่มีข้อมูลใน Session ให้โชว์ "เข้าสู่ระบบ" *@
         <div class="flex flex-col items-center group">
-            <i class="fa-solid fa-circle-user text-xl group-hover:scale-110 transition"></i>
-            <a asp-controller="Account" asp-action="Login" class="text-sm">เข้าสู่ระบบ</a>
+            <i class="fa-solid fa-circle-user text-3xl group-hover:scale-110 transition"></i>
+            <a asp-controller="Account" asp-action="Login" class="text-lg">เข้าสู่ระบบ</a>
         </div>
     }
     else
     {
         @* ถ้ามีข้อมูลใน Session ให้โชว์ "โปรไฟล์" *@
         <div class="flex flex-col items-center group">
-            <i class="fa-solid fa-user-gear text-xl group-hover:scale-110 transition"></i>
-            <a asp-controller="Account" asp-action="Profile" class="text-sm">โปรไฟล์</a>
+            <i class="fa-solid fa-user-gear text-3xl group-hover:scale-110 transition"></i>
+            <a asp-controller="Account" asp-action="Profile" class="text-lg">โปรไฟล์</a>
         </div>
     }
                 </div>

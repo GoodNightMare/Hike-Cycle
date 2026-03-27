@@ -23,6 +23,8 @@ namespace HikeCycle.Mvc.Models.db
         public DbSet<PromotionCondition> PromotionConditions { get; set; }
         public DbSet<PromotionBenefit> PromotionBenefits { get; set; }
 
+        public virtual DbSet<UserVoucher> UserVouchers { get; set; }
+
         public DbSet<RecommendedRoute> RecommendedRoutes { get; set; }
 
         public  DbSet<Booking> Bookings { get; set; }

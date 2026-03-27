@@ -127,6 +127,38 @@
                     }
                 </div>
             }
+@* --- ส่วนเลือก Voucher --- *@
+@if (Model.AvailableVouchers != null && Model.AvailableVouchers.Any())
+{
+    <div class="mt-8">
+        <h2 class="text-2xl font-black mb-4 flex items-center gap-2 text-amber-800">
+            <i class="fa-solid fa-ticket"></i> Voucher
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            @foreach (var v in Model.AvailableVouchers)
+            {
+                @* 🚩 เพิ่ม border-gray-100 เป็นพื้นฐาน *@
+                <label class="relative flex items-center gap-4 p-5 bg-white border-2 border-gray-100 rounded-2xl cursor-pointer hover:border-amber-400 transition shadow-sm group"
+                       id="label-voucher-@v.Id">
+                    
+                    <input type="radio" name="selectedVoucher" value="@v.Amount" 
+                           data-code="@v.Code"
+                           class="w-6 h-6 text-amber-600 focus:ring-amber-500 border-gray-300"
+                           onchange="applyVoucher(@v.Id, @v.Amount, '@v.Code')">
+                    
+                    <div class="flex-grow">
+                        <div class="flex items-center gap-2">
+                            <span class="font-black text-lg text-gray-900 uppercase tracking-tight">@v.Code</span>
+                        </div>
+                        <p class="text-sm text-amber-600 font-black">ลดเพิ่ม ฿@v.Amount.ToString("N0")</p>
+                    </div>
+                </label>
+            }
+        </div>
+    
+    </div>
+}
         </div>
 
 
@@ -188,21 +220,39 @@
 
             <div class="flex flex-col md:flex-row items-center gap-6 md:gap-12 order-1 md:order-2 w-full md:w-auto">
                 <div class="text-center md:text-right">
-                    <p class="text-gray-500 text-sm">ราคารวม</p>
-                    <p class="text-xl font-bold text-gray-500 line-through">
-                        ฿@Model.CalculationResult.OriginalTotal.ToString("F2")</p>
-            
-                        <p class="text-gray-500 text-sm mt-2">ส่วนลด</p>
-                        <p class="text-xl font-bold text-red-500">-฿@Model.CalculationResult.TotalDiscount.ToString("F2")</p>
+    <p class="text-gray-500 text-sm">ราคารวม</p>
+    <p class="text-xl font-bold text-gray-500 line-through">
+        ฿@Model.CalculationResult.OriginalTotal.ToString("F2")
+    </p>
 
-                        <p class="text-gray-500 text-sm uppercase tracking-widest mt-2">ยอดชำระรวมทั้งหมด</p>
-                        <p class="text-4xl font-black text-green-600">฿@Model.CalculationResult.FinalTotal.ToString("F2")</p>
-                    </div>
+    <p class="text-gray-500 text-sm mt-2">ส่วนลดโปรโมชั่น</p>
+    <p class="text-xl font-bold text-red-500">-฿@Model.CalculationResult.TotalDiscount.ToString("F2")</p>
+
+    @* 🚩 เพิ่มส่วนแสดงผล Voucher (ซ่อนไว้ก่อน) *@
+    <div id="voucher-display" class="hidden animate-in fade-in duration-300">
+        <p class="text-amber-600 text-sm mt-2 font-black">
+            ส่วนลด Voucher (<span id="voucher-code-text"></span>)
+        </p>
+        <p class="text-xl font-bold text-amber-500">
+            -฿<span id="voucher-amount-text">0.00</span>
+        </p>
+    </div>
+
+    <p class="text-gray-500 text-sm uppercase tracking-widest mt-2">ยอดชำระรวมทั้งหมด</p>
+    <p class="text-4xl font-black text-green-600">
+        @* 🚩 สำคัญ: ต้องมี id="grand-total" *@
+        ฿<span id="grand-total">@Model.CalculationResult.FinalTotal.ToString("F2")</span>
+    </p>
+</div>
         
                     <form asp-controller="Payments" asp-action="Index" method="get" id="checkoutForm" onsubmit="return validateCheckout()">
                         <input type="hidden" name="originalTotal" value="@Model.CalculationResult.OriginalTotal" />
                         <input type="hidden" name="totalDiscount" value="@Model.CalculationResult.TotalDiscount" />
+                        <input type="hidden" name="voucherCode" id="finalVoucherCode" value="" />
+                        <input type="hidden" name="voucherDiscount" id="finalVoucherDiscount" value="0" />
                         <input type="hidden" name="finalTotal" value="@Model.CalculationResult.FinalTotal" />
+
+                        <input type="hidden" name="finalTotal" id="hiddenFinalTotal" value="@Model.CalculationResult.FinalTotal" />
         
                         @* 🚩 Input ลับเพื่อส่งที่อยู่จัดส่งไปยังหน้า Payment *@
                         <input type="hidden" name="shippingAddress" id="finalShippingAddress"
@@ -329,6 +379,65 @@
 document.getElementById('displayShippingAddress').addEventListener('input', function() {
     document.getElementById('finalShippingAddress').value = this.value;
 });
+
+// วางไว้นอก DOMContentLoaded เพื่อให้ onchange เรียกเจอ
+const baseFinalTotal = parseFloat("@Model.CalculationResult.FinalTotal");
+
+function applyVoucher(id, amount, code) {
+    // 1. จัดการ UI: ล้างสีขอบทุกใบก่อน
+    document.querySelectorAll('[id^="label-voucher-"]').forEach(el => {
+        el.classList.remove('border-amber-400', 'bg-amber-50');
+        el.classList.add('border-gray-100');
+    });
+
+    // 2. ไฮไลท์ใบที่เลือก (เช็ค null เพื่อความปลอดภัย)
+    const activeLabel = document.getElementById('label-voucher-' + id);
+    if (activeLabel) {
+        activeLabel.classList.remove('border-gray-100');
+        activeLabel.classList.add('border-amber-400', 'bg-amber-50');
+    }
+
+    // 3. คำนวณยอดเงินใหม่
+    const newTotal = Math.max(0, baseFinalTotal - amount);
+
+    // 4. อัปเดตตัวเลขในหน้าเว็บ
+    const grandTotalDisplay = document.getElementById('grand-total');
+    if (grandTotalDisplay) {
+        grandTotalDisplay.innerText = newTotal.toLocaleString(undefined, { minimumFractionDigits: 2 });
+    }
+
+    // 5. อัปเดตค่าที่จะส่งไปหน้า Payment
+    document.getElementById('finalVoucherCode').value = code;
+    document.getElementById('finalVoucherDiscount').value = amount;
+    document.getElementById('hiddenFinalTotal').value = newTotal;
+
+    // แสดงรายละเอียดส่วนลด Voucher ในส่วนสรุปยอด
+    document.getElementById('voucher-display')?.classList.remove('hidden');
+    document.getElementById('voucher-code-text').innerText = code;
+    document.getElementById('voucher-amount-text').innerText = amount.toFixed(2);
+    document.getElementById('btn-reset-voucher')?.classList.remove('hidden');
+}
+
+function resetVoucher() {
+    // ล้าง Input Radio
+    document.querySelectorAll('input[name="selectedVoucher"]').forEach(input => input.checked = false);
+    
+    // ล้าง UI ของการเลือก
+    document.querySelectorAll('[id^="label-voucher-"]').forEach(el => {
+        el.classList.remove('border-amber-400', 'bg-amber-50');
+        el.classList.add('border-gray-100');
+    });
+
+    // กลับไปใช้ยอดเดิม
+    document.getElementById('grand-total').innerText = baseFinalTotal.toLocaleString(undefined, { minimumFractionDigits: 2 });
+    document.getElementById('voucher-display')?.classList.add('hidden');
+    document.getElementById('btn-reset-voucher')?.classList.add('hidden');
+    
+    // ล้างค่า Hidden Inputs
+    document.getElementById('finalVoucherCode').value = "";
+    document.getElementById('finalVoucherDiscount').value = "0";
+    document.getElementById('hiddenFinalTotal').value = baseFinalTotal;
+}
 
         </script>
     }

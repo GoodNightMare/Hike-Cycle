@@ -19,7 +19,7 @@ namespace HikeCycle.Mvc.Controllers
         {
             _context = context;
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> Add(int ProductId, string StartDate, string EndDate, string? Size)
         {
@@ -129,12 +129,30 @@ namespace HikeCycle.Mvc.Controllers
                     }
                 }
             }
-            
+
             // Save the potentially modified cart back to the session
             HttpContext.Session.SetString(CartSessionKey, JsonSerializer.Serialize(cartItems));
 
+            var userIdStr = HttpContext.Session.GetString("UserId");
+            List<UserVoucher> availableVouchers = new List<UserVoucher>();
+
+            if (!string.IsNullOrEmpty(userIdStr))
+            {
+                int userId = int.Parse(userIdStr);
+
+                // 🚩 ดึง Voucher ที่ยังไม่ได้ใช้ของผู้ใช้คนนี้
+                availableVouchers = await _context.UserVouchers
+                    .Where(v => v.UserId == userId && !v.IsUsed)
+                    .ToListAsync();
+
+                var profile = await _context.UserProfiles.AsNoTracking()
+                                .FirstOrDefaultAsync(p => p.UserId == userId);
+                ViewBag.UserAddress = profile?.Address;
+            }
+
             var promotions = await _context.Promotions.Where(p => p.Active).ToListAsync();
 
+            // ส่งรายการ Voucher เข้าไปคำนวณด้วย (ถ้าต้องการให้หักลบในยอดสรุปทันที)
             var calculationResult = CalculateCart(cartItems, promotions, isStudent);
 
             var viewModel = new CartViewModel
@@ -142,17 +160,18 @@ namespace HikeCycle.Mvc.Controllers
                 CartItems = cartItems,
                 Promotions = promotions,
                 CalculationResult = calculationResult,
-                IsStudent = isStudent
+                IsStudent = isStudent,
+                // อย่าลืมเพิ่ม Property นี้ใน CartViewModel ของคุณด้วยนะครับ
+                AvailableVouchers = availableVouchers
             };
-
-            var userIdStr = HttpContext.Session.GetString("UserId");
-    if (!string.IsNullOrEmpty(userIdStr))
-    {
-        var profile = await _context.UserProfiles.AsNoTracking()
-                        .FirstOrDefaultAsync(p => p.UserId == int.Parse(userIdStr));
-        // 🚩 ส่งไปที่หน้า View
-        ViewBag.UserAddress = profile?.Address;
-    }
+            
+            if (!string.IsNullOrEmpty(userIdStr))
+            {
+                var profile = await _context.UserProfiles.AsNoTracking()
+                                .FirstOrDefaultAsync(p => p.UserId == int.Parse(userIdStr));
+                // 🚩 ส่งไปที่หน้า View
+                ViewBag.UserAddress = profile?.Address;
+            }
 
             return View(viewModel);
         }
@@ -234,7 +253,7 @@ namespace HikeCycle.Mvc.Controllers
                 AppliedPromotions = appliedPromotions
             };
         }
-        
+
         [HttpPost]
         public IActionResult Remove(string id)
         {

@@ -8,8 +8,6 @@ namespace HikeCycle.Mvc.Models.db
     {
         [Key]
         [Column("user_id")]
-        // เนื่องจากเป็น PK ที่มาจากตาราง users (FK) ปกติจะไม่มี DatabaseGenerated 
-        // เพราะค่าจะถูกส่งมาจากตารางหลัก
         public int UserId { get; set; }
 
         [Column("full_name")]

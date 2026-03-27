@@ -22,6 +22,7 @@
                 <th scope="col" class="py-3 px-6">Province</th>
                 <th scope="col" class="py-3 px-6">Duration</th>
                 <th scope="col" class="py-3 px-6">Distance</th>
+                <th scope="col" class="py-3 px-6">Season</th>
                 <th scope="col" class="py-3 px-6">Level</th>
                 <th scope="col" class="py-3 px-6">Highlight</th>
                 <th scope="col" class="py-3 px-6">Suitable</th>
@@ -37,14 +38,14 @@
                     <td class="py-4 px-6" data-prop="Province">@item.Province</td>
                     <td class="py-4 px-6" data-prop="Duration">@item.Duration</td>
                     <td class="py-4 px-6" data-prop="Distance">@item.Distance</td>
+                    <td class="py-4 px-6" data-prop="Season">@item.Season</td>
                     <td class="py-4 px-6" data-prop="Level">@item.Level</td>
                     <td class="py-4 px-6" data-prop="Highlight">@item.Highlight</td>
                     <td class="py-4 px-6" data-prop="Suitable">@item.Suitable</td>
                     <td class="py-4 px-6">
-                        <button class="font-medium text-blue-600 dark:text-blue-500 hover:underline edit-btn">Edit</button>
+                        <button class="font-medium text-blue-600 dark:text-blue-500 hover:underline edit-btn">แก้ไข</button>
                         |
-                        <button
-                        class="font-medium text-red-600 dark:text-red-500 hover:underline delete-btn">Delete</button>
+                        <button class="font-medium text-red-600 dark:text-red-500 hover:underline delete-btn">ลบ</button>
                     </td>
                 </tr>
             }
@@ -91,6 +92,11 @@
                                class="form-control  bg-gray-100 p-2 rounded-lg">
                     </div>
                     <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Season</label>
+                        <input type="text" id="route-season" name="Season" placeholder="ฤดู"
+                               class="form-control  bg-gray-100 p-2 rounded-lg">
+                    </div>
+                    <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Level</label>
                         <input type="text" id="route-level" name="Level" placeholder="ระดับที่เหมาะกับผู้เดิน"
                                class="form-control bg-gray-100 p-2 rounded-lg">
@@ -109,10 +115,10 @@
                 
                 <div class="mt-8 flex justify-end gap-3">
                     <button type="button" onclick="hideModal()"
-                            class="px-5 py-2.5 text-sm font-bold text-gray-500 hover:text-gray-800 transition">Cancel</button>
+                            class="px-5 py-2.5 text-sm font-bold text-gray-500 hover:text-gray-800 transition">ยกเลิก</button>
                     <button type="submit" id="save-route-btn"
                             class="text-white bg-black hover:bg-gray-800 font-bold rounded-xl text-sm px-8 py-2.5 shadow-lg transition transform hover:scale-105">
-                        Save Route
+                        บันทึก
                     </button>
                 </div>
             </form>
@@ -210,25 +216,26 @@
                             row.find('td[data-prop="Province"]').text(route.province);
                             row.find('td[data-prop="Duration"]').text(route.duration);
                             row.find('td[data-prop="Distance"]').text(route.distance);
+                            row.find('td[data-prop="Season"]').text(route.season);
                             row.find('td[data-prop="Level"]').text(route.level);
                             row.find('td[data-prop="Highlight"]').text(route.highlight);
                             row.find('td[data-prop="Suitable"]').text(route.suitable);
                         } else {
                             var newRow = `
-                                                <tr data-id="${route.id}">
-                                                    <td class="py-4 px-6">${route.id}</td>
-                                                    <td class="py-4 px-6" data-prop="Name">${route.name}</td>
-                                                    <td class="py-4 px-6" data-prop="Province">${route.province}</td>
-                                                    <td class="py-4 px-6" data-prop="Duration">${route.duration}</td>
-                                                    <td class="py-4 px-6" data-prop="Distance">${route.distance}</td>
-                                                    <td class="py-4 px-6" data-prop="Level">${route.level}</td>
-                                                    <td class="py-4 px-6" data-prop="Highlight">${route.highlight}</td>
-                                                    <td class="py-4 px-6" data-prop="Suitable">${route.suitable}</td>
-                                                    <td class="py-4 px-6">
-                                                        <button class="font-medium text-blue-600 dark:text-blue-500 hover:underline edit-btn">Edit</button> |
-                                                        <button class="font-medium text-red-600 dark:text-red-500 hover:underline delete-btn">Delete</button>
-                                                    </td>
-                                                </tr>`;
+                                                    <tr data-id="${route.id}">
+                                                        <td class="py-4 px-6">${route.id}</td>
+                                                        <td class="py-4 px-6" data-prop="Name">${route.name}</td>
+                                                        <td class="py-4 px-6" data-prop="Province">${route.province}</td>
+                                                        <td class="py-4 px-6" data-prop="Duration">${route.duration}</td>
+                                                        <td class="py-4 px-6" data-prop="Distance">${route.distance}</td>
+                                                        <td class="py-4 px-6" data-prop="Level">${route.level}</td>
+                                                        <td class="py-4 px-6" data-prop="Highlight">${route.highlight}</td>
+                                                        <td class="py-4 px-6" data-prop="Suitable">${route.suitable}</td>
+                                                        <td class="py-4 px-6">
+                                                            <button class="font-medium text-blue-600 dark:text-blue-500 hover:underline edit-btn">Edit</button> |
+                                                            <button class="font-medium text-red-600 dark:text-red-500 hover:underline delete-btn">Delete</button>
+                                                        </td>
+                                                    </tr>`;
                             $('#routes-tbody').append(newRow);
                         }
                     },

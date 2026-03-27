@@ -12,5 +12,7 @@ namespace HikeCycle.Mvc.ViewModels
         public bool IsStudent { get; set; }
 
         public int? BookingId { get; set; }
+
+        public List<UserVoucher> AvailableVouchers { get; set; } = new();
     }
 }

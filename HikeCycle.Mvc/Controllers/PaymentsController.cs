@@ -19,15 +19,27 @@ namespace HikeCycle.Mvc.Controllers
             _context = context;
         }
 
-        public IActionResult Index(decimal originalTotal, decimal totalDiscount, decimal finalTotal, string shippingAddress)
+        public IActionResult Index(decimal originalTotal, decimal totalDiscount, decimal finalTotal, string shippingAddress, string? voucherCode, decimal? voucherDiscount)
         {
+            Console.WriteLine("Code: " + voucherCode);
+
+            decimal vDiscount = voucherDiscount ?? 0;
+            decimal combinedDiscount = totalDiscount + vDiscount;
+
+            // 🚩 จุดสำคัญ: ต้องนำยอด finalTotal ที่รับมา หักลบด้วย vDiscount อีกทีหนึ่ง
+            // เพื่อให้ Amount เป็นยอดจ่ายจริงหลังใช้ Voucher
+            decimal actualAmount = finalTotal - vDiscount;
+
             var model = new PaymentViewModel
             {
                 OriginalTotal = originalTotal,
-                TotalDiscount = totalDiscount,
-                Amount = finalTotal,
-                ShippingAddress = shippingAddress
+                TotalDiscount = combinedDiscount,
+                Amount = actualAmount, // 🚩 ใช้ค่าที่หักส่วนลดแล้ว
+                ShippingAddress = shippingAddress,
+                VoucherCode = voucherCode,
+                VoucherDiscount = vDiscount
             };
+
             return View(model);
         }
 
@@ -88,6 +100,18 @@ namespace HikeCycle.Mvc.Controllers
                     };
                     _context.Bookings.Add(newBooking);
                     await _context.SaveChangesAsync();
+
+                    if (!string.IsNullOrEmpty(model.VoucherCode))
+                    {
+                        var voucher = await _context.UserVouchers
+                            .FirstOrDefaultAsync(v => v.Code == model.VoucherCode && v.UserId == userId && !v.IsUsed);
+
+                        if (voucher != null)
+                        {
+                            voucher.IsUsed = true; // 🚩 ทำเครื่องหมายว่าใช้แล้ว
+                            _context.UserVouchers.Update(voucher);
+                        }
+                    }
 
                     foreach (var item in cartItems)
                     {

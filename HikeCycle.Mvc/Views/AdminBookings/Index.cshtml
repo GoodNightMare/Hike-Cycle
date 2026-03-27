@@ -1,4 +1,189 @@
+@model IEnumerable<HikeCycle.Mvc.Models.db.Booking>
 @{
     Layout = "_AdminLayout";
-    ViewData["Title"] = "การจอง";
+    ViewData["Title"] = "จัดการการจอง";
 }
+
+<div class="">
+    <div class="mb-8">
+        <h1 class="text-2xl font-black text-gray-900 uppercase tracking-tight">รายการเช่า</h1>
+        <p class="text-sm text-gray-500">ตรวจสอบรายการเช่าทั้งหมด</p>
+    </div>
+
+    <div class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 mt-4">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px]">ID / Date</th>
+                    <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px]">Customer</th>
+                    <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px]">Rental Period</th>
+                    <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px] text-center">Items</th>
+                    <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px] text-right">Final Amount</th>
+                    <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px] text-center">Status</th>
+                    <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px] text-center">Return?</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                @foreach (var item in Model)
+                {
+                    <tr class="group hover:bg-gray-50/50 transition-colors">
+                        <td class="py-4 px-6">
+                            <div class="font-mono font-bold text-gray-900">#BK-@item.Id</div>
+                            <div class="text-[10px] text-gray-400">@item.CreatedAt?.ToString("dd MMM yyyy, HH:mm", new
+                                                                                                                                                            System.Globalization.CultureInfo("th-TH"))</div>
+                            </td>
+                            <td class="py-4 px-6">
+                                <div class="font-bold text-gray-700">@item.User.Email</div>
+                                <div class="text-[10px] text-gray-400 truncate max-w-[150px]">@item.ShippingAddress</div>
+                            </td>
+                            <td class="py-4 px-6">
+                                <div class="flex items-center gap-2 text-xs font-medium text-gray-600">
+                                    <span>@item.StartDate.ToString("dd/MM/yy")</span>
+                                    <i class="fa-solid fa-arrow-right text-[10px] text-gray-300"></i>
+                                    <span>@item.EndDate.ToString("dd/MM/yy")</span>
+                                </div>
+                                <div class="text-[10px] text-blue-500 font-bold uppercase">
+                                    เช่า @((item.EndDate - item.StartDate).Days) วัน
+                                </div>
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                <span class="px-2 py-1 bg-gray-100 rounded-md text-xs font-bold text-gray-600">
+                                    @item.BookingItems.Sum(x => x.Quantity) ชิ้น
+                                </span>
+                            </td>
+                            <td class="py-4 px-6 text-right">
+                                <div class="font-black text-gray-900">฿@item.FinalAmount.ToString("F2")</div>
+                                @if (item.DiscountAmount > 0)
+                                {
+                                    <div class="text-[10px] text-red-400 line-through">฿@item.TotalAmount.ToString("F2")</div>
+                                }
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                @{
+                                    var statusClass = item.Status.ToLower() switch
+                                    {
+                                        "pending" => "bg-orange-50 text-orange-600 border-orange-100",
+                                        "confirmed" => "bg-blue-50 text-blue-600 border-blue-100",
+                                        "completed" => "bg-green-50 text-green-600 border-green-100",
+                                        "cancelled" => "bg-red-50 text-red-600 border-red-100",
+                                        _ => "bg-gray-50 text-gray-600 border-gray-100"
+                                    };
+                                }
+                                <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border @statusClass">
+                                    @item.Status
+                                </span>
+                            </td>
+                            <td class="py-4 px-6 text-right">
+                                <div class="flex justify-end gap-2">
+                                    @if (item.Status != "Completed" && item.Status != "Cancelled")
+                                    {
+                                        <button onclick="openReturnModal(@item.Id)"
+                                                class="p-2 text-green-600 hover:bg-green-50 rounded-xl"
+                                                title="Mark as Completed & Return">
+                                            <i class="fa-solid fa-circle-check text-lg"></i>
+                                        </button>
+
+                                        <form asp-action="UpdateStatus" method="post" onsubmit="return confirm('ยืนยันการยกเลิก?')">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <input type="hidden" name="status" value="Cancelled" />
+                                            <button type="submit" class="p-2 text-red-600 hover:bg-red-50 rounded-xl">
+                                                <i class="fa-solid fa-circle-xmark text-lg"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-[10px] font-black uppercase text-gray-300 p-2">ยืนยันแล้ว</span>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="return-modal" class="fixed inset-0 z-[120] hidden items-center justify-center p-4">
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" onclick="closeReturnModal()"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-8">
+            <h2 class="text-xl font-black text-gray-900 uppercase mb-6 tracking-tight text-center">บันทึกการคืนสินค้า</h2>
+        
+            <form asp-action="UpdateStatus" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" id="return-booking-id" />
+                <input type="hidden" name="status" value="Completed" />
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">สภาพสินค้า</label>
+                        <select name="condition"
+                                class="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:ring-1 focus:ring-black text-sm">
+                            <option value="Good">Good (ปกติ)</option>
+                            <option value="Dirty">Dirty (สกปรก)</option>
+                            <option value="Damaged">Damaged (ชำรุด)</option>
+                            <option value="Lost">Lost (สูญหาย)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">ค่าปรับเพิ่มเติม
+                            (ถ้ามี)</label>
+                            <input type="number" name="extraFee" step="0.01" value="0"
+                                   class="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:ring-1 focus:ring-black text-sm">
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">หมายเหตุ</label>
+                            <textarea name="note" rows="2"
+                                      class="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none text-sm"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 mt-8">
+                        <button type="button" onclick="closeReturnModal()"
+                                class="flex-1 font-bold text-gray-400 text-sm">ยกเลิก</button>
+                        <button type="submit"
+                                class="flex-1 bg-black text-white py-3 rounded-xl font-bold shadow-lg hover:bg-gray-800 transition">ยืนยันการคืน</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+            <div id="success-alert"
+                 class="fixed top-5 right-5 z-[200] flex items-center p-4 mb-4 text-green-800 rounded-2xl bg-green-50 border border-green-100 shadow-xl transition-opacity duration-500"
+                 role="alert">
+                <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-green-500 bg-white rounded-lg">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <div class="ml-3 text-sm font-bold pr-8">
+                    @TempData["Success"]
+                </div>
+                <button type="button" onclick="this.parentElement.remove()"
+                        class="ml-auto -mx-1.5 -my-1.5 text-green-500 hover:text-green-900 rounded-lg p-1.5 inline-flex h-8 w-8">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        }
+
+        @section Scripts {
+            <script>
+                function viewBooking(id) {
+                    // โค้ดสำหรับเปิด Modal ดูรายละเอียดสินค้าที่จอง (BookingItems)
+                    console.log("Viewing Booking Details for ID:", id);
+                }
+                function openReturnModal(bookingId) {
+                    $('#return-booking-id').val(bookingId);
+                    $('#return-modal').removeClass('hidden').addClass('flex');
+                    $('body').addClass('overflow-hidden');
+                }
+
+                function closeReturnModal() {
+                    $('#return-modal').addClass('hidden').removeClass('flex');
+                    $('body').removeClass('overflow-hidden');
+                }
+            </script>
+        }

@@ -48,13 +48,6 @@
                 <span class="font-medium">Bookings</span>
             </a>
 
-
-            <a asp-controller="AdminReturns" asp-action="Index"
-                   class="flex items-center gap-3 px-4 py-3 rounded-xl transition @IsActive("AdminReturns")">
-                <i class="fa-solid fa-rotate-left w-5 text-rose-400"></i>
-                <span class="font-medium">Returns</span>
-            </a>
-
             <a asp-controller="AdminReviews" asp-action="Index"
                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition @IsActive("AdminReviews")">
                 <i class="fa-solid fa-comment-dots w-5 text-yellow-400"></i>
@@ -97,17 +90,21 @@
                 <span class="font-medium">Bookings</span>
             </a>
 
-
-            <a asp-controller="AdminReturns" asp-action="Index"
-                   class="flex items-center gap-3 px-4 py-3 rounded-xl transition @IsActive("AdminReturns")">
-                <i class="fa-solid fa-rotate-left w-5 text-rose-400"></i>
-                <span class="font-medium">Returns</span>
-            </a>
-
             <a asp-controller="AdminReviews" asp-action="Index"
                    class="flex items-center gap-3 px-4 py-3 rounded-xl transition @IsActive("AdminReviews")">
                 <i class="fa-solid fa-comment-dots w-5 text-yellow-400"></i>
                 <span class="font-medium">Reviews</span>
+            </a>
+            <a asp-controller="AdminPromotions" asp-action="Index"
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl transition @IsActive("AdminPromotions")">
+                <i class="fa-solid fa-tags w-5 text-orange-500"></i>
+                <span class="font-medium">Promotions</span>
+            </a>
+
+            <a asp-controller="AdminRoutes" asp-action="Index"
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl transition @IsActive("AdminRoutes")">
+                <i class="fa-solid fa-map-location-dot w-5 text-green-600"></i>
+                <span class="font-medium">Routes</span>
             </a>
         }
     </nav>

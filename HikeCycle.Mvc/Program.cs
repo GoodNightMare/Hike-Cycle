@@ -1,10 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using HikeCycle.Mvc.Models.db;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login"; // 🚩 หน้าที่จะให้ไปถ้ายังไม่ได้ Login
+        options.AccessDeniedPath = "/"; // 🚩 หน้าที่จะให้ไปถ้า Role ไม่ถึง (เช่น User พยายามเข้า Admin)
+        options.ExpireTimeSpan = TimeSpan.FromDays(7); // ให้จำ Login ไว้ 7 วัน
+    });
 
 // Add DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -54,6 +61,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseSession();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
