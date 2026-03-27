@@ -5,7 +5,6 @@
 }
 
 <div class="max-w-2xl mx-auto p-6 md:p-10">
-    @* ส่วนหัวหน้าฟอร์ม *@
     <div class="text-center mb-10">
 
         <h1 class="text-3xl font-black mb-2">ให้คะแนนความพึงพอใจ</h1>
@@ -36,7 +35,6 @@
         <input type="hidden" name="BookingId" value="@ViewBag.BookingId" />
 
         <div class="space-y-10">
-            @* 1. ส่วนเลือกดาว (Star Rating) *@
             <div class="text-center">
                 <label class="block text-gray-400 font-black uppercase text-xs mb-4">คุณภาพสินค้าและบริการ</label>
                 <div class="flex flex-row-reverse justify-center gap-2 star-rating">
@@ -53,7 +51,6 @@
             <p id="rating-label" class="mt-4 font-bold text-gray-800 text-lg">ดีเยี่ยม!</p>
         </div>
 
-        @* 2. ส่วนเขียนความคิดเห็น *@
         <div>
             <label asp-for="Comment"
                    class="block text-gray-400 font-black uppercase text-xs mb-3">บอกความรู้สึกของคุณ (ถ้ามี)</label>
@@ -62,7 +59,6 @@
                       placeholder="แชร์ประสบการณ์การใช้งานเครื่องเดินป่าชิ้นนี้..."></textarea>
         </div>
 
-        @* 3. ปุ่มกดส่ง *@
         <div class="pt-4">
             <button type="submit"
                     class="w-full bg-black text-white py-5 rounded-2xl font-black text-lg hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl">
@@ -79,7 +75,6 @@
 
 @section Scripts {
     <script>
-        // Script สำหรับเปลี่ยนข้อความตามจำนวนดาวที่เลือก
         const labels = {
             '5': 'ดีเยี่ยม!',
             '4': 'ดีมาก',

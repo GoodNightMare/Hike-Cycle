@@ -14,7 +14,6 @@ namespace HikeCycle.Mvc.Models.db
         [Column("return_date")]
         public DateTime ReturnDate { get; set; } = DateTime.Now;
 
-        // ใช้ Enum เพื่อให้โค้ดอ่านง่าย (Good, Dirty, Damaged, Lost)
         public ReturnCondition Condition { get; set; }
 
         [Column("extra_fee", TypeName = "decimal(10,2)")]
@@ -25,7 +24,6 @@ namespace HikeCycle.Mvc.Models.db
 
         public string? Note { get; set; }
 
-        // Navigation Property
         [ForeignKey("BookingId")]
         public virtual Booking Booking { get; set; } = null!;
     }

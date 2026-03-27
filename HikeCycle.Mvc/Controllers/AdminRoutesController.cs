@@ -8,13 +8,13 @@ namespace HikeCycle.Mvc.Controllers
     [Authorize(Roles = "admin,staff")]
     public class AdminRoutesController : Controller
     {
-        private readonly HikeCycledbContext _context;
+        private readonly HikeCycledbContext _db;
 
-        public AdminRoutesController(HikeCycledbContext context) => _context = context;
+        public AdminRoutesController(HikeCycledbContext db) => _db = db;
 
         public async Task<IActionResult> Index()
         {
-            var recommendedRoutes = await _context.RecommendedRoutes.ToListAsync();
+            var recommendedRoutes = await _db.RecommendedRoutes.ToListAsync();
             return View(recommendedRoutes);
         }
 
@@ -24,8 +24,8 @@ namespace HikeCycle.Mvc.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.RecommendedRoutes.Add(route);
-                await _context.SaveChangesAsync();
+                _db.RecommendedRoutes.Add(route);
+                await _db.SaveChangesAsync();
                 return Json(route);
             }
             return BadRequest(ModelState);
@@ -37,18 +37,16 @@ namespace HikeCycle.Mvc.Controllers
         {
             if (ModelState.IsValid)
             {
-                // ใช้ Update จะช่วยลดปัญหาเรื่อง Tracking ของ Entity Framework ได้ดีกว่าในบางกรณี
-                _context.RecommendedRoutes.Update(route);
+                _db.RecommendedRoutes.Update(route);
 
                 try
                 {
-                    await _context.SaveChangesAsync();
-                    // 🚩 แก้ไข: ส่ง route กลับไปเพื่อให้ JavaScript อัปเดตตัวหนังสือในตารางทันที
+                    await _db.SaveChangesAsync();
                     return Json(route);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_context.RecommendedRoutes.Any(e => e.Id == route.Id))
+                    if (!_db.RecommendedRoutes.Any(e => e.Id == route.Id))
                     {
                         return NotFound();
                     }
@@ -62,14 +60,14 @@ namespace HikeCycle.Mvc.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteRoute(int id)
         {
-            var route = await _context.RecommendedRoutes.FindAsync(id);
+            var route = await _db.RecommendedRoutes.FindAsync(id);
             if (route == null)
             {
                 return NotFound();
             }
 
-            _context.RecommendedRoutes.Remove(route);
-            await _context.SaveChangesAsync();
+            _db.RecommendedRoutes.Remove(route);
+            await _db.SaveChangesAsync();
             return Ok();
         }
     }

@@ -18,7 +18,6 @@ namespace HikeCycle.Mvc.Models.db
         public DbSet<User> Users { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
 
-        // เพิ่มเข้าไปใน class HikeCycledbContext
         public DbSet<Promotion> Promotions { get; set; }
         public DbSet<PromotionCondition> PromotionConditions { get; set; }
         public DbSet<PromotionBenefit> PromotionBenefits { get; set; }
@@ -49,7 +48,7 @@ namespace HikeCycle.Mvc.Models.db
 
             modelBuilder.Entity<Reviews>(entity =>
             {
-                entity.ToTable("reviews"); // ชื่อตารางใน Database
+                entity.ToTable("reviews"); 
 
                 entity.Property(e => e.Comment)
                     .HasColumnType("text")
@@ -84,7 +83,6 @@ namespace HikeCycle.Mvc.Models.db
                     .UseCollation("utf8mb3_general_ci");
             });
 
-            // Configuration สำหรับ Promotion, PromotionCondition, PromotionBenefit
             modelBuilder.Entity<Promotion>(entity =>
             {
                 entity.ToTable("promotions");

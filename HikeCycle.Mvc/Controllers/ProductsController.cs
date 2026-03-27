@@ -13,53 +13,43 @@ namespace HikeCycle.Mvc.Controllers
     [Route("[controller]")]
     public class ProductsController : Controller
     {
-        private readonly HikeCycledbContext _context;
+        private readonly HikeCycledbContext _db;
 
-        public ProductsController(HikeCycledbContext context)
+        public ProductsController(HikeCycledbContext db)
         {
-            _context = context;
+            _db = db;
         }
 
-        // GET: /Products
         [HttpGet]
         public async Task<IActionResult> Index(string search, string category, decimal? maxPrice)
         {
-            // 1. Start with the base query
-            var query = _context.Products.Include(p => p.ProductImages).AsQueryable();
+            var query = _db.Products.Include(p => p.ProductImages).AsQueryable();
 
-            // 2. Filter by search term
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(p => p.Name.Contains(search) || p.Brand.Contains(search));
             }
 
-            // 3. Filter by category
             if (!string.IsNullOrEmpty(category))
             {
                 query = query.Where(p => p.Category == category);
             }
 
-            // 4. Filter by max price
             if (maxPrice.HasValue)
             {
                 query = query.Where(p => p.PricePerDay <= maxPrice.Value);
             }
 
-            // 5. Execute the query to get filtered products
             var products = await query.ToListAsync();
 
-            // 6. Get product IDs for the review query
             var productIds = products.Select(p => p.Id).ToList();
 
-            // 7. Fetch all reviews for the filtered products in one go
-            var reviews = await _context.Reviews
+            var reviews = await _db.Reviews
                                         .Where(r => productIds.Contains(r.ProductId))
                                         .ToListAsync();
 
-            // 8. Group reviews by ProductId for efficient lookup
             var reviewsByProductId = reviews.GroupBy(r => r.ProductId).ToDictionary(g => g.Key, g => g.ToList());
 
-            // 9. Create the view model list
             var viewModel = products.Select(p =>
             {
                 var productReviews = reviewsByProductId.ContainsKey(p.Id) ? reviewsByProductId[p.Id] : new List<Reviews>();
@@ -80,17 +70,15 @@ namespace HikeCycle.Mvc.Controllers
             return View(viewModel);
         }
 
-        // GET: /Products/Details/5
         [HttpGet("Details/{id}")]
         public async Task<IActionResult> Details(int id)
         {
-            var product = await _context.Products
+            var product = await _db.Products
                 .Include(p => p.ProductImages)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (product == null) return NotFound();
 
-            // --- [Logic การประมวลผลข้อมูล JSON] ---
             var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
             var specs = !string.IsNullOrEmpty(product.Specs)
@@ -104,17 +92,14 @@ namespace HikeCycle.Mvc.Controllers
                            ? JsonDocument.Parse(product.Variants).RootElement.EnumerateArray().ToList()
                            : new List<JsonElement>();
 
-            // --- [การคำนวณ Stock] ---
             int totalStock = (product.Category == "shoes" && variants.Any())
                              ? variants.Sum(v => v.GetProperty("stock").GetInt32())
                              : product.Stock.GetValueOrDefault();
 
-            // --- [การคำนวณ Rating และ Review Count] ---
-            var reviews = await _context.Reviews.Where(r => r.ProductId == id).ToListAsync();
+            var reviews = await _db.Reviews.Where(r => r.ProductId == id).ToListAsync();
             var rating = reviews.Any() ? Math.Round((decimal)reviews.Average(r => r.Rating), 2) : 0;
             var reviewCount = reviews.Count;
 
-            // --- [การคำนวณวันที่] ---
             var tomorrow = DateTime.Now.AddDays(1);
 
             var viewModel = new ProductDetailViewModel
@@ -137,40 +122,32 @@ namespace HikeCycle.Mvc.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddToCart(int ProductId, string StartDate, string EndDate, string PickupTime, string? Size)
         {
-            // --- [Logic การประมวลผลฝั่ง Controller] ---
-            var product = await _context.Products.FindAsync(ProductId);
+            var product = await _db.Products.FindAsync(ProductId);
             if (product == null) return NotFound();
 
-            // 1. จำลองการเช็คข้อมูล (เช่น วันที่)
             DateTime start = DateTime.Parse(StartDate);
             DateTime end = DateTime.Parse(EndDate);
 
             if (end <= start)
             {
-                // ส่งข้อความ Error กลับไปหน้าเดิม
                 TempData["ErrorMessage"] = "วันที่คืนต้องหลังจากวันที่เช่า";
                 return RedirectToAction("Details", new { id = ProductId });
             }
 
-            // 2. บันทึกลงตะกร้า (Session หรือ Database)
-            // ตรงนี้คือจุดที่คุณจัดการข้อมูลตามต้องการ
-
-            // 3. ส่งข้อความ Success กลับไปหน้าเดิม (ทำให้ดูเหมือนไม่ย้ายหน้า)
             TempData["SuccessMessage"] = $"เพิ่ม {product.Name} ลงตะกร้าเรียบร้อย!";
 
-            // Redirect กลับมาที่หน้า Details ของสินค้าตัวเดิม
             return RedirectToAction("Details", new { id = ProductId });
         }
 
         [HttpGet("api/all")]
         public async Task<ActionResult<IEnumerable<dynamic>>> GetProducts()
         {
-            var products = await _context.Products.ToListAsync();
-            var productImages = await _context.ProductImages.ToListAsync();
+            var products = await _db.Products.ToListAsync();
+            var productImages = await _db.ProductImages.ToListAsync();
 
             var productImagesGrouped = productImages.GroupBy(pi => pi.ProductId).ToDictionary(g => g.Key, g => g.ToList());
 
-            var allReviews = await _context.Reviews.ToListAsync();
+            var allReviews = await _db.Reviews.ToListAsync();
 
             var productDtos = products.Select(p =>
             {
@@ -206,19 +183,19 @@ namespace HikeCycle.Mvc.Controllers
         [HttpGet("api/{id}")]
         public async Task<ActionResult<dynamic>> GetProduct(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _db.Products.FindAsync(id);
 
             if (product == null)
             {
                 return NotFound();
             }
 
-            var productImages = await _context.ProductImages
+            var productImages = await _db.ProductImages
                 .Where(pi => pi.ProductId == id)
                 .Select(pi => new { ImageUrl = pi.ImageUrl })
                 .ToListAsync();
 
-            var reviews = await _context.Reviews
+            var reviews = await _db.Reviews
     .Where(r => r.ProductId == id)
     .ToListAsync();
 
@@ -245,14 +222,13 @@ namespace HikeCycle.Mvc.Controllers
             return Ok(productDto);
         }
 
-        // POST: api/Products
         [HttpPost("api/create")]
         public async Task<ActionResult<Product>> CreateProduct([FromBody] Product product)
         {
             try
             {
-                _context.Products.Add(product);
-                await _context.SaveChangesAsync();
+                _db.Products.Add(product);
+                await _db.SaveChangesAsync();
 
                 return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
             }
@@ -265,8 +241,7 @@ namespace HikeCycle.Mvc.Controllers
         [HttpPut("api/{id}")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] Product updatedProduct)
         {
-            // 1. ดึงข้อมูล "ของจริง" จาก DB มาก่อน
-            var existingProduct = await _context.Products.FindAsync(id);
+            var existingProduct = await _db.Products.FindAsync(id);
 
             if (existingProduct == null) return NotFound();
 
@@ -284,7 +259,7 @@ namespace HikeCycle.Mvc.Controllers
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _db.SaveChangesAsync();
                 return Ok(new { message = "อัปเดตสำเร็จ" });
             }
             catch (Exception ex)
@@ -293,11 +268,10 @@ namespace HikeCycle.Mvc.Controllers
             }
         }
 
-        // DELETE: api/Products/5
         [HttpDelete("api/{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _db.Products.FindAsync(id);
             if (product == null)
             {
                 return NotFound(new { message = "ไม่พบสินค้าที่ต้องการลบ" });
@@ -305,8 +279,8 @@ namespace HikeCycle.Mvc.Controllers
 
             try
             {
-                _context.Products.Remove(product);
-                await _context.SaveChangesAsync();
+                _db.Products.Remove(product);
+                await _db.SaveChangesAsync();
                 return Ok(new { message = "ลบสินค้าสำเร็จ" });
             }
             catch (Exception ex)
@@ -318,16 +292,15 @@ namespace HikeCycle.Mvc.Controllers
         [HttpGet("api/{productId}/reviews")]
         public async Task<ActionResult<IEnumerable<dynamic>>> GetProductReviews(int productId)
         {
-            // ดึงรีวิวของสินค้านั้นๆ และอาจจะ Join กับ UserProfile เพื่อเอาชื่อมาโชว์
-            var reviews = await (from r in _context.Reviews
-                                 join u in _context.UserProfiles on r.UserId equals u.UserId
+            var reviews = await (from r in _db.Reviews
+                                 join u in _db.UserProfiles on r.UserId equals u.UserId
                                  where r.ProductId == productId
                                  orderby r.CreatedAt descending
                                  select new 
                                  {
                                      Id = r.Id,
                                      UserId = r.UserId,
-                                     UserName = u.FullName, // ดึงชื่อจริงจากตาราง user_profiles มาใส่ใน DTO
+                                     UserName = u.FullName,
                                      Rating = r.Rating,
                                      Comment = r.Comment,
                                      CreatedAt = r.CreatedAt

@@ -6,7 +6,6 @@
         <div id="bookingModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl transition-all">
                 <form asp-action="Add" asp-controller="Cart" method="post">
-                    @* ส่งข้อมูลสำคัญผ่าน Hidden Inputs *@
                     <input type="hidden" name="ProductId" value="@Model.Product.Id" />
                     <input type="hidden" id="selectedSizeInput" name="Size" value="" />
 
@@ -15,7 +14,6 @@
                     </h2>
 
                     <div class="space-y-4">
-                        @* วันที่เริ่มเช่า *@
                         <div>
                             <label class="block text-sm font-semibold mb-1 text-gray-600">วันที่เริ่มเช่า</label>
                             <input type="date" name="StartDate" id="startDate"
@@ -23,7 +21,6 @@
                                 class="border p-2 rounded-lg w-full focus:ring-2 focus:ring-black outline-none" required />
                         </div>
 
-                        @* วันที่คืน *@
                         <div>
                             <label class="block text-sm font-semibold mb-1 text-gray-600">วันที่คืน</label>
                             <input type="date" name="EndDate" id="endDate"
@@ -60,7 +57,6 @@
     </div>
 }
 
-@* --- 2. Modal แจ้งเตือนเมื่อยังไม่ได้ Login --- *@
 <div id="loginModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
     <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl">
         <div class="text-center mb-4">
@@ -86,13 +82,11 @@
 
 
         <div class="relative">
-            @* 1. ปุ่มย้อนกลับ (Back Button) *@
             <a asp-action="Index" asp-controller="Products" 
    class="absolute top-3 left-3 z-10 px-2 py-1 bg-white rounded-full shadow hover:bg-gray-100 transition border border-gray-100 flex items-center justify-center">
     <i class="fa-solid fa-arrow-left text-gray-700"></i>
 </a>
 
-            @* 2. รูปภาพหลัก (Main Image) *@
             <div
                 class="rounded-lg w-full h-[480px] bg-gray-50 p-5 flex items-center justify-center border border-gray-100 overflow-hidden">
                 @if (Model.Product.ProductImages != null && Model.Product.ProductImages.Any())
@@ -109,7 +103,6 @@
                 }
             </div>
 
-            @* 3. รูป Thumbnail (Gallery) *@
             <div class="flex flex-wrap gap-3 mt-4">
                 @if (Model.Product.ProductImages != null)
                 {
@@ -124,12 +117,9 @@
 
 
         <div>
-
-            @* 1. ชื่อและแบรนด์ *@
             <h1 class="text-3xl font-bold text-gray-900">@Model.Product.Name</h1>
             <p class="text-gray-500 mt-1">@Model.Product.Brand</p>
 
-            @* 2. Rating และ รีวิว *@
             <div class="flex items-center gap-2 mt-2 text-sm text-gray-600 underline hover:text-red-500 cursor-pointer">
                 <i class="fa-solid fa-star text-yellow-400"></i>
                 <a asp-action="Index" asp-controller="Reviews" asp-route-id="@Model.Product.Id">
@@ -137,13 +127,11 @@
                 </a>
             </div>
 
-            @* 3. ราคา *@
             <p class="text-4xl text-green-600 font-bold mt-5">
                 ฿@Model.Product.PricePerDay.GetValueOrDefault().ToString("N0")
                 <span class="text-sm text-gray-500 font-normal"> / วัน</span>
             </p>
 
-            @* 4. คำอธิบาย *@
             <div class="mt-8 border-t pt-6">
                 <h3 class="font-semibold text-lg mb-2">คำอธิบาย</h3>
                 <p class="text-gray-700 leading-relaxed">
@@ -151,7 +139,6 @@
                 </p>
             </div>
 
-            @* 5. ข้อมูลทางเทคนิค (Specs) - ดึงจาก ViewModel ที่ Controller Parse ไว้แล้ว *@
             @if (Model.Specs.HasValue)
             {
                 var s = Model.Specs.Value;
@@ -181,27 +168,22 @@
                                         กันน้ำ: @(wp.GetBoolean() ? "ได้" : "ไม่ได้")
                                     </li>
                                 }
-                                @* --- 5. ความสว่าง (ไฟฉาย) --- *@
             @if (s.TryGetProperty("brightness_lumen", out var bright)) {
                 <li class="flex gap-2 items-center"><i class="fa-solid fa-check text-green-600"></i> ความสว่าง: @bright.GetRawText() ลูเมน</li>
             }
 
-            @* --- 6. ขนาด (Dimensions) --- *@
             @if (s.TryGetProperty("dimensions_cm", out var dim)) {
                 <li class="flex gap-2 items-center"><i class="fa-solid fa-check text-green-600"></i> ขนาด (กxยxส): @dim.GetString() ซม.</li>
             }
 
-            @* --- 7. การปรับระดับ --- *@
             @if (s.TryGetProperty("adjustable", out var adj)) {
                 <li class="flex gap-2 items-center"><i class="fa-solid fa-check text-green-600"></i> ปรับความยาวได้: @adj.GetString()</li>
             }
 
-            @* --- 8. โหมดการใช้งาน --- *@
             @if (s.TryGetProperty("mode", out var mode)) {
                 <li class="flex gap-2 items-center"><i class="fa-solid fa-check text-green-600"></i> โหมด: @mode.GetString()</li>
             }
 
-            @* --- 9. ประเภทแบตเตอรี่ --- *@
             @if (s.TryGetProperty("battery_type", out var batt)) {
                 <li class="flex gap-2 items-center"><i class="fa-solid fa-check text-green-600"></i> ประเภทแบตเตอรี่: @batt.GetString()</li>
             }
@@ -209,7 +191,6 @@
                         </div>
                     }
 
-                    @* 6. เหมาะสำหรับ (Suitable For) *@
                     <div class="mt-6">
                         <h3 class="font-semibold text-lg mb-2">เหมาะสำหรับ</h3>
                         <div class="flex flex-wrap gap-2">
@@ -220,7 +201,6 @@
                         </div>
                     </div>
 
-                    @* 7. ระดับผู้ใช้งาน *@
                     <div class="mt-4">
                         <h3 class="font-semibold text-lg mb-1 text-gray-800">ระดับผู้ใช้งาน</h3>
                         <span class="inline-block px-3 py-1 text-sm bg-green-100 text-green-700 rounded-full font-medium">
@@ -228,7 +208,6 @@
                         </span>
                     </div>
 
-                    @* 8. เลือกไซส์รองเท้า (เฉพาะหมวดรองเท้า) *@
                     @if (Model.Product.Category == "shoes" && Model.Variants != null && Model.Variants.Any())
                     {
                         <div class="mt-6">
@@ -236,7 +215,6 @@
                             <div class="flex flex-wrap gap-2">
                                 @foreach (var v in Model.Variants)
                                 {
-                                    // ใช้ GetRawText() เพื่อรองรับทั้งไซส์ 36 (Int) หรือ "S/M" (String)
                                     var size = v.GetProperty("size").GetRawText().Replace("\"", ""); 
                                     var stock = v.GetProperty("stock").GetInt32();
                                     
@@ -254,11 +232,9 @@
                     }
 
                     @{
-    // เช็คจาก Session ที่เราทำไว้ใน Layout
     var sessionUser = Context.Session.GetString("UserId");
     bool isLoggedIn = !string.IsNullOrEmpty(sessionUser);
-    
-    // ถ้าเป็นรองเท้า ให้ปิดปุ่มไว้ก่อนจนกว่าจะเลือกไซส์ (ใช้ CSS class 'opacity-50' และ 'pointer-events-none')
+
     bool isInitialDisabled = Model.TotalStock == 0 || Model.Product.Category == "shoes";
 }
 
@@ -318,7 +294,6 @@
             }, 3000);
         });
 
-        // ฟังก์ชันเปลี่ยนรูปภาพหลัก
         function changeMainImage(element) {
             var mainImg = document.getElementById('mainProductImage');
             if (mainImg) {
@@ -333,7 +308,6 @@
             }
         }
 
-        // ฟังก์ชันเลือกไซส์
         let currentSize = "";
         function selectSize(size) {
             currentSize = size;
@@ -351,7 +325,6 @@
                 activeBtn.classList.remove('bg-white', 'text-black');
             }
             
-            // Enable booking button
             const bookBtn = document.getElementById('btn-book');
             if(bookBtn) {
                 bookBtn.classList.remove('opacity-50', 'pointer-events-none');

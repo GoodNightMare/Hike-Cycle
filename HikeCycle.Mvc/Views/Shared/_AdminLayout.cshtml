@@ -13,14 +13,11 @@
 <body class="bg-gray-50 font-sans">
 
     <div class="flex min-h-screen bg-gray-50">
-        @* เรียกใช้ Sidebar *@
         @await Html.PartialAsync("_AdminSidebar")
 
         <div class="flex-1 flex flex-col min-w-0">
-            @* เรียกใช้ Topbar ที่เราทำกันก่อนหน้านี้ *@
             @await Html.PartialAsync("_AdminTopbar")
 
-            @* พื้นที่แสดงเนื้อหาหลัก *@
             <main class="p-6 lg:p-10">
                 @RenderBody()
             </main>

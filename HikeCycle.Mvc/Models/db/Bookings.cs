@@ -3,29 +3,29 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HikeCycle.Mvc.Models.db
 {
-    [Table("bookings")] // ระบุชื่อตารางให้ตรง (เผื่อ EF ไปหาตารางชื่อ Bookings เติม s ตัวใหญ่)
+    [Table("bookings")]
     public class Booking
     {
         [Key]
         [Column("id")]
-        public int Id { get; set; } 
+        public int Id { get; set; }
 
-        [Column("user_id")] // 🚩 ตรงกับ user_id ใน SQL
+        [Column("user_id")]
         public int UserId { get; set; }
 
-        [Column("start_date")] // 🚩 ตรงกับ start_date ใน SQL
+        [Column("start_date")]
         public DateTime StartDate { get; set; }
-        
-        [Column("end_date")] // 🚩 ตรงกับ end_date ใน SQL
+
+        [Column("end_date")]
         public DateTime EndDate { get; set; }
 
-        [Column("total_amount", TypeName = "decimal(10,2)")] // 🚩 ตรงกับ total_amount
+        [Column("total_amount", TypeName = "decimal(10,2)")]
         public decimal TotalAmount { get; set; }
 
-        [Column("discount_amount", TypeName = "decimal(10,2)")] // 🚩 ตรงกับ discount_amount
+        [Column("discount_amount", TypeName = "decimal(10,2)")]
         public decimal DiscountAmount { get; set; }
 
-        [Column("final_amount", TypeName = "decimal(10,2)")] // 🚩 ตรงกับ final_amount
+        [Column("final_amount", TypeName = "decimal(10,2)")]
         public decimal FinalAmount { get; set; }
 
         [Column("status")]
@@ -34,19 +34,17 @@ namespace HikeCycle.Mvc.Models.db
         [Column("shipping_address")]
         public string? ShippingAddress { get; set; }
 
-        [Column("created_at")] // 🚩 ตรงกับ created_at ใน SQL
+        [Column("created_at")]
         public DateTime? CreatedAt { get; set; }
 
-        // Navigation Properties
         [ForeignKey("UserId")]
         public virtual User User { get; set; } = null!;
-        
+
         public virtual ICollection<BookingItem> BookingItems { get; set; } = new List<BookingItem>();
         public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
         public virtual ICollection<Return> Returns { get; set; } = new List<Return>();
 
-        // ในไฟล์ Models/db/Booking.cs
-public virtual ICollection<Reviews> Reviews { get; set; } = new List<Reviews>();
+        public virtual ICollection<Reviews> Reviews { get; set; } = new List<Reviews>();
     }
 }

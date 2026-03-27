@@ -11,7 +11,7 @@ namespace HikeCycle.Mvc.Models.db
         public int Id { get; set; }
 
         [Column("type")]
-        public required string Type { get; set; } // 'Discount', 'FreeDay', 'Cashback'
+        public required string Type { get; set; } 
 
         [Column("title")]
         public required string Title { get; set; }

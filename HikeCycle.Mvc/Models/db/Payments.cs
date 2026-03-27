@@ -3,14 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HikeCycle.Mvc.Models.db
 {
-    [Table("payments")] // 🚩 ระบุชื่อตารางให้เป็นตัวเล็กตามใน MySQL
+    [Table("payments")] 
     public class Payment
     {
         [Key]
-        [Column("id")] // 🚩 ระบุชื่อคอลัมน์ให้ตรงกับ SQL
+        [Column("id")] 
         public int Id { get; set; }
 
-        [Column("booking_id")] // 🚩 ตรงกับ booking_id ใน SQL
+        [Column("booking_id")] 
         public int BookingId { get; set; }
 
         [Column("amount", TypeName = "decimal(18,2)")]
@@ -22,10 +22,9 @@ namespace HikeCycle.Mvc.Models.db
         [Column("status")]
         public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
 
-        [Column("created_at")] // 🚩 ตรงกับ created_at ใน SQL
+        [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        // Navigation Property
         [ForeignKey("BookingId")]
         public virtual Booking Booking { get; set; } = null!;
     }

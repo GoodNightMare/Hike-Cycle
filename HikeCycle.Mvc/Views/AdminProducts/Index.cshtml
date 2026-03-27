@@ -57,7 +57,6 @@
                         </td>
                         <td class="py-4 px-6 text-right">
                             <div class="flex justify-end gap-2">
-                                @* 🚩 แก้ไขปุ่ม View *@
                                 <button type="button" onclick="viewProduct(@item.Id, 
                                     '@JavaScriptEncoder.Default.Encode(item.Name ?? "")', 
                                     '@item.Category', 
@@ -71,7 +70,6 @@
                                     <i class="fa-solid fa-eye"></i>
                                 </button>
 
-                                @* 🚩 แก้ไขปุ่ม Edit *@
                                 <button type="button" onclick="editProduct(@item.Id, 
                                     '@JavaScriptEncoder.Default.Encode(item.Name ?? "")', 
                                     '@item.Brand', 
@@ -278,30 +276,26 @@
                                     const container = $('#variants-container');
                                     const input = $('#p-variants');
 
-                                    // 🚩 ถ้าไม่ใช่ Shoes ให้ซ่อน และล้างค่าทิ้ง (เพื่อไม่ให้ส่ง JSON ผิดไปที่ DB)
                                     if (category !== 'shoes') {
                                         container.hide();
-                                        input.val(''); // ล้างค่าทิ้งป้องกัน Error JSON
+                                        input.val('');
                                     } else {
                                         container.show();
                                     }
                                 }
 
                                 function openCreateModal() {
-                                    // 1. เปลี่ยนหัวข้อ Modal
+
                                     $('#modal-title').text("เพิ่มสินค้าใหม่");
-    
-                                    // 2. ล้างข้อมูลใน Form ทั้งหมด
+
                                     $('#product-form')[0].reset();
-    
-                                    // 3. เซต ID เป็น 0 (เพื่อบอกว่าเป็นรายการใหม่)
+
                                     $('#p-id').val(0);
 
                                     toggleVariants()
 
                                     $('#product-form').attr('action', '/AdminProducts/SaveProduct');
-    
-                                    // 5. แสดง Modal
+
                                     $('#product-modal').removeClass('hidden').addClass('flex');
                                     $('body').addClass('overflow-hidden');
                                 }
@@ -313,7 +307,6 @@
                                     $('#p-id').val(0);
                                 }
 
-                                // 🚩 ปรับปรุงให้รับฟิลด์ใหม่ๆ เข้ามาใส่ Form
                                 function editProduct(id, name, brand, cat, price, stock, status, desc, level, specs, suitable, variants) {
                                     showProductModal("แก้ไขสินค้า");
                                     $('#p-id').val(id);
@@ -328,7 +321,7 @@
                                     $('#p-specs').val(specs);
                                     $('#p-suitable').val(suitable);
                                     $('#p-variants').val(variants);
-                                    toggleVariants(); // 🚩 เช็คสถานะตามหมวดหมู่ของสินค้าที่แก้ไข
+                                    toggleVariants();
     
                                     $('#product-modal').removeClass('hidden').addClass('flex');
                                 }
@@ -348,42 +341,36 @@
                                     $('#v-suitable').text(suitable || 'Not specified.');
                                     $('#v-desc').text(desc || 'No description available.');
             
-                                    // UI Styling for Level
                                     const levelEl = $('#v-level');
                                     levelEl.text(level || 'Normal').removeClass().addClass(`inline-block px-3 py-1 rounded-full text-[10px] font-black border uppercase`);
                                     if (level === 'Hard') levelEl.addClass('bg-red-50 text-red-600 border-red-100');
                                     else if (level === 'Easy') levelEl.addClass('bg-green-50 text-green-600 border-green-100');
                                     else levelEl.addClass('bg-gray-100 text-gray-600 border-gray-200');
 
-                                    // UI Styling for Status
                                     const statusEl = $('#v-status');
                                     statusEl.text(status).removeClass().addClass(`inline-block px-3 py-1 rounded-full text-[10px] font-black border uppercase`);
                                     if (status === 'Available') statusEl.addClass('bg-green-50 text-green-600 border-green-100');
                                     else statusEl.addClass('bg-orange-50 text-orange-600 border-orange-100');
 
-                                    // Variant Badges
                                     const variantContainer = $('#v-variants');
                                     variantContainer.empty();
                                     if (variants && variants.trim() !== "") {
                                         try {
-                                            // 🚩 ตรวจสอบว่าเป็น JSON หรือไม่
                                             const data = JSON.parse(variants);
             
                                             if (Array.isArray(data)) {
                                                 data.forEach(v => {
-                                                    // ออกแบบ Badge ใหม่ให้โชว์ทั้ง Size และ Stock
                                                     const badge = `
-                                                                                                                                                                                                                                                        <div class="flex items-center bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-                                                                                                                                                                                                                                                            <span class="px-3 py-1 bg-gray-50 border-r border-gray-200 text-[10px] font-black text-gray-400 uppercase">Size</span>
-                                                                                                                                                                                                                                                            <span class="px-3 py-1 text-xs font-bold text-gray-900">${v.size || v.Size || '-'}</span>
-                                                                                                                                                                                                                                                            <span class="px-3 py-1 bg-blue-50 border-l border-gray-200 text-[10px] font-black text-blue-500 uppercase">Stock</span>
-                                                                                                                                                                                                                                                            <span class="px-3 py-1 text-xs font-bold ${v.stock > 0 ? 'text-green-600' : 'text-red-400'}">${v.stock ?? 0}</span>
-                                                                                                                                                                                                                                                        </div>`;
+                                                            <div class="flex items-center bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                                                                <span class="px-3 py-1 bg-gray-50 border-r border-gray-200 text-[10px] font-black text-gray-400 uppercase">Size</span>
+                                                                <span class="px-3 py-1 text-xs font-bold text-gray-900">${v.size || v.Size || '-'}</span>
+                                                                <span class="px-3 py-1 bg-blue-50 border-l border-gray-200 text-[10px] font-black text-blue-500 uppercase">Stock</span>
+                                                                <span class="px-3 py-1 text-xs font-bold ${v.stock > 0 ? 'text-green-600' : 'text-red-400'}">${v.stock ?? 0}</span>
+                                                            </div>`;
                                                     variantContainer.append(badge);
                                                 });
                                             }
                                         } catch (e) {
-                                            // 🚩 กรณีไม่ใช่ JSON (เป็นข้อความ S, M, L ธรรมดา) ให้ใช้แบบเดิม
                                             variants.split(',').forEach(v => {
                                                 variantContainer.append(`<span class="px-3 py-1 bg-white border border-gray-200 text-gray-600 rounded-lg text-xs font-medium shadow-sm">${v.trim()}</span>`);
                                             });

@@ -104,7 +104,6 @@
                             <td class="py-4 px-6 text-gray-600">@(profile?.Address ?? "-")</td>
                             <td class="py-4 px-6 text-center">
                                 @{
-                                    // กำหนดสีตาม Role
                                     var roleClass = user.Role.ToLower() switch
                                     {
                                         "admin" => "bg-red-50 text-red-600 border-red-100",
@@ -141,7 +140,6 @@
 
     @section Scripts {
         <script>
-            // ฟังก์ชันลบ User
             function deleteUser(id) {
                 if (confirm('ยืนยันการลบผู้ใช้งานรายนี้? ข้อมูลโปรไฟล์จะถูกลบไปด้วย')) {
                     $.post('@Url.Action("DeleteUser")', { id: id }, function () {
@@ -152,14 +150,7 @@
                 }
             }
 
-            // ฟังก์ชันแก้ไข (เปิด Modal หรือไปหน้าอื่น)
-            function editUser(id) {
-                // โค้ดสำหรับเปิด Modal แก้ไขข้อมูล
-                console.log("Editing user:", id);
-            }
-
             function showUserModal(id, email, role, fullName, phone, address) {
-                // โยนค่าที่ส่งมาจากการคลิก เข้าไปใน Input ของ Modal
                 $('#edit-id').val(id);
                 $('#edit-email').val(email);
                 $('#edit-role').val(role.toLowerCase());

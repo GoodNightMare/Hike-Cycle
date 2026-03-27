@@ -8,13 +8,13 @@ namespace HikeCycle.Mvc.Controllers
     [Authorize(Roles = "admin,staff")]
     public class AdminPromotionsController : Controller
     {
-        private readonly HikeCycledbContext _context;
+        private readonly HikeCycledbContext _db;
 
-        public AdminPromotionsController(HikeCycledbContext context) => _context = context;
+        public AdminPromotionsController(HikeCycledbContext db) => _db = db;
 
         public async Task<IActionResult> Index()
         {
-            var promotions = await _context.Promotions
+            var promotions = await _db.Promotions
                                    .OrderBy(p => p.Id)
                                    .ToListAsync();
             return View(promotions);

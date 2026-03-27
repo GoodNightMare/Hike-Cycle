@@ -12,12 +12,12 @@ namespace HikeCycle.Mvc.Controllers
 {
     public class CartController : Controller
     {
-        private readonly HikeCycledbContext _context;
+        private readonly HikeCycledbContext _db;
         private const string CartSessionKey = "UserCart";
 
-        public CartController(HikeCycledbContext context)
+        public CartController(HikeCycledbContext db)
         {
-            _context = context;
+            _db = db;
         }
 
         [HttpPost]
@@ -29,7 +29,7 @@ namespace HikeCycle.Mvc.Controllers
                 return RedirectToAction("Details", "Products", new { id = ProductId });
             }
 
-            var product = await _context.Products
+            var product = await _db.Products
                 .Include(p => p.ProductImages)
                 .FirstOrDefaultAsync(p => p.Id == ProductId);
 
@@ -49,7 +49,6 @@ namespace HikeCycle.Mvc.Controllers
                     var variant = doc.RootElement.EnumerateArray()
                         .FirstOrDefault(v => v.GetProperty("size").GetRawText().Replace("\"", "") == Size);
 
-                    // ป้องกันกรณีหาไซส์ไม่เจอใน JSON
                     if (variant.ValueKind != JsonValueKind.Undefined)
                         availableStock = variant.GetProperty("stock").GetInt32();
                     else
@@ -62,14 +61,12 @@ namespace HikeCycle.Mvc.Controllers
                 (product.Category?.ToLower() != "shoes" || i.Size == Size)
             );
 
-            // 3. ตรวจสอบ: ถ้าที่มีในตะกร้า + ที่จะเพิ่มใหม่ (1) > สต็อกจริง
             if (amountInCart + 1 > availableStock)
             {
                 TempData["ErrorMessage"] = $"ไม่สามารถเพิ่มได้ เนื่องจากสต็อกสินค้า (รวมในตะกร้า) มีเพียง {availableStock} ชิ้น";
                 return RedirectToAction("Details", "Products", new { id = ProductId });
             }
 
-            // 4. เพิ่มลงตะกร้า
             cart.Add(new CartSessionItem
             {
                 ProductId = ProductId,
@@ -96,21 +93,18 @@ namespace HikeCycle.Mvc.Controllers
                 ? new List<CartSessionItem>()
                 : JsonSerializer.Deserialize<List<CartSessionItem>>(sessionData) ?? new List<CartSessionItem>();
 
-            // Remove non-removable items first. They will be re-added if the condition is still met.
             cartItems.RemoveAll(i => !i.IsRemovable);
 
-            // Condition to add free items
             if (cartItems.Count(i => i.Category?.ToLower() == "tent") >= 2)
             {
                 var productIdsToAdd = new List<int> { 3, 5 };
-                var productsToAdd = await _context.Products
+                var productsToAdd = await _db.Products
                     .Include(p => p.ProductImages)
                     .Where(p => productIdsToAdd.Contains(p.Id))
                     .ToListAsync();
 
                 foreach (var product in productsToAdd)
                 {
-                    // Check if the item is already in the cart to avoid duplicates
                     if (!cartItems.Any(ci => ci.ProductId == product.Id))
                     {
                         cartItems.Add(new CartSessionItem
@@ -118,19 +112,18 @@ namespace HikeCycle.Mvc.Controllers
                             ProductId = product.Id,
                             ProductName = product.Name,
                             ImageUrl = product.ProductImages.FirstOrDefault()?.ImageUrl,
-                            PricePerDay = 0, // It's a free item
+                            PricePerDay = 0,
                             Category = product.Category,
                             IsFree = true,
-                            IsRemovable = false, // Cannot be removed by the user
-                            StartDate = "", // Not applicable for free items
-                            EndDate = "",   // Not applicable for free items
+                            IsRemovable = false,
+                            StartDate = "", 
+                            EndDate = "",   
                             Id = Guid.NewGuid().ToString()
                         });
                     }
                 }
             }
 
-            // Save the potentially modified cart back to the session
             HttpContext.Session.SetString(CartSessionKey, JsonSerializer.Serialize(cartItems));
 
             var userIdStr = HttpContext.Session.GetString("UserId");
@@ -140,19 +133,17 @@ namespace HikeCycle.Mvc.Controllers
             {
                 int userId = int.Parse(userIdStr);
 
-                // 🚩 ดึง Voucher ที่ยังไม่ได้ใช้ของผู้ใช้คนนี้
-                availableVouchers = await _context.UserVouchers
+                availableVouchers = await _db.UserVouchers
                     .Where(v => v.UserId == userId && !v.IsUsed)
                     .ToListAsync();
 
-                var profile = await _context.UserProfiles.AsNoTracking()
+                var profile = await _db.UserProfiles.AsNoTracking()
                                 .FirstOrDefaultAsync(p => p.UserId == userId);
                 ViewBag.UserAddress = profile?.Address;
             }
 
-            var promotions = await _context.Promotions.Where(p => p.Active).ToListAsync();
+            var promotions = await _db.Promotions.Where(p => p.Active).ToListAsync();
 
-            // ส่งรายการ Voucher เข้าไปคำนวณด้วย (ถ้าต้องการให้หักลบในยอดสรุปทันที)
             var calculationResult = CalculateCart(cartItems, promotions, isStudent);
 
             var viewModel = new CartViewModel
@@ -161,15 +152,13 @@ namespace HikeCycle.Mvc.Controllers
                 Promotions = promotions,
                 CalculationResult = calculationResult,
                 IsStudent = isStudent,
-                // อย่าลืมเพิ่ม Property นี้ใน CartViewModel ของคุณด้วยนะครับ
                 AvailableVouchers = availableVouchers
             };
             
             if (!string.IsNullOrEmpty(userIdStr))
             {
-                var profile = await _context.UserProfiles.AsNoTracking()
+                var profile = await _db.UserProfiles.AsNoTracking()
                                 .FirstOrDefaultAsync(p => p.UserId == int.Parse(userIdStr));
-                // 🚩 ส่งไปที่หน้า View
                 ViewBag.UserAddress = profile?.Address;
             }
 
@@ -186,7 +175,7 @@ namespace HikeCycle.Mvc.Controllers
             {
                 if (item.IsFree || string.IsNullOrEmpty(item.StartDate) || string.IsNullOrEmpty(item.EndDate))
                 {
-                    continue; // Skip free items or items with invalid dates
+                    continue; 
                 }
 
                 var start = DateTime.Parse(item.StartDate);
@@ -268,7 +257,6 @@ namespace HikeCycle.Mvc.Controllers
 
             if (itemToRemove != null)
             {
-                // Additional check to ensure non-removable items are not removed
                 if (itemToRemove.IsRemovable)
                 {
                     cartItems.Remove(itemToRemove);
@@ -345,7 +333,7 @@ namespace HikeCycle.Mvc.Controllers
                 return RedirectToAction("Index");
             }
 
-            var product = await _context.Products.FindAsync(existingItem.ProductId);
+            var product = await _db.Products.FindAsync(existingItem.ProductId);
             if (product == null) return NotFound();
 
             int availableStock = product.Stock ?? 0;
@@ -385,7 +373,7 @@ namespace HikeCycle.Mvc.Controllers
                 Size = existingItem.Size,
                 StartDate = existingItem.StartDate,
                 EndDate = existingItem.EndDate,
-                Id = Guid.NewGuid().ToString() // New Id for the new item
+                Id = Guid.NewGuid().ToString() 
             });
 
             HttpContext.Session.SetString(CartSessionKey, JsonSerializer.Serialize(cartItems));

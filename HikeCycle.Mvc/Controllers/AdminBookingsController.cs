@@ -8,48 +8,45 @@ namespace HikeCycle.Mvc.Controllers
     [Authorize(Roles = "admin,staff")]
     public class AdminBookingsController : Controller
     {
-        private readonly HikeCycledbContext _context;
+        private readonly HikeCycledbContext _db;
 
-        public AdminBookingsController(HikeCycledbContext context) => _context = context;
+        public AdminBookingsController(HikeCycledbContext db) => _db = db;
 
         public async Task<IActionResult> Index()
         {
-            var bookings = await _context.Bookings
-                .Include(b => b.User) // ดึงข้อมูลผู้ใช้งาน
+            var bookings = await _db.Bookings
+                .Include(b => b.User) 
                 .Include(b => b.BookingItems)
-                .ThenInclude(bi => bi.Product) // ดึงข้อมูลสินค้าในแต่ละรายการจอง
-                .OrderBy(b => b.Id) // เอาการจองล่าสุดขึ้นก่อน
+                .ThenInclude(bi => bi.Product) 
+                .OrderBy(b => b.Id) 
                 .ToListAsync();
 
             return View(bookings);
         }
 
-        // เพิ่ม Action สำหรับอัปเดตสถานะการจองแบบง่าย
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(int id, string status, ReturnCondition? condition, decimal? extraFee, string? note)
         {
-            var booking = await _context.Bookings
+            var booking = await _db.Bookings
         .Include(b => b.User) 
         .FirstOrDefaultAsync(b => b.Id == id);
             if (booking == null) return NotFound();
 
             if (status == "Completed")
             {
-                // 1. อัปเดตสถานะ Booking
                 booking.Status = "Completed";
 
-                // 2. สร้างข้อมูลการคืน (Return)
                 var returnEntry = new Return
                 {
                     BookingId = id,
                     ReturnDate = DateTime.Now,
                     Condition = condition ?? ReturnCondition.Good,
                     ExtraFee = extraFee ?? 0,
-                    IsExtraFeePaid = (extraFee ?? 0) <= 0, // ถ้าไม่มีค่าปรับ ให้ถือว่าจ่ายแล้ว
+                    IsExtraFeePaid = (extraFee ?? 0) <= 0, 
                     Note = note
                 };
-                _context.Returns.Add(returnEntry);
+                _db.Returns.Add(returnEntry);
                 if (condition == ReturnCondition.Good)
                 {
                     var voucher = new UserVoucher
@@ -61,9 +58,8 @@ namespace HikeCycle.Mvc.Controllers
                         IsUsed = false,
                         CreatedAt = DateTime.Now
                     };
-                    _context.UserVouchers.Add(voucher);
+                    _db.UserVouchers.Add(voucher);
 
-                    // แจ้ง Admin บนหน้าจอ
                     TempData["Success"] = $"คืนอุปกรณ์สำเร็จ! ระบบแจก Voucher 50 บาทให้คุณ {booking.User.Email} แล้ว";
 
                 }
@@ -73,7 +69,7 @@ namespace HikeCycle.Mvc.Controllers
                 booking.Status = "Cancelled";
             }
 
-            await _context.SaveChangesAsync();
+            await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
     }

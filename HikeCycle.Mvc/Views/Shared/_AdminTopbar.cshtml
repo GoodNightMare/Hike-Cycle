@@ -1,17 +1,12 @@
 @using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
 @{
-    // ดึงข้อมูล User จาก Session
     var userEmail = HttpContextAccessor.HttpContext?.Session.GetString("UserEmail") ?? "Admin";
     var userRole = HttpContextAccessor.HttpContext?.Session.GetString("UserRole") ?? "Staff";
 }
 
 <header class="w-full h-16 bg-white border-b flex items-center justify-between px-6 shadow-sm sticky top-0 z-40">
-    @* ซ้าย: (ว่างไว้เผื่อใส่ปุ่ม Toggle Sidebar ในอนาคต) *@
-
-    @* ขวา: ข้อมูลผู้ใช้และปุ่ม Logout *@
     <div class="flex items-center gap-6 w-full">
-        @* User info *@
         <div class="flex flex-1  items-center gap-3 text-sm text-gray-700">
             <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
                 <i class="fa-solid fa-user-circle text-gray-400 text-xl"></i>
@@ -23,8 +18,7 @@
                 </span>
             </div>
         </div>
-
-        @* Logout *@
+        
         <div class="flex-1 flex justify-end">
             <form asp-controller="Account" asp-action="Logout" method="post">
                 <button type="submit"

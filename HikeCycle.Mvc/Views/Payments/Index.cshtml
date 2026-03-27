@@ -8,7 +8,6 @@
     <h1 class="text-2xl font-black mb-8 text-gray-900">ชำระเงิน</h1>
 
     <div class="grid gap-8">
-        @* --- 2. Shipping Info Card (เน้นสีขาว สะอาด) --- *@
         <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
             <div class="flex items-center gap-2 mb-4">
                 <div class="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center">
@@ -21,7 +20,6 @@
             </p>
         </div>
 
-        @* --- 3. Order Summary Card (เปลี่ยนจากดำเป็นขาว-เทาอ่อน) --- *@
         <div class="bg-gray-50 border border-gray-100 p-8 rounded-3xl">
             <h2 class="text-lg font-bold mb-6 text-gray-800 flex items-center gap-2">
                 <i class="fa-solid fa-receipt text-gray-400"></i> สรุปรายการ
@@ -42,7 +40,6 @@
             </div>
         </div>
 
-        @* --- 4. Payment Method Form --- *@
         <form asp-controller="Payments" asp-action="Create" method="post" class="space-y-8">
             <input type="hidden" asp-for="BookingId" />
             <input type="hidden" asp-for="Amount" />
@@ -56,7 +53,6 @@
                 <label class="block text-xs font-black text-gray-400 uppercase tracking-widest">เลือกช่องทางชำระเงิน</label>
                 
                 <div class="grid grid-cols-1 gap-3">
-                    @* Option 1 *@
                     <label class="group relative flex items-center p-4 border border-gray-200 rounded-2xl cursor-pointer hover:border-black transition-all has-[:checked]:border-black has-[:checked]:ring-1 has-[:checked]:ring-black">
                         <input id="method_bank" name="Method" type="radio" value="Bank" checked class="w-4 h-4 text-black border-gray-300 focus:ring-black">
                         <div class="ml-4 flex items-center gap-4">
@@ -65,12 +61,10 @@
                             </div>
                             <div>
                                 <span class="block text-sm font-bold text-gray-800">โอนเงินผ่านบัญชีธนาคาร</span>
-                                @* <span class="block text-[10px] text-gray-400 font-medium">รอตรวจสอบยอดภายใน 24 ชม.</span> *@
                             </div>
                         </div>
                     </label>
 
-                    @* Option 2 *@
                     <label class="group relative flex items-center p-4 border border-gray-200 rounded-2xl cursor-pointer hover:border-black transition-all has-[:checked]:border-black has-[:checked]:ring-1 has-[:checked]:ring-black">
                         <input id="method_promptpay" name="Method" type="radio" value="PromptPay" class="w-4 h-4 text-black border-gray-300 focus:ring-black">
                         <div class="ml-4 flex items-center gap-4">
@@ -79,7 +73,6 @@
                             </div>
                             <div>
                                 <span class="block text-sm font-bold text-gray-800">พร้อมเพย์ (PromptPay)</span>
-                                @* <span class="block text-[10px] text-gray-400 font-medium">ยืนยันยอดอัตโนมัติ</span> *@
                             </div>
                         </div>
                     </label>

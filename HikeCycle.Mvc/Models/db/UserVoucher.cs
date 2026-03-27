@@ -27,7 +27,6 @@ namespace HikeCycle.Mvc.Models.db
         [Column("created_at")]
         public DateTime? CreatedAt { get; set; }
 
-        // Navigation Properties
         [ForeignKey("UserId")]
         public virtual User User { get; set; } = null!;
 

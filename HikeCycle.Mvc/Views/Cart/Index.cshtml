@@ -127,7 +127,6 @@
                     }
                 </div>
             }
-@* --- ส่วนเลือก Voucher --- *@
 @if (Model.AvailableVouchers != null && Model.AvailableVouchers.Any())
 {
     <div class="mt-8">
@@ -138,7 +137,6 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             @foreach (var v in Model.AvailableVouchers)
             {
-                @* 🚩 เพิ่ม border-gray-100 เป็นพื้นฐาน *@
                 <label class="relative flex items-center gap-4 p-5 bg-white border-2 border-gray-100 rounded-2xl cursor-pointer hover:border-amber-400 transition shadow-sm group"
                        id="label-voucher-@v.Id">
                     
@@ -161,15 +159,12 @@
 }
         </div>
 
-
-        @* --- ส่วนเลือกที่อยู่จัดส่ง --- *@
         <div class="mt-8 p-8 bg-white border-2 border-gray-100 rounded-3xl shadow-sm">
             <h2 class="text-2xl font-black mb-6 flex items-center gap-2">
                 <i class="fa-solid fa-truck-fast text-red-500"></i> วิธีการจัดส่ง
             </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                @* 1. รับที่ร้าน *@
                 <label class="relative flex flex-col p-4 border-2 rounded-2xl cursor-pointer hover:bg-gray-50 transition"
                        id="label-shop">
                     <input type="radio" name="addrType" value="Shop"
@@ -180,7 +175,6 @@
                     <span class="text-[10px] text-gray-400 uppercase font-black"></span>
                 </label>
 
-                @* 2. ตามโปรไฟล์ *@
                 <label class="relative flex flex-col p-4 border-2 rounded-2xl cursor-pointer hover:bg-gray-50 transition"
                        id="label-profile">
                     <input type="radio" name="addrType" value="Profile"
@@ -191,7 +185,6 @@
                     <span class="text-[10px] text-gray-400 uppercase font-black"></span>
                 </label>
 
-                @* 3. กรอกเอง *@
                 <label class="relative flex flex-col p-4 border-2 rounded-2xl cursor-pointer hover:bg-gray-50 transition"
                        id="label-custom">
                     <input type="radio" name="addrType" value="Custom"
@@ -203,7 +196,6 @@
                 </label>
             </div>
 
-            @* ช่องกรอกที่อยู่ (แสดงเมื่อเลือก Profile หรือ Custom) *@
             <div id="cartAddrSection" class="hidden animate-in fade-in slide-in-from-top-2 duration-300">
                 <textarea id="displayShippingAddress" rows="3"
                           class="w-full border-2 border-gray-100 p-4 rounded-2xl text-sm focus:border-black outline-none bg-gray-50 transition-all"
@@ -228,7 +220,6 @@
     <p class="text-gray-500 text-sm mt-2">ส่วนลดโปรโมชั่น</p>
     <p class="text-xl font-bold text-red-500">-฿@Model.CalculationResult.TotalDiscount.ToString("F2")</p>
 
-    @* 🚩 เพิ่มส่วนแสดงผล Voucher (ซ่อนไว้ก่อน) *@
     <div id="voucher-display" class="hidden animate-in fade-in duration-300">
         <p class="text-amber-600 text-sm mt-2 font-black">
             ส่วนลด Voucher (<span id="voucher-code-text"></span>)
@@ -240,7 +231,6 @@
 
     <p class="text-gray-500 text-sm uppercase tracking-widest mt-2">ยอดชำระรวมทั้งหมด</p>
     <p class="text-4xl font-black text-green-600">
-        @* 🚩 สำคัญ: ต้องมี id="grand-total" *@
         ฿<span id="grand-total">@Model.CalculationResult.FinalTotal.ToString("F2")</span>
     </p>
 </div>
@@ -254,7 +244,6 @@
 
                         <input type="hidden" name="finalTotal" id="hiddenFinalTotal" value="@Model.CalculationResult.FinalTotal" />
         
-                        @* 🚩 Input ลับเพื่อส่งที่อยู่จัดส่งไปยังหน้า Payment *@
                         <input type="hidden" name="shippingAddress" id="finalShippingAddress"
                                value="รับที่ร้าน (Self-Pickup)" />
 
@@ -296,7 +285,6 @@
                         form.submit();
                     });
 
-                    // Initial setup
                     updateEndDateMin();
                 });
             });
@@ -309,7 +297,6 @@
                 const displayInput = document.getElementById('displayShippingAddress');
                 const hiddenInput = document.getElementById('finalShippingAddress');
     
-                // รีเซ็ตขอบ Border ของ Label
                 ['label-shop', 'label-profile', 'label-custom'].forEach(id => {
                     document.getElementById(id).classList.remove('border-black', 'bg-gray-50');
                     document.getElementById(id).classList.add('border-gray-100');
@@ -335,21 +322,16 @@
                     displayInput.readOnly = false;
                     displayInput.classList.remove('bg-gray-100');
                     displayInput.focus();
-                    hiddenInput.value = ""; // จะถูกอัปเดตเมื่อมีการพิมพ์
+                    hiddenInput.value = "";
                     document.getElementById('label-custom').classList.add('border-black', 'bg-gray-50');
                 }
             }
 
-            function validateCheckout() {
-    // 1. ดึงค่าจาก Hidden Input ที่จะส่งไปจริง
+            function validateCheckout()
     const finalAddr = document.getElementById('finalShippingAddress').value.trim();
-    
-    // 2. ดึงประเภทที่เลือก (เพื่อเอามาแสดง Alert ให้ถูกจุด)
+  
     const addrType = document.querySelector('input[name="addrType"]:checked').value;
 
-    // เงื่อนไขการตรวจสอบ
-    // - ถ้าค่าว่าง
-    // - หรือถ้าค่าเป็น "ไม่ได้ระบุที่อยู่จัดส่งในโปรไฟล์" (กรณีเลือก Profile แต่โปรไฟล์ไม่มีข้อมูล)
     if (!finalAddr || finalAddr === "" || finalAddr === "ไม่ได้ระบุที่อยู่จัดส่งในโปรไฟล์") {
         
         let errorMsg = "";
@@ -361,57 +343,47 @@
             errorMsg = "⚠️ กรุณาระบุข้อมูลที่อยู่จัดส่งให้ครบถ้วน";
         }
 
-        // แสดง SweetAlert2 (ถ้าคุณมี) หรือ Alert ธรรมดา
         alert(errorMsg);
         
-        // ถ้าเป็น Custom ให้ Focus ที่ช่องกรอกทันที
         if (addrType === 'Custom') {
             document.getElementById('displayShippingAddress').focus();
         }
         
-        return false; // หยุดการส่งฟอร์ม
+        return false; 
     }
 
-    return true; // อนุญาตให้ส่งฟอร์มไปหน้า Payment
+    return true; 
 }
 
-// เพิ่มเติม: อัปเดตค่า Hidden Input ทุกครั้งที่พิมพ์ในช่อง Custom Address
 document.getElementById('displayShippingAddress').addEventListener('input', function() {
     document.getElementById('finalShippingAddress').value = this.value;
 });
 
-// วางไว้นอก DOMContentLoaded เพื่อให้ onchange เรียกเจอ
 const baseFinalTotal = parseFloat("@Model.CalculationResult.FinalTotal");
 
 function applyVoucher(id, amount, code) {
-    // 1. จัดการ UI: ล้างสีขอบทุกใบก่อน
     document.querySelectorAll('[id^="label-voucher-"]').forEach(el => {
         el.classList.remove('border-amber-400', 'bg-amber-50');
         el.classList.add('border-gray-100');
     });
 
-    // 2. ไฮไลท์ใบที่เลือก (เช็ค null เพื่อความปลอดภัย)
     const activeLabel = document.getElementById('label-voucher-' + id);
     if (activeLabel) {
         activeLabel.classList.remove('border-gray-100');
         activeLabel.classList.add('border-amber-400', 'bg-amber-50');
     }
 
-    // 3. คำนวณยอดเงินใหม่
     const newTotal = Math.max(0, baseFinalTotal - amount);
 
-    // 4. อัปเดตตัวเลขในหน้าเว็บ
     const grandTotalDisplay = document.getElementById('grand-total');
     if (grandTotalDisplay) {
         grandTotalDisplay.innerText = newTotal.toLocaleString(undefined, { minimumFractionDigits: 2 });
     }
 
-    // 5. อัปเดตค่าที่จะส่งไปหน้า Payment
     document.getElementById('finalVoucherCode').value = code;
     document.getElementById('finalVoucherDiscount').value = amount;
     document.getElementById('hiddenFinalTotal').value = newTotal;
 
-    // แสดงรายละเอียดส่วนลด Voucher ในส่วนสรุปยอด
     document.getElementById('voucher-display')?.classList.remove('hidden');
     document.getElementById('voucher-code-text').innerText = code;
     document.getElementById('voucher-amount-text').innerText = amount.toFixed(2);
@@ -419,21 +391,17 @@ function applyVoucher(id, amount, code) {
 }
 
 function resetVoucher() {
-    // ล้าง Input Radio
     document.querySelectorAll('input[name="selectedVoucher"]').forEach(input => input.checked = false);
     
-    // ล้าง UI ของการเลือก
     document.querySelectorAll('[id^="label-voucher-"]').forEach(el => {
         el.classList.remove('border-amber-400', 'bg-amber-50');
         el.classList.add('border-gray-100');
     });
 
-    // กลับไปใช้ยอดเดิม
     document.getElementById('grand-total').innerText = baseFinalTotal.toLocaleString(undefined, { minimumFractionDigits: 2 });
     document.getElementById('voucher-display')?.classList.add('hidden');
     document.getElementById('btn-reset-voucher')?.classList.add('hidden');
     
-    // ล้างค่า Hidden Inputs
     document.getElementById('finalVoucherCode').value = "";
     document.getElementById('finalVoucherDiscount').value = "0";
     document.getElementById('hiddenFinalTotal').value = baseFinalTotal;

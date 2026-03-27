@@ -9,22 +9,21 @@ namespace HikeCycle.Mvc.Controllers
     [Route("api/[controller]")]
     public class RecommendedRoutesController : ControllerBase
     {
-        private readonly HikeCycledbContext _context;
+        private readonly HikeCycledbContext _db;
 
-        public RecommendedRoutesController(HikeCycledbContext context)
+        public RecommendedRoutesController(HikeCycledbContext db)
         {
-            _context = context;
+            _db = db;
         }
 
-        // GET: api/RecommendedRoutes
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RecommendedRoute>>> GetRoutes()
         {
             try
             {
-                var routes = await _context.RecommendedRoutes
+                var routes = await _db.RecommendedRoutes
                     .Where(r => r.IsActive)
-                    .OrderBy(r => r.Id) // หรือ OrderByDescending(r => r.Id) เพื่อเอาอันใหม่ขึ้นก่อน
+                    .OrderBy(r => r.Id)
                     .ToListAsync();
 
                 return Ok(routes);
@@ -35,11 +34,10 @@ namespace HikeCycle.Mvc.Controllers
             }
         }
 
-        // GET: api/RecommendedRoutes/5
         [HttpGet("{id}")]
         public async Task<ActionResult<RecommendedRoute>> GetRoute(int id)
         {
-            var route = await _context.RecommendedRoutes.FindAsync(id);
+            var route = await _db.RecommendedRoutes.FindAsync(id);
 
             if (route == null)
             {

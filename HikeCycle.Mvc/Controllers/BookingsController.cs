@@ -7,14 +7,13 @@ namespace HikeCycle.Mvc.Controllers
 {
     public class BookingsController : Controller
     {
-        private readonly HikeCycledbContext _context;
+        private readonly HikeCycledbContext _db;
 
-        public BookingsController(HikeCycledbContext context)
+        public BookingsController(HikeCycledbContext db)
         {
-            _context = context;
+            _db = db;
         }
 
-        // GET: Bookings/Success/5
         public async Task<IActionResult> Success(int? id)
         {
             if (id == null)
@@ -22,7 +21,7 @@ namespace HikeCycle.Mvc.Controllers
                 return NotFound();
             }
 
-            var booking = await _context.Bookings
+            var booking = await _db.Bookings
                 .Include(b => b.User)
                 .Include(b => b.BookingItems)
                 .ThenInclude(bi => bi.Product)

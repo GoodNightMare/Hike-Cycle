@@ -8,28 +8,27 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Account/Login"; // 🚩 หน้าที่จะให้ไปถ้ายังไม่ได้ Login
-        options.AccessDeniedPath = "/"; // 🚩 หน้าที่จะให้ไปถ้า Role ไม่ถึง (เช่น User พยายามเข้า Admin)
-        options.ExpireTimeSpan = TimeSpan.FromDays(7); // ให้จำ Login ไว้ 7 วัน
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/";
+        options.ExpireTimeSpan = TimeSpan.FromDays(7);
     });
 
-// Add DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<HikeCycledbContext>(options =>
     options.UseMySql(
-        connectionString, 
+        connectionString,
         ServerVersion.AutoDetect(connectionString)));
 
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDistributedMemoryCache(); // 1. จำเป็นสำหรับการเก็บ Session ใน Memory
+builder.Services.AddDistributedMemoryCache(); 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // ตั้งเวลาหมดอายุ (เช่น 30 นาที)
-    options.Cookie.HttpOnly = true;                // ป้องกัน Script ภายนอกเข้าถึง Cookie
-    options.Cookie.IsEssential = true;             // จำเป็นสำหรับการทำงาน
+    options.IdleTimeout = TimeSpan.FromMinutes(30); 
+    options.Cookie.HttpOnly = true;                
+    options.Cookie.IsEssential = true;             
 });
 
 var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -38,8 +37,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: myAllowSpecificOrigins,
         policy =>
         {
-            // ใส่ URL ของ Frontend-Admin และ Frontend-User ของคุณ
-            policy.WithOrigins("http://localhost:5173", "http://localhost:5174") 
+            policy.WithOrigins("http://localhost:5173", "http://localhost:5174")
                   .AllowAnyHeader()
                   .AllowAnyMethod()
                   .AllowCredentials();
@@ -50,11 +48,9 @@ var app = builder.Build();
 
 app.UseCors(myAllowSpecificOrigins);
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

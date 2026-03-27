@@ -17,7 +17,6 @@
             </div>
 
             <form asp-action="UpdateProfile" asp-controller="Account" method="post" class="space-y-6">
-                @* ข้อมูลที่อนุญาตให้แก้ *@
                 <div>
                     <label
                     class="block text-gray-400 font-black uppercase text-[10px] tracking-widest mb-2 ml-1">ชื่อ-นามสกุล</label>
@@ -56,8 +55,6 @@
 
 <div class="max-w-7xl mx-auto p-6 md:p-10">
     <div class="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-gray-100">
-
-        @* Header Section *@
         <div class="main-color-bg-brown p-10 text-white relative">
             <div class="flex flex-col md:flex-row items-center gap-8 relative z-10">
                 <div
@@ -71,7 +68,6 @@
             </div>
         </div>
 
-        @* Data Section *@
         <div class="p-10 grid grid-cols-1 md:grid-cols-2 gap-12">
             <div class="space-y-8">
                 <h2 class="text-xl font-bold flex items-center gap-3 text-gray-800">บัญชี</h2>
@@ -97,7 +93,6 @@
 
         <div class="px-10 py-8 bg-gray-50 border-t flex justify-end gap-4">
             <a asp-action="Logout" class="px-6 py-3 text-red-500 font-bold hover:underline">ออกจากระบบ</a>
-            @* เปลี่ยนจากปุ่มเดิม เป็นโค้ดชุดนี้ครับ *@
             <button onclick="toggleModal()"
                     class="px-8 py-3 bg-black text-white rounded-2xl font-bold shadow-xl hover:scale-105 transition-all">
                 แก้ไขข้อมูล
@@ -105,7 +100,6 @@
         </div>
     </div>
 
-    @* Booking History Section *@
     <div class="mt-12">
         <h2 class="text-3xl font-black mb-8">ประวัติการเช่า</h2>
 
@@ -132,14 +126,12 @@
                     </div>
                 </div>
 
-                @* รายการสินค้าพร้อมปุ่มรีวิว *@
                 <ul class="space-y-3">
                     @foreach (var item in booking.BookingItems)
                     {
                         <li
                             class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-yellow-400/50 transition-all group">
                             <div class="flex items-center gap-4">
-                                @* ถ้าคุณมีรูปสินค้าใส่ตรงนี้ได้เลย *@
                                 <div class="flex flex-col">
                                     <span class="font-bold text-gray-800 group-hover:text-black">@item.Product.Name</span>
                                     <div class="flex gap-2 items-center">
@@ -162,15 +154,12 @@
                                     </div>
                                 </div>
 
-                                @* 🚩 เช็คเงื่อนไขการคืนของ *@
                                 @if (booking.Returns != null && booking.Returns.Any())
                                 {
-                                    @* ตรวจสอบว่าใน Booking นี้ สินค้า ProductId นี้ถูกรีวิวไปแล้วหรือยัง *@
                                     var isReviewed = booking.Reviews?.Any(r => r.ProductId == item.ProductId) ?? false;
 
                                     @if (isReviewed)
                                     {
-                                        @* ถ้ามีการรีวิวแล้ว -> โชว์สถานะว่ารีวิวแล้ว *@
                                         <span
                                             class="flex items-center gap-1 px-4 py-2 bg-green-50 text-green-600 rounded-xl font-black text-xs border border-green-100">
                                             <i class="fa-solid fa-check-circle"></i> รีวิวเรียบร้อยแล้ว
@@ -178,7 +167,6 @@
                                     }
                                     else
                                     {
-                                        @* ถ้ายังไม่รีวิว -> โชว์ปุ่มรีวิวสินค้า *@
                                         <a asp-controller="Reviews" asp-action="Create" asp-route-productId="@item.ProductId"
                                                asp-route-bookingId="@booking.Id"
                                                class="flex items-center gap-2 px-6 py-2 bg-yellow-400 text-yellow-900 rounded-xl font-black text-xs hover:scale-105 hover:shadow-lg transition-all active:scale-95">
@@ -188,7 +176,6 @@
                                 }
                                 else
                                 {
-                                    @* ถ้ายังไม่ได้คืนของ *@
                                     <span class="text-[10px] font-black text-gray-300 bg-gray-100 px-3 py-1.5 rounded-lg uppercase">
                                         รอคืนของเพื่อรีวิว
                                     </span>
@@ -213,7 +200,6 @@
             const modal = document.getElementById('editProfileModal');
             modal.classList.toggle('hidden');
         
-            // ป้องกันการเลื่อนหน้าจอเมื่อ Modal เปิดอยู่
             if (!modal.classList.contains('hidden')) {
                 document.body.style.overflow = 'hidden';
             } else {
@@ -221,7 +207,6 @@
             }
         }
 
-        // ปิด Modal เมื่อคลิกพื้นหลัง (Backdrop)
         window.onclick = function (event) {
             const modal = document.getElementById('editProfileModal');
             if (event.target == modal) {

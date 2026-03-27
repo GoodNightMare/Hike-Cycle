@@ -55,14 +55,12 @@
 
 <!-- Modal -->
 <div id="route-modal" class="fixed inset-0 z-[100] hidden justify-center">
-    @* Backdrop *@
     <div id="modal-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"></div>
     
     <div class="flex items-center justify-center min-h-screen p-4">
         <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-auto p-8 z-[110]">
             <div class="flex justify-between items-center mb-6">
                 <h2 id="modal-title" class="text-xl font-black text-gray-900"></h2>
-                @* ปุ่ม X *@
                 <button type="button" onclick="hideModal()" class="text-gray-400 hover:text-gray-900">
                     <i class="fa-solid fa-xmark text-xl"></i>
                 </button>
@@ -132,24 +130,20 @@
         $(document).ready(function () {
             var token = $('input[name="__RequestVerificationToken"]').val();
 
-            // 🚩 เปลี่ยนเป็น window. เพื่อให้เรียกใช้จาก onclick ใน HTML ได้
             window.showModal = function (title) {
                 console.log("Opening Modal...")
                 $('#modal-title').text(title);
                 $('#route-modal').removeClass('hidden').css('display', 'flex');
-                $('body').addClass('overflow-hidden'); // กันเลื่อนหน้าจอข้างหลัง
+                $('body').addClass('overflow-hidden'); 
             }
 
             window.hideModal = function () {
                 console.log("Attempting to hide modal...");
     
-                // 1. สั่งซ่อนด้วยวิธีต่างๆ ทั้งลบคลาสและสั่ง CSS ตรงๆ
                 $('#route-modal').addClass('hidden').removeClass('flex').hide();
-    
-                // 2. ปลดล็อก Scrollbar
+
                 $('body').removeClass('overflow-hidden');
-    
-                // 3. ล้างฟอร์ม (ใส่ Try-Catch กันพัง)
+
                 try {
                     $('#route-form')[0].reset();
                     $('#route-id').val('');
@@ -166,12 +160,10 @@
                 hideModal();
             });
 
-            // ปิด Modal เมื่อคลิกพื้นหลังสีดำ
             $('#route-modal > div:first-child').on('click', function () {
                 hideModal();
             });
 
-            // ส่วนของ Edit ให้ดึงค่ามาใส่ Form
             $('#routes-tbody').on('click', '.edit-btn', function () {
                 var row = $(this).closest('tr');
                 var id = row.data('id');
@@ -190,7 +182,6 @@
                 var id = $('#route-id').val();
 
                 var formData = $(this).serializeArray().reduce(function (obj, item) {
-                    // 🚩 ถ้าชื่อฟิลด์คือ Id และค่าเป็นว่าง (ตอน Create) ให้ข้ามไป ไม่ต้องส่งไปใน JSON
                     if (item.name === "Id" && !item.value) {
                         return obj;
                     }
@@ -246,7 +237,6 @@
                 });
             });
 
-            // Delete
             $('#routes-tbody').on('click', '.delete-btn', function () {
                 var row = $(this).closest('tr');
                 var id = row.data('id');

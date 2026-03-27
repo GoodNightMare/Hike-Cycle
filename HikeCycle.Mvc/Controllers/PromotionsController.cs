@@ -12,19 +12,17 @@ namespace HikeCycle.Mvc.Controllers
     [Route("api/[controller]")]
     public class PromotionsController : ControllerBase
     {
-        private readonly HikeCycledbContext _context;
+        private readonly HikeCycledbContext _db;
 
-        public PromotionsController(HikeCycledbContext context)
+        public PromotionsController(HikeCycledbContext db)
         {
-            _context = context;
+            _db = db;
         }
 
-        // GET: api/promotions
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetActivePromotions()
         {
-            // ดึงข้อมูลโปรโมชันที่ Active พร้อม Join ข้อมูลจากตารางลูก
-            var promotions = await _context.Promotions
+            var promotions = await _db.Promotions
                 .Where(p => p.Active)
                 .OrderByDescending(p => p.CreatedAt)
                 .Select(p => new
@@ -33,23 +31,21 @@ namespace HikeCycle.Mvc.Controllers
                     p.Type,
                     p.Title,
                     p.Description,
-                    // ดึง Conditions ที่เกี่ยวข้อง
-                    Conditions = _context.PromotionConditions
+                    Conditions = _db.PromotionConditions
                     .Where(c => c.PromotionId == p.Id)
                     .Select(c => new
                     {
-                        Key = c.ConditionKey,    // ✅ เปลี่ยนจาก c.Key เป็น c.ConditionKey
-                        Value = c.ConditionValue // ✅ เปลี่ยนจาก c.Value เป็น c.ConditionValue
+                        Key = c.ConditionKey,    
+                        Value = c.ConditionValue 
                     })
                     .ToList(),
 
-                                    // ดึง Benefits ที่เกี่ยวข้อง
-                    Benefits = _context.PromotionBenefits
+                    Benefits = _db.PromotionBenefits
                     .Where(b => b.PromotionId == p.Id)
                     .Select(b => new
                     {
-                        Key = b.BenefitKey,      // ✅ เปลี่ยนจาก b.Key เป็น b.BenefitKey
-                        Value = b.BenefitValue   // ✅ เปลี่ยนจาก b.Value เป็น b.BenefitValue
+                        Key = b.BenefitKey,      
+                        Value = b.BenefitValue   
                     })
                     .ToList()
                 })

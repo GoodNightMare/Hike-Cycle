@@ -14,25 +14,23 @@ namespace HikeCycle.Mvc.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly HikeCycledbContext _context;
+        private readonly HikeCycledbContext _db;
 
-        public AccountController(HikeCycledbContext context)
+        public AccountController(HikeCycledbContext db)
         {
-            _context = context;
+            _db = db;
         }
 
-        // GET: /Account/Login
         [HttpGet]
         public IActionResult Login() => View();
 
-        // POST: /Account/Login
         [HttpPost]
-        [ValidateAntiForgeryToken] // ป้องกัน CSRF
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string email, string password)
         {
             string hashedInput = HashPassword(password);
 
-            var user = await _context.Users
+            var user = await _db.Users
                 .FirstOrDefaultAsync(u => u.Email == email && u.Password == hashedInput);
 
             if (user == null)
@@ -41,24 +39,22 @@ namespace HikeCycle.Mvc.Controllers
                 return View();
             }
 
-            var profile = await _context.UserProfiles.FirstOrDefaultAsync(p => p.UserId == user.Id);
+            var profile = await _db.UserProfiles.FirstOrDefaultAsync(p => p.UserId == user.Id);
             HttpContext.Session.SetString("UserId", user.Id.ToString());
             HttpContext.Session.SetString("UserEmail", user.Email);
             HttpContext.Session.SetString("UserName", profile?.FullName ?? "User");
             HttpContext.Session.SetString("UserRole", user.Role);
 
-            // 🎫 1. สร้างบัตรผ่าน (Claims)
             var claims = new List<Claim>
     {
         new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
         new Claim(ClaimTypes.Email, user.Email),
         new Claim(ClaimTypes.Name, profile?.FullName ?? "User"),
-        new Claim(ClaimTypes.Role, user.Role) // 🚩 สำคัญมาก: ตัวนี้จะทำให้ [Authorize(Roles="...")] ทำงานได้
+        new Claim(ClaimTypes.Role, user.Role) 
     };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-            // 🍪 2. สั่งให้เบราว์เซอร์เก็บ Cookie ยืนยันตัวตน
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(claimsIdentity));
 
@@ -67,12 +63,11 @@ namespace HikeCycle.Mvc.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        // POST: /Account/Register
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel request)
         {
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+            if (await _db.Users.AnyAsync(u => u.Email == request.Email))
             {
                 TempData["RegError"] = "Email นี้ถูกใช้งานแล้ว";
                 return RedirectToAction("Login");
@@ -86,17 +81,17 @@ namespace HikeCycle.Mvc.Controllers
                 CreatedAt = DateTime.Now
             };
 
-            _context.Users.Add(newUser);
-            await _context.SaveChangesAsync();
+            _db.Users.Add(newUser);
+            await _db.SaveChangesAsync();
 
-            _context.UserProfiles.Add(new UserProfile
+            _db.UserProfiles.Add(new UserProfile
             {
                 UserId = newUser.Id,
                 FullName = request.FullName,
                 Phone = request.Phone,
                 Address = request.Address
             });
-            await _context.SaveChangesAsync();
+            await _db.SaveChangesAsync();
 
             TempData["Success"] = "สมัครสมาชิกสำเร็จ กรุณาเข้าสู่ระบบ";
             return RedirectToAction("Login");
@@ -113,14 +108,14 @@ namespace HikeCycle.Mvc.Controllers
 
             int userId = int.Parse(userIdStr);
 
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _db.Users.FindAsync(userId);
             if (user == null)
             {
                 return NotFound();
             }
-            var profile = await _context.UserProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
+            var profile = await _db.UserProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
 
-            var bookings = await _context.Bookings
+            var bookings = await _db.Bookings
                                      .Where(b => b.UserId == userId)
                                      .Include(b => b.BookingItems)
                                      .ThenInclude(bi => bi.Product)
@@ -148,24 +143,22 @@ namespace HikeCycle.Mvc.Controllers
 
             int userId = int.Parse(userIdStr);
 
-            // หาโปรไฟล์เดิมในตาราง UserProfiles
-            var profile = await _context.UserProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
+            
+            var profile = await _db.UserProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
 
             if (profile == null)
             {
-                // ถ้ายังไม่มีก้อนโปรไฟล์ ให้สร้างใหม่
+                
                 profile = new UserProfile { UserId = userId };
-                _context.UserProfiles.Add(profile);
+                _db.UserProfiles.Add(profile);
             }
 
-            // อัปเดตเฉพาะฟิลด์ที่อนุญาต
             profile.FullName = fullName;
             profile.Phone = phone;
             profile.Address = address;
 
-            await _context.SaveChangesAsync();
+            await _db.SaveChangesAsync();
 
-            // อัปเดต Session ชื่อ (ถ้าต้องการให้ชื่อบน Nav เปลี่ยนทันที)
             HttpContext.Session.SetString("UserName", fullName ?? "User");
 
             return RedirectToAction("Profile");

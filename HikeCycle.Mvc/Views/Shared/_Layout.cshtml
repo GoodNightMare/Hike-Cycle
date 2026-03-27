@@ -20,8 +20,6 @@
         .main-color-bg-brown {
         background-color: #4A3728;
         }
-
-        /* สีน้ำตาลเข้มแบบเดินป่า */
     </style>
 </head>
 
@@ -42,7 +40,6 @@
                     </div>
 
                     @{
-                        // ดึงข้อมูลจาก Session มานับจำนวน
                         var sessionData = Context.Session.GetString("UserCart");
                         int cartCount = 0;
 
@@ -67,13 +64,11 @@
                         <a asp-controller="Cart" asp-action="Index" class="text-lg">ตะกร้า</a>
                     </div>
 @{
-        // ดึงข้อมูล UserId จาก Session เพื่อเช็คสถานะการ Login
         var sessionName = Context.Session.GetString("UserName"); 
     }
 
 @if (string.IsNullOrEmpty(sessionName))
     {
-        @* ถ้าไม่มีข้อมูลใน Session ให้โชว์ "เข้าสู่ระบบ" *@
         <div class="flex flex-col items-center group">
             <i class="fa-solid fa-circle-user text-3xl group-hover:scale-110 transition"></i>
             <a asp-controller="Account" asp-action="Login" class="text-lg">เข้าสู่ระบบ</a>
@@ -81,7 +76,6 @@
     }
     else
     {
-        @* ถ้ามีข้อมูลใน Session ให้โชว์ "โปรไฟล์" *@
         <div class="flex flex-col items-center group">
             <i class="fa-solid fa-user-gear text-3xl group-hover:scale-110 transition"></i>
             <a asp-controller="Account" asp-action="Profile" class="text-lg">โปรไฟล์</a>
@@ -92,14 +86,12 @@
         </nav>
     </header>
 
-    @* Main Content *@
     <div class="container mx-auto min-h-screen">
         <main role="main" class="py-6">
             @RenderBody()
         </main>
     </div>
 
-    @* Footer *@
     <footer class="bg-white border-t py-8 mt-10">
         <div class="container mx-auto px-4 text-center text-gray-500">
             &copy; 2026 - HikeCycle - <a asp-area="" asp-controller="Home" asp-action="Privacy"

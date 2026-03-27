@@ -10,20 +10,17 @@
     <div class="bg-white rounded-2xl p-5 shadow-sm mb-8 border border-gray-100">
         <form asp-action="Index" method="get" class="flex flex-wrap gap-4 items-center">
         
-            @* 1. Search (ค้นหาชื่อสินค้า) *@
             <div class="relative w-full sm:w-72">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                 <input type="text" name="search" value="@Context.Request.Query["search"]" placeholder="ค้นหาสินค้า..."
                        class="w-full border border-gray-200 pl-10 pr-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A3728]" />
             </div>
 
-            @* 2. Category (หมวดหมู่) *@
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-sliders text-gray-500"></i>
                 <select name="category" onchange="this.form.submit()"
                         class="border border-gray-200 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A3728]">
                     <option value="">ทุกหมวดหมู่</option>
-                    @* ดึงหมวดหมู่ที่มีจริงจาก Database หรือ Hardcode ตามถนัด *@
                     <option value="backpack" selected="@(Context.Request.Query["category"] == "backpack")">กระเป๋าเป้
                     </option>
                     <option value="tent" selected="@(Context.Request.Query["category"] == "tent")">เต็นท์</option>
@@ -35,17 +32,14 @@
                     </select>
                 </div>
 
-                @* 3. Max Price (ราคาสูงสุด) *@
                 <div class="relative w-full sm:w-40">
                     <i class="fa-solid fa-tag absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                     <input type="number" name="maxPrice" value="@Context.Request.Query["maxPrice"]" placeholder="ราคาสูงสุด"
                            class="w-full border border-gray-200 pl-10 pr-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4A3728]" />
                 </div>
 
-                @* 4. ปุ่มล้างค่า (Reset) *@
                 <a asp-action="Index" class="text-sm text-gray-500 hover:text-black transition">ล้างตัวกรอง</a>
         
-                @* ปุ่ม Submit (กรณี Search หรือใส่ราคา) *@
                 <button type="submit" class="hidden"></button>
             </form>
         </div>
@@ -55,7 +49,6 @@
             {
                 <div
                     class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-100 flex flex-col h-full">
-                    @* ส่วนรูปภาพ *@
                     <div class="relative bg-gray-200 h-72 m-auto object-cover rounded-lg">
                         @if (item.ProductImages != null && item.ProductImages.Any())
                         {
@@ -65,26 +58,19 @@
                         {
                             <div class="w-full h-full flex items-center justify-center text-gray-400">ไม่มีรูปภาพ</div>
                         }
-                        @* <span class="absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-lg text-xs font-bold shadow-sm">
-                            @item.Category
-                        </span> *@
                     </div>
 
-                    @* ส่วนเนื้อหา *@
                     <div class="p-4 flex-grow">
                         <h3 class="font-bold text-lg text-gray-800 truncate">@item.Name</h3>
                         <p class="text-sm text-gray-500 mb-2 line-clamp-2">@item.Brand</p>
 
                         <div class="flex items-center gap-1 mt-1 text-sm mb-2">
-                            @* ใช้ FontAwesome Icon แทน Star Component *@
                             <i class="fa-solid fa-star text-yellow-400"></i>
     
-                            @* แสดงคะแนนแบบทศนิยม 2 ตำแหน่ง (C# Syntax) *@
                             <span class="font-medium text-gray-700">
                                 @item.Rating.ToString("F2")
                             </span>
     
-                            @* แสดงจำนวนรีวิว *@
                             <span class="text-gray-400 text-xs">
                                 (@item.ReviewCount)
                             </span>
