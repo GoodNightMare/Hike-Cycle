@@ -1,9 +1,17 @@
 @using HikeCycle.Mvc.Models
 @model CartViewModel
 
+@{
+    var totalItems = Model.CartItems?.Count() ?? 0;
+}
+
 <div class="max-w-4xl mx-auto p-10">
     <h1 class="text-3xl font-black mb-8 flex items-center gap-3">
         <i class="fa-solid fa-basket-shopping"></i> ตะกร้าสินค้า
+        @if (totalItems > 0)
+        {
+            <span class="text-lg font-bold text-gray-500 bg-gray-100 rounded-full px-3 py-1">@totalItems ชิ้น</span>
+        }
     </h1>
 
     @if (TempData["ErrorMessage"] != null)
@@ -240,6 +248,8 @@
                         <input type="hidden" name="totalDiscount" value="@Model.CalculationResult.TotalDiscount" />
                         <input type="hidden" name="voucherCode" id="finalVoucherCode" value="" />
                         <input type="hidden" name="voucherDiscount" id="finalVoucherDiscount" value="0" />
+
+                        <input type="hidden" name="totalItems" value="@totalItems" />
 
                         <input type="hidden" name="finalTotal" id="hiddenFinalTotal" value="@Model.CalculationResult.FinalTotal" />
         

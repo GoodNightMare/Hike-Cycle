@@ -19,12 +19,15 @@ namespace HikeCycle.Mvc.Controllers
             _db = db;
         }
 
-        public IActionResult Index(decimal originalTotal, decimal totalDiscount, decimal finalTotal, string shippingAddress, string? voucherCode, decimal? voucherDiscount)
+        public IActionResult Index(decimal originalTotal, decimal totalDiscount, decimal finalTotal, string shippingAddress, string? voucherCode, decimal? voucherDiscount, int totalItems)
         {
             decimal vDiscount = voucherDiscount ?? 0;
             decimal combinedDiscount = totalDiscount + vDiscount;
 
-            decimal actualAmount = finalTotal;
+            int deposit = 200;
+            int depositTotal = totalItems * deposit;
+
+            decimal actualAmount = finalTotal + depositTotal;
             if(actualAmount < 0) actualAmount = 0;
 
             var model = new PaymentViewModel
@@ -34,7 +37,8 @@ namespace HikeCycle.Mvc.Controllers
                 Amount = actualAmount,
                 ShippingAddress = shippingAddress,
                 VoucherCode = voucherCode,
-                VoucherDiscount = vDiscount
+                VoucherDiscount = vDiscount,
+                DepositTotal = depositTotal
             };
 
             return View(model);
@@ -91,6 +95,7 @@ namespace HikeCycle.Mvc.Controllers
                         TotalAmount = model.OriginalTotal,
                         DiscountAmount = model.TotalDiscount,
                         FinalAmount = finalAmount,
+                        DepositAmount = model.DepositTotal,
                         Status = "Confirmed",
                         ShippingAddress = model.ShippingAddress,
                         CreatedAt = DateTime.Now

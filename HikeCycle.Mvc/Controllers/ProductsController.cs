@@ -23,7 +23,10 @@ namespace HikeCycle.Mvc.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(string search, string category, decimal? maxPrice)
         {
-            var query = _db.Products.Include(p => p.ProductImages).AsQueryable();
+            var query = _db.Products
+                        .Include(p => p.ProductImages)
+                        .Where(p => p.Status == "Active")
+                        .AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
             {

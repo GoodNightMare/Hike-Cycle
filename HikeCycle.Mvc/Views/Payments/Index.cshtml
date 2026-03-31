@@ -33,6 +33,10 @@
                     <span class="text-gray-500">ส่วนลด</span>
                     <span class="font-semibold text-red-500">-฿@Model.TotalDiscount.ToString("N2")</span>
                 </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">ค่ามัดจำ</span>
+                    <span class="font-semibold text-green-500">฿@Model.DepositTotal.ToString("N2")</span>
+                </div>
                 <div class="pt-4 mt-4 border-t border-gray-200 flex justify-between items-center">
                     <span class="font-bold text-gray-800">ยอดชำระสุทธิ</span>
                     <span class="text-3xl font-black text-green-600">฿@Model.Amount.ToString("N2")</span>
@@ -46,6 +50,8 @@
             <input type="hidden" asp-for="OriginalTotal" />
             <input type="hidden" asp-for="TotalDiscount" />
             <input type="hidden" asp-for="ShippingAddress" />
+
+            <input type="hidden" asp-for="DepositTotal" />
 
             <input type="hidden" asp-for="VoucherCode" />
             <input type="hidden" asp-for="VoucherDiscount" />

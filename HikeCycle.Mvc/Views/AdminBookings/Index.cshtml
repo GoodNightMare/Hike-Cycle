@@ -19,6 +19,7 @@
                     <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px]">Rental Period</th>
                     <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px] text-center">Items</th>
                     <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px] text-right">Final Amount</th>
+                    <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px] text-center">Deposit Amount</th>
                     <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px] text-center">Status</th>
                     <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px] text-center">Return?</th>
                 </tr>
@@ -57,6 +58,9 @@
                                 {
                                     <div class="text-[10px] text-red-400 line-through">฿@item.TotalAmount.ToString("F2")</div>
                                 }
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                <div class="font-black text-green-600">฿@item.DepositAmount.ToString("F2")</div>
                             </td>
                             <td class="py-4 px-6 text-center">
                                 @{

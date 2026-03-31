@@ -11,5 +11,6 @@ namespace HikeCycle.Mvc.ViewModels
 
         public string? VoucherCode { get; set; }
         public decimal VoucherDiscount { get; set; }
+        public int DepositTotal { get; set; }
     }
 }

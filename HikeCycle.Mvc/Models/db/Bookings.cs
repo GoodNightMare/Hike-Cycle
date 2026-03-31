@@ -32,6 +32,9 @@ namespace HikeCycle.Mvc.Models.db
         [Column("shipping_address")]
         public string? ShippingAddress { get; set; }
 
+        [Column("deposit_amount", TypeName = "decimal(18,2)")]
+        public decimal DepositAmount { get; set; }
+
         [Column("created_at")]
         public DateTime? CreatedAt { get; set; }
 
