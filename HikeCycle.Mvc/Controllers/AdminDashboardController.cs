@@ -33,7 +33,7 @@ namespace HikeCycle.Mvc.Controllers
                     Count = g.Count(),
                     Revenue = g.Sum(b => b.FinalAmount)
                 })
-                .OrderBy(g => g.Date) 
+                .OrderBy(g => g.Date)
                 .ToListAsync();
 
             var labels = new List<string>();

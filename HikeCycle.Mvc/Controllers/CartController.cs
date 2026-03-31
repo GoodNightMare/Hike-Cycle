@@ -244,32 +244,9 @@ namespace HikeCycle.Mvc.Controllers
         }
 
         [HttpPost]
-        public IActionResult Remove(string id)
-        {
-            var sessionData = HttpContext.Session.GetString(CartSessionKey);
-            if (string.IsNullOrEmpty(sessionData))
-            {
-                return RedirectToAction("Index");
-            }
-
-            var cartItems = JsonSerializer.Deserialize<List<CartSessionItem>>(sessionData);
-            var itemToRemove = cartItems.FirstOrDefault(item => item.Id == id);
-
-            if (itemToRemove != null)
-            {
-                if (itemToRemove.IsRemovable)
-                {
-                    cartItems.Remove(itemToRemove);
-                    HttpContext.Session.SetString(CartSessionKey, JsonSerializer.Serialize(cartItems));
-                }
-            }
-
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost]
         public IActionResult UpdateDate(string id, string startDate, string endDate)
         {
+            Console.WriteLine($"Received UpdateDate for Id: {id}, StartDate: {startDate}, EndDate: {endDate}");
             if (DateTime.Parse(startDate) > DateTime.Parse(endDate))
             {
                 TempData["ErrorMessage"] = "วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่มต้น";

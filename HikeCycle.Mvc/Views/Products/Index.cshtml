@@ -9,7 +9,6 @@
 
     <div class="bg-white rounded-2xl p-5 shadow-sm mb-8 border border-gray-100">
         <form asp-action="Index" method="get" class="flex flex-wrap gap-4 items-center">
-        
             <div class="relative w-full sm:w-72">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                 <input type="text" name="search" value="@Context.Request.Query["search"]" placeholder="ค้นหาสินค้า..."
@@ -29,8 +28,8 @@
                     </option>
                     <option value="lighting" selected="@(Context.Request.Query["category"] == "lighting")">
                         ไฟฉาย/แสงสว่าง</option>
-                    </select>
-                </div>
+                </select>
+            </div>
 
                 <div class="relative w-full sm:w-40">
                     <i class="fa-solid fa-tag absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
@@ -41,7 +40,7 @@
                 <a asp-action="Index" class="text-sm text-gray-500 hover:text-black transition">ล้างตัวกรอง</a>
         
                 <button type="submit" class="hidden"></button>
-            </form>
+        </form>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

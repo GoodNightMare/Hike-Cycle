@@ -120,7 +120,7 @@
                         <span
                             class="inline-flex items-center px-4 py-1 rounded-full text-xs font-black uppercase tracking-widest 
                             @(booking.Status == "Completed" ? "bg-blue-100 text-blue-600" :
-                                                                            booking.Status == "Confirmed" ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-500")">
+                                                                                                        booking.Status == "Confirmed" ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-500")">
                             @booking.Status
                         </span>
                     </div>
@@ -143,12 +143,12 @@
                                             }
                                             <span class="text-xs font-bold text-gray-400">จำนวน: @item.Quantity</span>
                                             <span class="text-xs text-gray-400">
-                                               ที่อยู่การจัดส่ง: 
-                                               <span class="text-sm text-gray-600">
+                                                ที่อยู่การจัดส่ง:
+                                                <span class="text-sm text-gray-600">
 
-                                               @(string.IsNullOrEmpty(booking.ShippingAddress) ? "ไม่มีข้อมูลที่อยู่" :
-                                                                booking.ShippingAddress)
-                                               </span>
+                                                    @(string.IsNullOrEmpty(booking.ShippingAddress) ? "ไม่มีข้อมูลที่อยู่" :
+                                                                     booking.ShippingAddress)
+                                                </span>
                                             </span>
                                         </div>
                                     </div>

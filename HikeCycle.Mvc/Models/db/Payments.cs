@@ -7,7 +7,6 @@ namespace HikeCycle.Mvc.Models.db
     public class Payment
     {
         [Key]
-        [Column("id")] 
         public int Id { get; set; }
 
         [Column("booking_id")] 
@@ -16,10 +15,8 @@ namespace HikeCycle.Mvc.Models.db
         [Column("amount", TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
 
-        [Column("method")]
         public PaymentMethod Method { get; set; }
 
-        [Column("status")]
         public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
 
         [Column("created_at")]

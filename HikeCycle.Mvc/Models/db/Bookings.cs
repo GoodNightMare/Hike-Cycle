@@ -7,7 +7,6 @@ namespace HikeCycle.Mvc.Models.db
     public class Booking
     {
         [Key]
-        [Column("id")]
         public int Id { get; set; }
 
         [Column("user_id")]
@@ -28,7 +27,6 @@ namespace HikeCycle.Mvc.Models.db
         [Column("final_amount", TypeName = "decimal(10,2)")]
         public decimal FinalAmount { get; set; }
 
-        [Column("status")]
         public string Status { get; set; } = "Pending";
 
         [Column("shipping_address")]
@@ -42,9 +40,7 @@ namespace HikeCycle.Mvc.Models.db
 
         public virtual ICollection<BookingItem> BookingItems { get; set; } = new List<BookingItem>();
         public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
-
         public virtual ICollection<Return> Returns { get; set; } = new List<Return>();
-
         public virtual ICollection<Reviews> Reviews { get; set; } = new List<Reviews>();
     }
 }

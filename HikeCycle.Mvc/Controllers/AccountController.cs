@@ -25,7 +25,6 @@ namespace HikeCycle.Mvc.Controllers
         public IActionResult Login() => View();
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string email, string password)
         {
             string hashedInput = HashPassword(password);
@@ -42,16 +41,16 @@ namespace HikeCycle.Mvc.Controllers
             var profile = await _db.UserProfiles.FirstOrDefaultAsync(p => p.UserId == user.Id);
             HttpContext.Session.SetString("UserId", user.Id.ToString());
             HttpContext.Session.SetString("UserEmail", user.Email);
-            HttpContext.Session.SetString("UserName", profile?.FullName ?? "User");
+            HttpContext.Session.SetString("UserName", profile?.FullName ?? "ไม่ระบุ");
             HttpContext.Session.SetString("UserRole", user.Role);
 
             var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new Claim(ClaimTypes.Email, user.Email),
-        new Claim(ClaimTypes.Name, profile?.FullName ?? "User"),
-        new Claim(ClaimTypes.Role, user.Role) 
-    };
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Name, profile?.FullName ?? "ไม่ระบุ"),
+                    new Claim(ClaimTypes.Role, user.Role)
+                };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -64,7 +63,6 @@ namespace HikeCycle.Mvc.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel request)
         {
             if (await _db.Users.AnyAsync(u => u.Email == request.Email))
@@ -109,10 +107,7 @@ namespace HikeCycle.Mvc.Controllers
             int userId = int.Parse(userIdStr);
 
             var user = await _db.Users.FindAsync(userId);
-            if (user == null)
-            {
-                return NotFound();
-            }
+
             var profile = await _db.UserProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
 
             var bookings = await _db.Bookings
@@ -124,7 +119,6 @@ namespace HikeCycle.Mvc.Controllers
                                      .OrderByDescending(b => b.Id)
                                      .ToListAsync();
 
-            var now = DateTime.Now;
             var viewModel = new AccountProfileViewModel
             {
                 User = user,
@@ -143,12 +137,11 @@ namespace HikeCycle.Mvc.Controllers
 
             int userId = int.Parse(userIdStr);
 
-            
             var profile = await _db.UserProfiles.FirstOrDefaultAsync(p => p.UserId == userId);
 
             if (profile == null)
             {
-                
+
                 profile = new UserProfile { UserId = userId };
                 _db.UserProfiles.Add(profile);
             }
@@ -159,7 +152,7 @@ namespace HikeCycle.Mvc.Controllers
 
             await _db.SaveChangesAsync();
 
-            HttpContext.Session.SetString("UserName", fullName ?? "User");
+            HttpContext.Session.SetString("UserName", fullName ?? "ไม่ระบุ");
 
             return RedirectToAction("Profile");
         }

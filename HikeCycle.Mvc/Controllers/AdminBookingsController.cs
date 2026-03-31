@@ -15,10 +15,10 @@ namespace HikeCycle.Mvc.Controllers
         public async Task<IActionResult> Index()
         {
             var bookings = await _db.Bookings
-                .Include(b => b.User) 
+                .Include(b => b.User)
                 .Include(b => b.BookingItems)
-                .ThenInclude(bi => bi.Product) 
-                .OrderBy(b => b.Id) 
+                .ThenInclude(bi => bi.Product)
+                .OrderBy(b => b.Id)
                 .ToListAsync();
 
             return View(bookings);
@@ -29,7 +29,7 @@ namespace HikeCycle.Mvc.Controllers
         public async Task<IActionResult> UpdateStatus(int id, string status, ReturnCondition? condition, decimal? extraFee, string? note)
         {
             var booking = await _db.Bookings
-        .Include(b => b.User) 
+        .Include(b => b.User)
         .FirstOrDefaultAsync(b => b.Id == id);
             if (booking == null) return NotFound();
 
@@ -43,7 +43,7 @@ namespace HikeCycle.Mvc.Controllers
                     ReturnDate = DateTime.Now,
                     Condition = condition ?? ReturnCondition.Good,
                     ExtraFee = extraFee ?? 0,
-                    IsExtraFeePaid = (extraFee ?? 0) <= 0, 
+                    IsExtraFeePaid = (extraFee ?? 0) <= 0,
                     Note = note
                 };
                 _db.Returns.Add(returnEntry);

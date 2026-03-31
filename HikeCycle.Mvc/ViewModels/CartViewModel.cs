@@ -1,6 +1,4 @@
 using HikeCycle.Mvc.Models.db;
-using HikeCycle.Mvc.Controllers;
-using System.Collections.Generic;
 
 namespace HikeCycle.Mvc.ViewModels
 {

@@ -127,36 +127,36 @@
                     }
                 </div>
             }
-@if (Model.AvailableVouchers != null && Model.AvailableVouchers.Any())
-{
-    <div class="mt-8">
-        <h2 class="text-2xl font-black mb-4 flex items-center gap-2 text-amber-800">
-            <i class="fa-solid fa-ticket"></i> Voucher
-        </h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            @foreach (var v in Model.AvailableVouchers)
+            @if (Model.AvailableVouchers != null && Model.AvailableVouchers.Any())
             {
-                <label class="relative flex items-center gap-4 p-5 bg-white border-2 border-gray-100 rounded-2xl cursor-pointer hover:border-amber-400 transition shadow-sm group"
-                       id="label-voucher-@v.Id">
-                    
-                    <input type="radio" name="selectedVoucher" value="@v.Amount" 
-                           data-code="@v.Code"
-                           class="w-6 h-6 text-amber-600 focus:ring-amber-500 border-gray-300"
-                           onchange="applyVoucher(@v.Id, @v.Amount, '@v.Code')">
-                    
-                    <div class="flex-grow">
-                        <div class="flex items-center gap-2">
-                            <span class="font-black text-lg text-gray-900 uppercase tracking-tight">@v.Code</span>
-                        </div>
-                        <p class="text-sm text-amber-600 font-black">ลดเพิ่ม ฿@v.Amount.ToString("N0")</p>
+                <div class="mt-8">
+                    <h2 class="text-2xl font-black mb-4 flex items-center gap-2 text-amber-800">
+                        <i class="fa-solid fa-ticket"></i> Voucher
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        @foreach (var v in Model.AvailableVouchers)
+                        {
+                            <label class="relative flex items-center gap-4 p-5 bg-white border-2 border-gray-100 rounded-2xl cursor-pointer hover:border-amber-400 transition shadow-sm group"
+                                id="label-voucher-@v.Id">
+                                
+                                <input type="radio" name="selectedVoucher" value="@v.Amount" 
+                                    data-code="@v.Code"
+                                    class="w-6 h-6 text-amber-600 focus:ring-amber-500 border-gray-300"
+                                    onchange="applyVoucher(@v.Id, @v.Amount, '@v.Code')">
+                                
+                                <div class="flex-grow">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-black text-lg text-gray-900 uppercase tracking-tight">@v.Code</span>
+                                    </div>
+                                    <p class="text-sm text-amber-600 font-black">ลดเพิ่ม ฿@v.Amount.ToString("N0")</p>
+                                </div>
+                            </label>
+                        }
                     </div>
-                </label>
+                
+                </div>
             }
-        </div>
-    
-    </div>
-}
         </div>
 
         <div class="mt-8 p-8 bg-white border-2 border-gray-100 rounded-3xl shadow-sm">
@@ -212,35 +212,34 @@
 
             <div class="flex flex-col md:flex-row items-center gap-6 md:gap-12 order-1 md:order-2 w-full md:w-auto">
                 <div class="text-center md:text-right">
-    <p class="text-gray-500 text-sm">ราคารวม</p>
-    <p class="text-xl font-bold text-gray-500 line-through">
-        ฿@Model.CalculationResult.OriginalTotal.ToString("F2")
-    </p>
+                <p class="text-gray-500 text-sm">ราคารวม</p>
+                <p class="text-xl font-bold text-gray-500 line-through">
+                    ฿@Model.CalculationResult.OriginalTotal.ToString("F2")
+                </p>
 
-    <p class="text-gray-500 text-sm mt-2">ส่วนลดโปรโมชั่น</p>
-    <p class="text-xl font-bold text-red-500">-฿@Model.CalculationResult.TotalDiscount.ToString("F2")</p>
+                <p class="text-gray-500 text-sm mt-2">ส่วนลดโปรโมชั่น</p>
+                <p class="text-xl font-bold text-red-500">-฿@Model.CalculationResult.TotalDiscount.ToString("F2")</p>
 
-    <div id="voucher-display" class="hidden animate-in fade-in duration-300">
-        <p class="text-amber-600 text-sm mt-2 font-black">
-            ส่วนลด Voucher (<span id="voucher-code-text"></span>)
-        </p>
-        <p class="text-xl font-bold text-amber-500">
-            -฿<span id="voucher-amount-text">0.00</span>
-        </p>
-    </div>
+                <div id="voucher-display" class="hidden animate-in fade-in duration-300">
+                    <p class="text-amber-600 text-sm mt-2 font-black">
+                        ส่วนลด Voucher (<span id="voucher-code-text"></span>)
+                    </p>
+                    <p class="text-xl font-bold text-amber-500">
+                        -฿<span id="voucher-amount-text">0.00</span>
+                    </p>
+                </div>
 
-    <p class="text-gray-500 text-sm uppercase tracking-widest mt-2">ยอดชำระรวมทั้งหมด</p>
-    <p class="text-4xl font-black text-green-600">
-        ฿<span id="grand-total">@Model.CalculationResult.FinalTotal.ToString("F2")</span>
-    </p>
-</div>
+                <p class="text-gray-500 text-sm uppercase tracking-widest mt-2">ยอดชำระรวมทั้งหมด</p>
+                <p class="text-4xl font-black text-green-600">
+                    ฿<span id="grand-total">@Model.CalculationResult.FinalTotal.ToString("F2")</span>
+                </p>
+            </div>
         
                     <form asp-controller="Payments" asp-action="Index" method="get" id="checkoutForm" onsubmit="return validateCheckout()">
                         <input type="hidden" name="originalTotal" value="@Model.CalculationResult.OriginalTotal" />
                         <input type="hidden" name="totalDiscount" value="@Model.CalculationResult.TotalDiscount" />
                         <input type="hidden" name="voucherCode" id="finalVoucherCode" value="" />
                         <input type="hidden" name="voucherDiscount" id="finalVoucherDiscount" value="0" />
-                        <input type="hidden" name="finalTotal" value="@Model.CalculationResult.FinalTotal" />
 
                         <input type="hidden" name="finalTotal" id="hiddenFinalTotal" value="@Model.CalculationResult.FinalTotal" />
         
@@ -275,6 +274,8 @@
                             endDateInput.value = nextDate.toISOString().split('T')[0];
                         }
                     }
+
+                    console.log(startDateInput.value, endDateInput.value);
 
                     startDateInput.addEventListener('change', function () {
                         updateEndDateMin();
@@ -327,33 +328,33 @@
                 }
             }
 
-            function validateCheckout()
-    const finalAddr = document.getElementById('finalShippingAddress').value.trim();
-  
-    const addrType = document.querySelector('input[name="addrType"]:checked').value;
+            function validateCheckout() {
+                const finalAddr = document.getElementById('finalShippingAddress').value.trim();
+            
+                const addrType = document.querySelector('input[name="addrType"]:checked').value;
 
-    if (!finalAddr || finalAddr === "" || finalAddr === "ไม่ได้ระบุที่อยู่จัดส่งในโปรไฟล์") {
-        
-        let errorMsg = "";
-        if (addrType === 'Profile') {
-            errorMsg = "⚠️ โปรไฟล์ของคุณยังไม่ได้ระบุที่อยู่ กรุณาเลือก 'ระบุที่อยู่'";
-        } else if (addrType === 'Custom') {
-            errorMsg = "⚠️ กรุณากรอกที่อยู่สำหรับจัดส่งสินค้าด้วยครับ";
-        } else {
-            errorMsg = "⚠️ กรุณาระบุข้อมูลที่อยู่จัดส่งให้ครบถ้วน";
-        }
+                if (!finalAddr || finalAddr === "" || finalAddr === "ไม่ได้ระบุที่อยู่จัดส่งในโปรไฟล์") {
+                    
+                    let errorMsg = "";
+                    if (addrType === 'Profile') {
+                        errorMsg = "⚠️ โปรไฟล์ของคุณยังไม่ได้ระบุที่อยู่ กรุณาเลือก 'ระบุที่อยู่'";
+                    } else if (addrType === 'Custom') {
+                        errorMsg = "⚠️ กรุณากรอกที่อยู่สำหรับจัดส่งสินค้าด้วยครับ";
+                    } else {
+                        errorMsg = "⚠️ กรุณาระบุข้อมูลที่อยู่จัดส่งให้ครบถ้วน";
+                    }
 
-        alert(errorMsg);
-        
-        if (addrType === 'Custom') {
-            document.getElementById('displayShippingAddress').focus();
-        }
-        
-        return false; 
-    }
+                    alert(errorMsg);
+                    
+                    if (addrType === 'Custom') {
+                        document.getElementById('displayShippingAddress').focus();
+                    }
+                    
+                    return false; 
+                }
 
-    return true; 
-}
+                return true; 
+            }
 
 document.getElementById('displayShippingAddress').addEventListener('input', function() {
     document.getElementById('finalShippingAddress').value = this.value;

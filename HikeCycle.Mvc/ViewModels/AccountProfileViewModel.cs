@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using HikeCycle.Mvc.Models.db;
 
 namespace HikeCycle.Mvc.ViewModels

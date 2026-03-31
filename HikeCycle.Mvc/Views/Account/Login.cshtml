@@ -29,6 +29,17 @@
                 </div>
             </div>
         }
+        @if (TempData["RegError"] != null)
+        {
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 shadow-md">
+                <div class="flex items-center">
+                    <i class="fa-solid fa-circle-check text-red-500"></i>
+                    <div class="ml-3">
+                        <p class="text-sm text-red-700">@TempData["RegError"]</p>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 
     <div class="w-full max-w-sm bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
@@ -38,8 +49,6 @@
         </div>
 
         <form asp-controller="Account" asp-action="Login" method="post" class="space-y-5">
-            @Html.AntiForgeryToken()
-            
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input type="email" name="email" required placeholder="example@email.com"
@@ -59,9 +68,7 @@
         </form>
 
         <div class="flex justify-end text-sm gap-1">
-            <form asp-controller="Account" asp-action="Login" method="post">
-                @Html.AntiForgeryToken()
-            
+            <form asp-controller="Account" asp-action="Login" method="post">     
                 <div>
                     <input type="email" value="user1@gmail.com" name="email" required placeholder="example@email.com"
                            class="hidden w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-black transition">
@@ -78,8 +85,6 @@
             </form>
 
             <form asp-controller="Account" asp-action="Login" method="post">
-                @Html.AntiForgeryToken()
-            
                 <div>
                     <input type="email" value="staff1@gmail.com" name="email" required placeholder="example@email.com"
                            class="hidden w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-black transition">
@@ -96,8 +101,6 @@
             </form>
 
             <form asp-controller="Account" asp-action="Login" method="post">
-                @Html.AntiForgeryToken()
-            
                 <div>
                     <input type="email" value="admin@hikecycle.com" name="email" required
                            placeholder="example@email.com"
@@ -135,8 +138,6 @@
             </div>
 
             <form asp-controller="Account" asp-action="Register" method="post" class="space-y-4">
-                @Html.AntiForgeryToken()
-                
                 <input type="email" name="Email" placeholder="Email *" required
                        class="w-full border border-gray-200 p-2.5 rounded-lg focus:ring-2 focus:ring-green-600 outline-none">
                 

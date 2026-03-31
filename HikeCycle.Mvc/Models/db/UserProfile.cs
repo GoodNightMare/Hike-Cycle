@@ -11,15 +11,10 @@ namespace HikeCycle.Mvc.Models.db
         public int UserId { get; set; }
 
         [Column("full_name")]
-        [MaxLength(100)]
         public string? FullName { get; set; }
 
-        [Column("phone")]
-        [MaxLength(10)]
         public string? Phone { get; set; }
 
-        [Column("address")]
-        [MaxLength(100)]
         public string? Address { get; set; }
     }
 }

@@ -14,7 +14,7 @@ namespace HikeCycle.Mvc.Controllers
             _db = db;
         }
 
-        public async Task<IActionResult> Success(int? id)
+        public async Task<IActionResult> Success(int? id, decimal? voucherDiscount)
         {
             if (id == null)
             {
@@ -32,6 +32,8 @@ namespace HikeCycle.Mvc.Controllers
             {
                 return NotFound();
             }
+
+            ViewBag.VoucherDiscount = voucherDiscount ?? 0;
 
             return View(booking);
         }

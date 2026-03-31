@@ -26,7 +26,8 @@ namespace HikeCycle.Mvc.Controllers
             decimal vDiscount = voucherDiscount ?? 0;
             decimal combinedDiscount = totalDiscount + vDiscount;
 
-            decimal actualAmount = finalTotal - vDiscount;
+            decimal actualAmount = finalTotal;
+            if(actualAmount < 0) actualAmount = 0;
 
             var model = new PaymentViewModel
             {
@@ -37,6 +38,8 @@ namespace HikeCycle.Mvc.Controllers
                 VoucherCode = voucherCode,
                 VoucherDiscount = vDiscount
             };
+
+            Console.WriteLine($"PaymentViewModel - OriginalTotal: {model.OriginalTotal}, TotalDiscount: {model.TotalDiscount}, Amount: {model.Amount}, ShippingAddress: {model.ShippingAddress}, VoucherCode: {model.VoucherCode}, VoucherDiscount: {model.VoucherDiscount}");
 
             return View(model);
         }
@@ -81,6 +84,9 @@ namespace HikeCycle.Mvc.Controllers
                     var minDate = validCartItems.Min(i => DateTime.ParseExact(i.StartDate, "yyyy-MM-dd", CultureInfo.InvariantCulture));
                     var maxDate = validCartItems.Max(i => DateTime.ParseExact(i.EndDate, "yyyy-MM-dd", CultureInfo.InvariantCulture));
 
+                    decimal finalAmount = model.Amount;
+                    if (finalAmount < 0) finalAmount = 0; 
+
                     var newBooking = new Booking
                     {
                         UserId = userId,
@@ -88,7 +94,7 @@ namespace HikeCycle.Mvc.Controllers
                         EndDate = maxDate,
                         TotalAmount = model.OriginalTotal,
                         DiscountAmount = model.TotalDiscount,
-                        FinalAmount = model.Amount,
+                        FinalAmount = finalAmount,
                         Status = "Confirmed",
                         ShippingAddress = model.ShippingAddress,
                         CreatedAt = DateTime.Now
@@ -192,9 +198,11 @@ namespace HikeCycle.Mvc.Controllers
                     await _db.SaveChangesAsync();
                     await transaction.CommitAsync();
 
+                    Console.WriteLine($"Payment created for BookingId: {newBooking.Id}, Amount: {model.VoucherDiscount}");
+
                     HttpContext.Session.Remove("UserCart");
 
-                    return RedirectToAction("Success", "Bookings", new { id = newBooking.Id });
+                    return RedirectToAction("Success", "Bookings", new { id = newBooking.Id, voucherDiscount = model.VoucherDiscount });
                 }
                 catch (Exception ex)
                 {

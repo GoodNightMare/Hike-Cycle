@@ -7,19 +7,14 @@ namespace HikeCycle.Mvc.Models.db
     public class Promotion
     {
         [Key]
-        [Column("id")]
         public int Id { get; set; }
 
-        [Column("type")]
         public required string Type { get; set; } 
 
-        [Column("title")]
         public required string Title { get; set; }
 
-        [Column("description")]
         public string? Description { get; set; }
 
-        [Column("active")]
         public bool Active { get; set; } = true;
 
         [Column("created_at")]

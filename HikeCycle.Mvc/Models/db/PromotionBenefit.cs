@@ -7,7 +7,6 @@ namespace HikeCycle.Mvc.Models.db
     public class PromotionBenefit
     {
         [Key]
-        [Column("id")]
         public int Id { get; set; }
 
         [Column("promotion_id")]

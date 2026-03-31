@@ -7,7 +7,6 @@ namespace HikeCycle.Mvc.Models.db
     public class ProductImage
     {
         [Key]
-        [Column("id")]
         public int Id { get; set; }
 
         [Column("product_id")]

@@ -7,7 +7,6 @@ namespace HikeCycle.Mvc.Models.db
     public class BookingItem
     {
         [Key]
-        [Column("id")]
         public int Id { get; set; }
 
         [Column("booking_id")]
@@ -16,11 +15,9 @@ namespace HikeCycle.Mvc.Models.db
         [Column("product_id")]
         public int ProductId { get; set; }
 
-        [Column("size")]
         [StringLength(10)]
         public string? Size { get; set; }
 
-        [Column("quantity")]
         public int Quantity { get; set; }
 
         [Column("is_free")] 

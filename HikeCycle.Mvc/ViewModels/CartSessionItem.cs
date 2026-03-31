@@ -13,6 +13,5 @@ namespace HikeCycle.Mvc.ViewModels
         public string? Category { get; set; } 
         public bool IsFree { get; set; } = false;
         public bool IsRemovable { get; set; } = true;
-
     }
 }

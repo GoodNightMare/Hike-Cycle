@@ -15,10 +15,8 @@ namespace HikeCycle.Mvc.Models.db
         [Column("promotion_id")]
         public int PromotionId { get; set; }
 
-        [Column("code")]
         public string Code { get; set; } = null!;
 
-        [Column("amount")]
         public decimal Amount { get; set; } = 50;
 
         [Column("is_used")]
