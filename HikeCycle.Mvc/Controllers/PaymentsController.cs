@@ -21,8 +21,6 @@ namespace HikeCycle.Mvc.Controllers
 
         public IActionResult Index(decimal originalTotal, decimal totalDiscount, decimal finalTotal, string shippingAddress, string? voucherCode, decimal? voucherDiscount)
         {
-            Console.WriteLine("Code: " + voucherCode);
-
             decimal vDiscount = voucherDiscount ?? 0;
             decimal combinedDiscount = totalDiscount + vDiscount;
 
@@ -38,8 +36,6 @@ namespace HikeCycle.Mvc.Controllers
                 VoucherCode = voucherCode,
                 VoucherDiscount = vDiscount
             };
-
-            Console.WriteLine($"PaymentViewModel - OriginalTotal: {model.OriginalTotal}, TotalDiscount: {model.TotalDiscount}, Amount: {model.Amount}, ShippingAddress: {model.ShippingAddress}, VoucherCode: {model.VoucherCode}, VoucherDiscount: {model.VoucherDiscount}");
 
             return View(model);
         }
@@ -197,8 +193,6 @@ namespace HikeCycle.Mvc.Controllers
 
                     await _db.SaveChangesAsync();
                     await transaction.CommitAsync();
-
-                    Console.WriteLine($"Payment created for BookingId: {newBooking.Id}, Amount: {model.VoucherDiscount}");
 
                     HttpContext.Session.Remove("UserCart");
 

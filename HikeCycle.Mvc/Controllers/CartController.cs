@@ -246,7 +246,6 @@ namespace HikeCycle.Mvc.Controllers
         [HttpPost]
         public IActionResult UpdateDate(string id, string startDate, string endDate)
         {
-            Console.WriteLine($"Received UpdateDate for Id: {id}, StartDate: {startDate}, EndDate: {endDate}");
             if (DateTime.Parse(startDate) > DateTime.Parse(endDate))
             {
                 TempData["ErrorMessage"] = "วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่มต้น";
