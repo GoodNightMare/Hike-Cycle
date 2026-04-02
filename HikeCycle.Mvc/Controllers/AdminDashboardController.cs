@@ -69,8 +69,7 @@ namespace HikeCycle.Mvc.Controllers
             ViewBag.TopProductNames = topProducts.Select(x => x.ProductName).ToList();
             ViewBag.TopProductCounts = topProducts.Select(x => x.TotalRented).ToList();
 
-            var reviews = await _db.Reviews.OrderBy(r => r.Id).Take(5).ToListAsync();
-            return View(reviews);
+            return View();
         }
     }
 }
