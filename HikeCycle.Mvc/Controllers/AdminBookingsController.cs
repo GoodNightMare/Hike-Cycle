@@ -25,7 +25,6 @@ namespace HikeCycle.Mvc.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateStatus(int id, string status, ReturnCondition? condition, decimal? extraFee, string? note)
         {
             var booking = await _db.Bookings

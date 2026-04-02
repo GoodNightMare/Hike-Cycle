@@ -19,7 +19,6 @@ namespace HikeCycle.Mvc.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateRoute([FromBody] RecommendedRoute route)
         {
             if (ModelState.IsValid)
@@ -32,7 +31,6 @@ namespace HikeCycle.Mvc.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateRoute([FromBody] RecommendedRoute route)
         {
             if (ModelState.IsValid)
@@ -57,7 +55,6 @@ namespace HikeCycle.Mvc.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteRoute(int id)
         {
             var route = await _db.RecommendedRoutes.FindAsync(id);

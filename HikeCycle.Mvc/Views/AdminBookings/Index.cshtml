@@ -88,7 +88,6 @@
                                         </button>
 
                                         <form asp-action="UpdateStatus" method="post" onsubmit="return confirm('ยืนยันการยกเลิก?')">
-                                            @Html.AntiForgeryToken()
                                             <input type="hidden" name="id" value="@item.Id" />
                                             <input type="hidden" name="status" value="Cancelled" />
                                             <button type="submit" class="p-2 text-red-600 hover:bg-red-50 rounded-xl">
@@ -115,7 +114,6 @@
             <h2 class="text-xl font-black text-gray-900 uppercase mb-6 tracking-tight text-center">บันทึกการคืนสินค้า</h2>
         
             <form asp-action="UpdateStatus" method="post">
-                @Html.AntiForgeryToken()
                 <input type="hidden" name="id" id="return-booking-id" />
                 <input type="hidden" name="status" value="Completed" />
 

@@ -24,7 +24,6 @@ namespace HikeCycle.Mvc.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateUser(UserUpdateViewModel model)
         {
             if (!ModelState.IsValid) return View("Index", await _db.Users.ToListAsync());

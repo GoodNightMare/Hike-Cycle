@@ -167,8 +167,8 @@
                     <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" onclick="hideProductModal()"></div>
                     <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-8 max-h-[90vh] overflow-y-auto">
                         <h2 id="modal-title" class="text-xl font-black text-gray-900 uppercase mb-6 tracking-tight">เพิ่มสินค้า</h2>
-                        <form id="product-form" method="post" asp-action="SaveProduct" enctype="multipart/form-data" class="grid grid-cols-2 gap-4">
-                            @Html.AntiForgeryToken()
+                        <form id="product-form" method="post" asp-action="SaveProduct" enctype="multipart/form-data"
+                              class="grid grid-cols-2 gap-4">
                             <input type="hidden" name="Id" id="p-id" value="0">
                             <div id="p-images" class="col-span-2 grid grid-cols-4 gap-4"></div>
             
@@ -368,12 +368,12 @@
                                             if (Array.isArray(data)) {
                                                 data.forEach(v => {
                                                     const badge = `
-                                                            <div class="flex items-center bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-                                                                <span class="px-3 py-1 bg-gray-50 border-r border-gray-200 text-[10px] font-black text-gray-400 uppercase">Size</span>
-                                                                <span class="px-3 py-1 text-xs font-bold text-gray-900">${v.size || v.Size || '-'}</span>
-                                                                <span class="px-3 py-1 bg-blue-50 border-l border-gray-200 text-[10px] font-black text-blue-500 uppercase">Stock</span>
-                                                                <span class="px-3 py-1 text-xs font-bold ${v.stock > 0 ? 'text-green-600' : 'text-red-400'}">${v.stock ?? 0}</span>
-                                                            </div>`;
+                                                                                        <div class="flex items-center bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                                                                                            <span class="px-3 py-1 bg-gray-50 border-r border-gray-200 text-[10px] font-black text-gray-400 uppercase">Size</span>
+                                                                                            <span class="px-3 py-1 text-xs font-bold text-gray-900">${v.size || v.Size || '-'}</span>
+                                                                                            <span class="px-3 py-1 bg-blue-50 border-l border-gray-200 text-[10px] font-black text-blue-500 uppercase">Stock</span>
+                                                                                            <span class="px-3 py-1 text-xs font-bold ${v.stock > 0 ? 'text-green-600' : 'text-red-400'}">${v.stock ?? 0}</span>
+                                                                                        </div>`;
                                                     variantContainer.append(badge);
                                                 });
                                             }

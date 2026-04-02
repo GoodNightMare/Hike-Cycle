@@ -22,7 +22,6 @@ namespace HikeCycle.Mvc.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveProduct(Product model, IFormFileCollection? images)
         {
             if (!ModelState.IsValid)
