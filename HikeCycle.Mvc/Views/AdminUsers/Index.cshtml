@@ -57,6 +57,15 @@
                             <textarea name="Address" id="edit-address" rows="2"
                                       class="w-full px-4 py-2 border border-gray-200 rounded-xl outline-none focus:ring-1 focus:ring-black"></textarea>
                         </div>
+                    
+                        <div class="md:col-span-2">
+                            <div class="flex items-center">
+                                <input type="checkbox" name="IsExpert" id="edit-isExpert" value="true" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                <label for="edit-isExpert" class="ml-2 block text-sm text-gray-900">
+                                    เป็นผู้เชี่ยวชาญ (Is Expert)
+                                </label>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="flex justify-end gap-3 mt-8">
@@ -87,6 +96,7 @@
                         <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px]">Phone</th>
                         <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px]">Address</th>
                         <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px] text-center">Role</th>
+                        <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px] text-center">Expert</th>
                         <th class="py-4 px-6 font-bold text-gray-400 uppercase text-[10px] text-right">Actions</th>
                     </tr>
                 </thead>
@@ -94,6 +104,7 @@
                     @foreach (var user in Model)
                     {
                         var profile = profiles?.FirstOrDefault(p => p.UserId == user.Id);
+                        var isExpert = profile?.IsExpert ?? false;
                         <tr data-id="@user.Id" class="group hover:bg-gray-50/50 transition-colors">
                             <td class="py-4 px-6 font-mono text-xs text-gray-400">#@user.Id</td>
                             <td class="py-4 px-6">
@@ -117,11 +128,21 @@
                                     @user.Role
                                 </span>
                             </td>
+                            <td class="py-4 px-6 text-center">
+                                @if (isExpert)
+                                {
+                                    <i class="fa-solid fa-check-circle text-green-500"></i>
+                                }
+                                else
+                                {
+                                    <i class="fa-solid fa-times-circle text-gray-300"></i>
+                                }
+                            </td>
                             <td class="py-4 px-6 text-right">
                                 <div class="flex justify-end gap-2 ">
                                     <button type="button"
                                             class="p-2 hover:bg-white hover:shadow-sm rounded-lg text-blue-600 edit-btn transition-all"
-                                            onclick="showUserModal(@user.Id, '@user.Email', '@user.Role', '@(profile?.FullName ?? "")', '@(profile?.Phone ?? "")', '@(profile?.Address ?? "")')">
+                                            onclick="showUserModal(@user.Id, '@user.Email', '@user.Role', '@(profile?.FullName ?? "")', '@(profile?.Phone ?? "")', '@(profile?.Address ?? "")', @isExpert.ToString().ToLower())">
                                         <i class="fa-solid fa-user-gear"></i>
                                     </button>
                                     <button
@@ -150,13 +171,14 @@
                 }
             }
 
-            function showUserModal(id, email, role, fullName, phone, address) {
+            function showUserModal(id, email, role, fullName, phone, address, isExpert) {
                 $('#edit-id').val(id);
                 $('#edit-email').val(email);
                 $('#edit-role').val(role.toLowerCase());
                 $('#edit-fullname').val(fullName);
                 $('#edit-phone').val(phone);
                 $('#edit-address').val(address);
+                $('#edit-isExpert').prop('checked', isExpert);
 
                 $('#user-modal').removeClass('hidden').addClass('flex');
             }

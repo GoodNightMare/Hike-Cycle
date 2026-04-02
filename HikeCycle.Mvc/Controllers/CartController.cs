@@ -86,7 +86,7 @@ namespace HikeCycle.Mvc.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(bool isStudent = false)
+        public async Task<IActionResult> Index(bool isStudent = false, int? selectedPromotionId = null, string? selectedVoucherCode = null)
         {
             var sessionData = HttpContext.Session.GetString(CartSessionKey);
             var cartItems = string.IsNullOrEmpty(sessionData)
@@ -116,8 +116,8 @@ namespace HikeCycle.Mvc.Controllers
                             Category = product.Category,
                             IsFree = true,
                             IsRemovable = false,
-                            StartDate = "", 
-                            EndDate = "",   
+                            StartDate = "",
+                            EndDate = "",
                             Id = Guid.NewGuid().ToString()
                         });
                     }
@@ -142,19 +142,49 @@ namespace HikeCycle.Mvc.Controllers
                 ViewBag.UserAddress = profile?.Address;
             }
 
-            var promotions = await _db.Promotions.Where(p => p.Active).ToListAsync();
+            var allActivePromotions = await _db.Promotions.Where(p => p.Active).ToListAsync();
+            var applicablePromotions = new List<Promotion>();
 
-            var calculationResult = CalculateCart(cartItems, promotions, isStudent);
+            var longTripPromo = allActivePromotions.FirstOrDefault(p => p.Title == "Long Trip Deal");
+            if (longTripPromo != null && cartItems.Any(i => !i.IsFree && !string.IsNullOrEmpty(i.StartDate) && !string.IsNullOrEmpty(i.EndDate) && (DateTime.Parse(i.EndDate) - DateTime.Parse(i.StartDate)).Days > 5))
+            {
+                applicablePromotions.Add(longTripPromo);
+            }
+
+            var earlyBirdPromo = allActivePromotions.FirstOrDefault(p => p.Title == "Early Bird Hiker");
+            if (earlyBirdPromo != null && cartItems.Any(i => !i.IsFree && !string.IsNullOrEmpty(i.StartDate) && (DateTime.Parse(i.StartDate) - DateTime.Now).TotalDays >= 30))
+            {
+                applicablePromotions.Add(earlyBirdPromo);
+            }
+
+            var merrierPromo = allActivePromotions.FirstOrDefault(p => p.Title == "The more The Merrier");
+            if (merrierPromo != null && cartItems.Count(i => !i.IsFree && i.Category?.ToLower() == "tent") >= 2)
+            {
+                applicablePromotions.Add(merrierPromo);
+            }
+            
+            if (isStudent)
+            {
+                var studentPromo = allActivePromotions.FirstOrDefault(p => p.Title == "Student Explorer");
+                if (studentPromo != null)
+                {
+                    applicablePromotions.Add(studentPromo);
+                }
+            }
+
+            var calculationResult = await CalculateCart(cartItems, allActivePromotions, isStudent, selectedPromotionId, selectedVoucherCode);
 
             var viewModel = new CartViewModel
             {
                 CartItems = cartItems,
-                Promotions = promotions,
+                Promotions = applicablePromotions,
                 CalculationResult = calculationResult,
                 IsStudent = isStudent,
-                AvailableVouchers = availableVouchers
+                AvailableVouchers = availableVouchers,
+                SelectedPromotionId = selectedPromotionId,
+                SelectedVoucherCode = selectedVoucherCode
             };
-            
+
             if (!string.IsNullOrEmpty(userIdStr))
             {
                 var profile = await _db.UserProfiles.AsNoTracking()
@@ -165,7 +195,7 @@ namespace HikeCycle.Mvc.Controllers
             return View(viewModel);
         }
 
-        private CartCalculationResult CalculateCart(List<CartSessionItem> cartItems, List<Promotion> activePromotions, bool isStudent)
+        private async Task<CartCalculationResult> CalculateCart(List<CartSessionItem> cartItems, List<Promotion> activePromotions, bool isStudent, int? selectedPromotionId, string? selectedVoucherCode)
         {
             decimal originalTotal = 0;
             decimal totalDiscount = 0;
@@ -175,7 +205,7 @@ namespace HikeCycle.Mvc.Controllers
             {
                 if (item.IsFree || string.IsNullOrEmpty(item.StartDate) || string.IsNullOrEmpty(item.EndDate))
                 {
-                    continue; 
+                    continue;
                 }
 
                 var start = DateTime.Parse(item.StartDate);
@@ -184,55 +214,89 @@ namespace HikeCycle.Mvc.Controllers
                 if (totalDays <= 0) totalDays = 1;
 
                 decimal itemOriginalPrice = item.PricePerDay * totalDays;
-                decimal itemDiscount = 0;
-
-                var longTripDeal = activePromotions.FirstOrDefault(p => p.Title == "Long Trip Deal");
-                if (longTripDeal != null && totalDays > 5)
-                {
-                    var discount = (totalDays - 5) * (item.PricePerDay / 2);
-                    itemDiscount += discount;
-                    if (!appliedPromotions.Any(p => p.Title == longTripDeal.Title))
-                    {
-                        appliedPromotions.Add(new AppliedPromotion { Title = longTripDeal.Title, Description = longTripDeal.Description });
-                    }
-                }
-
-                var earlyBirdHiker = activePromotions.FirstOrDefault(p => p.Title == "Early Bird Hiker");
-                if (earlyBirdHiker != null && (start - DateTime.Now).TotalDays >= 30)
-                {
-                    var discount = (itemOriginalPrice - itemDiscount) * 0.20m;
-                    itemDiscount += discount;
-                    if (!appliedPromotions.Any(p => p.Title == earlyBirdHiker.Title))
-                    {
-                        appliedPromotions.Add(new AppliedPromotion { Title = earlyBirdHiker.Title, Description = earlyBirdHiker.Description });
-                    }
-                }
-
                 originalTotal += itemOriginalPrice;
-                totalDiscount += itemDiscount;
             }
 
-            decimal subTotal = originalTotal - totalDiscount;
-
-            var studentExplorer = activePromotions.FirstOrDefault(p => p.Title == "Student Explorer");
-            if (studentExplorer != null && isStudent)
+            if (selectedPromotionId.HasValue)
             {
-                var studentDiscount = subTotal * 0.10m;
-                totalDiscount += studentDiscount;
-                if (!appliedPromotions.Any(p => p.Title == studentExplorer.Title))
+                var selectedPromotion = activePromotions.FirstOrDefault(p => p.Id == selectedPromotionId.Value);
+                if (selectedPromotion != null)
                 {
-                    appliedPromotions.Add(new AppliedPromotion { Title = studentExplorer.Title, Description = studentExplorer.Description });
+                    decimal promotionDiscount = 0;
+                    switch (selectedPromotion.Title)
+                    {
+                        case "Long Trip Deal":
+                            foreach (var item in cartItems.Where(i => !i.IsFree && !string.IsNullOrEmpty(i.StartDate) && !string.IsNullOrEmpty(i.EndDate)))
+                            {
+                                var start = DateTime.Parse(item.StartDate);
+                                var end = DateTime.Parse(item.EndDate);
+                                int totalDays = (end - start).Days;
+                                if (totalDays > 5)
+                                {
+                                    promotionDiscount += (totalDays - 5) * (item.PricePerDay / 2);
+                                }
+                            }
+                            break;
+                        case "Early Bird Hiker":
+                            decimal earlyBirdEligibleTotal = 0;
+                            foreach (var item in cartItems.Where(i => !i.IsFree && !string.IsNullOrEmpty(i.StartDate) && !string.IsNullOrEmpty(i.EndDate)))
+                            {
+                                var start = DateTime.Parse(item.StartDate);
+                                if ((start - DateTime.Now).TotalDays >= 30)
+                                {
+                                    var end = DateTime.Parse(item.EndDate);
+                                    int totalDays = (end - start).Days;
+                                    if (totalDays <= 0) totalDays = 1;
+                                    earlyBirdEligibleTotal += item.PricePerDay * totalDays;
+                                }
+                            }
+                            promotionDiscount = earlyBirdEligibleTotal * 0.20m;
+                            break;
+                        case "Student Explorer":
+                            if (isStudent)
+                            {
+                                promotionDiscount = originalTotal * 0.10m;
+                            }
+                            break;
+                        case "The more The Merrier":
+                            if (cartItems.Count(i => i.Category?.ToLower() == "tent") >= 2)
+                            {
+                                // No direct discount, benefit is free items added elsewhere.
+                                // Just add to applied promotions list.
+                            }
+                            break;
+                    }
+
+                    if (promotionDiscount > 0)
+                    {
+                        totalDiscount += promotionDiscount;
+                        appliedPromotions.Add(new AppliedPromotion { Title = selectedPromotion.Title, Description = selectedPromotion.Description });
+                    }
+                    
+                    if (selectedPromotion.Title == "The more The Merrier" && cartItems.Count(i => i.Category?.ToLower() == "tent") >= 2)
+                    {
+                        appliedPromotions.Add(new AppliedPromotion { Title = selectedPromotion.Title, Description = selectedPromotion.Description });
+                    }
+                }
+            }
+            
+            if (!string.IsNullOrEmpty(selectedVoucherCode))
+            {
+                var userIdStr = HttpContext.Session.GetString("UserId");
+                if (!string.IsNullOrEmpty(userIdStr))
+                {
+                    int userId = int.Parse(userIdStr);
+                    var voucher = await _db.UserVouchers
+                        .FirstOrDefaultAsync(v => v.UserId == userId && v.Code == selectedVoucherCode && !v.IsUsed);
+
+                    if (voucher != null)
+                    {
+                        totalDiscount += voucher.Amount;
+                        appliedPromotions.Add(new AppliedPromotion { Title = "Voucher", Description = $"ส่วนลด {voucher.Amount} บาท" });
+                    }
                 }
             }
 
-            var moreTheMerrier = activePromotions.FirstOrDefault(p => p.Title == "The more The Merrier");
-            if (moreTheMerrier != null && cartItems.Count(i => i.Category?.ToLower() == "tent") >= 2)
-            {
-                if (!appliedPromotions.Any(p => p.Title == moreTheMerrier.Title))
-                {
-                    appliedPromotions.Add(new AppliedPromotion { Title = moreTheMerrier.Title, Description = moreTheMerrier.Description });
-                }
-            }
 
             return new CartCalculationResult
             {

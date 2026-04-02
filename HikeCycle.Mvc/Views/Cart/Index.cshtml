@@ -111,14 +111,38 @@
 
         <div class="mt-8 p-6 bg-gray-50 rounded-2xl">
             <h2 class="text-xl font-bold mb-4">ส่วนลดและโปรโมชั่น</h2>
-            <form>
-                <div class="flex items-center">
+            <form asp-controller="Cart" asp-action="Index" method="get" id="promotion-form">
+
+                <div class="flex items-center mb-4">
                     <input type="checkbox" id="isStudent" name="isStudent" value="true" @(Model.IsStudent ? "checked" : "")
                            onchange="this.form.submit()"
                            class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
                     <label for="isStudent" class="ml-2 block text-sm text-gray-900">
-                        ใช้ส่วนลดนักเรียน/นักศึกษา
+                        ฉันเป็นนักเรียน/นักศึกษา
                     </label>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="flex items-center p-3 rounded-lg border cursor-pointer @(Model.SelectedPromotionId == null ? "bg-white border-indigo-500" : "bg-gray-100 hover:bg-white")">
+                        <input type="radio" name="selectedPromotionId" value="" @(Model.SelectedPromotionId == null ? "checked" : "") onchange="this.form.submit()" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500">
+                        <span class="ml-3 text-sm font-semibold text-gray-900">ไม่ใช้โปรโมชั่น</span>
+                    </label>
+
+                    @foreach (var promo in Model.Promotions)
+                    {
+                        var isStudentPromo = promo.Title == "Student Explorer";
+                        var disabled = isStudentPromo && !Model.IsStudent;
+                        <label class="flex items-center p-3 rounded-lg border @(disabled ? "bg-gray-200" : "bg-gray-100 hover:bg-white") @(Model.SelectedPromotionId == promo.Id ? "bg-white border-indigo-500" : "") @(disabled ? "cursor-not-allowed" : "cursor-pointer")">
+                            <input type="radio" name="selectedPromotionId" value="@promo.Id" @(Model.SelectedPromotionId == promo.Id ? "checked" : "") onchange="this.form.submit()" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" @(disabled ? "disabled" : "")>
+                            <span class="ml-3 text-sm @(disabled ? "text-gray-400" : "text-gray-900")">
+                                <span class="font-bold">@promo.Title</span>
+                                @if (!string.IsNullOrEmpty(promo.Description))
+                                {
+                                    <p class="text-xs">@promo.Description</p>
+                                }
+                            </span>
+                        </label>
+                    }
                 </div>
             </form>
     

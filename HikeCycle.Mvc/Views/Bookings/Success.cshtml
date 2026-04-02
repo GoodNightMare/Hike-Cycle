@@ -27,8 +27,8 @@
                 <div>
                     <p class="font-semibold text-gray-600">วันที่เริ่มเช่า - วันที่คืนสินค้า:</p>
                     <p class="text-gray-800">@Model.StartDate.ToString("dd MMM yyyy", new
-                                                System.Globalization.CultureInfo("th-TH")) - @Model.EndDate.ToString("dd MMM yyyy", new
-                                                System.Globalization.CultureInfo("th-TH"))</p>
+                                                                        System.Globalization.CultureInfo("th-TH")) - @Model.EndDate.ToString("dd MMM yyyy", new
+                                                                        System.Globalization.CultureInfo("th-TH"))</p>
                     </div>
                 </div>
 
@@ -79,7 +79,7 @@
                     </div>
                     @{
                         var voucherDiscount = (decimal)ViewBag.VoucherDiscount;
-                        var promotionDiscount = Model.DiscountAmount ;
+                        var promotionDiscount = Model.DiscountAmount;
                     }
                     @if (promotionDiscount > 0)
                     {
@@ -104,7 +104,6 @@
                         <span class="w-24">฿@Model.FinalAmount.ToString("F2")</span>
                     </div>
                 </div>
-
             </div>
         </div>
         <div class="mt-8">

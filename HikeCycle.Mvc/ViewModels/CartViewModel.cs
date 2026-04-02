@@ -8,6 +8,8 @@ namespace HikeCycle.Mvc.ViewModels
         public List<Promotion> Promotions { get; set; }
         public CartCalculationResult CalculationResult { get; set; }
         public bool IsStudent { get; set; }
+        public int? SelectedPromotionId { get; set; }
+        public string? SelectedVoucherCode { get; set; }
 
         public int? BookingId { get; set; }
 

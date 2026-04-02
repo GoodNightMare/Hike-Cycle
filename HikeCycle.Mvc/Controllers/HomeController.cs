@@ -32,5 +32,38 @@ namespace HikeCycle.Controllers
 
             return View(viewModel);
         }
+
+        public async Task<IActionResult> Experts()
+        {
+            var expertUserIds = await _db.UserProfiles
+                .Where(p => p.IsExpert)
+                .Select(p => p.UserId)
+                .ToListAsync();
+
+            var experts = await _db.Users
+                .Where(u => expertUserIds.Contains(u.Id))
+                .ToListAsync();
+
+            var expertProfiles = await _db.UserProfiles
+                .Where(p => expertUserIds.Contains(p.UserId))
+                .ToListAsync();
+            
+            ViewBag.ExpertProfiles = expertProfiles;
+
+            var expertReviews = await _db.Reviews
+                .Where(r => expertUserIds.Contains(r.UserId))
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
+            ViewBag.ExpertReviews = expertReviews;
+
+            var reviewedProductIds = expertReviews.Select(r => r.ProductId).Distinct().ToList();
+            var reviewedProducts = await _db.Products
+                .Include(p => p.ProductImages)
+                .Where(p => reviewedProductIds.Contains(p.Id))
+                .ToListAsync();
+            ViewBag.ReviewedProducts = reviewedProducts;
+
+            return View(experts);
+        }
     }
 }

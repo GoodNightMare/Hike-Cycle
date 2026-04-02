@@ -16,5 +16,7 @@ namespace HikeCycle.Mvc.Models.db
         public string? Phone { get; set; }
 
         public string? Address { get; set; }
+        [Column("is_expert")]
+        public bool IsExpert { get; set; } = false;
     }
 }

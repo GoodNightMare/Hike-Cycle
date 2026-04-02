@@ -45,6 +45,7 @@ namespace HikeCycle.Mvc.Controllers
             profile.FullName = model.FullName;
             profile.Phone = model.Phone;
             profile.Address = model.Address;
+            profile.IsExpert = model.IsExpert;
 
             await _db.SaveChangesAsync();
 

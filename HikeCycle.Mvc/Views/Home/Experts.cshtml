@@ -1,0 +1,84 @@
+@model IEnumerable<HikeCycle.Mvc.Models.db.User>
+@using HikeCycle.Mvc.Models.db
+@{
+    ViewData["Title"] = "ผู้เชี่ยวชาญของเรา";
+    var profiles = ViewBag.ExpertProfiles as List<UserProfile>;
+    var reviews = ViewBag.ExpertReviews as List<Reviews>;
+    var products = ViewBag.ReviewedProducts as List<Product>;
+}
+
+<div class="max-w-7xl mx-auto p-10">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-black flex items-center gap-3">
+            <i class="fa-solid fa-user-tie"></i>
+            ปรึกษาผู้เชี่ยวชาญ
+        </h1>
+        <a href="@Url.Action("Index", "Home")" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg">
+            <i class="fa-solid fa-arrow-left mr-2"></i>
+            กลับหน้าหลัก
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="py-20 text-center border-2 border-dashed rounded-3xl bg-gray-50">
+            <p class="text-gray-400 text-lg">ขออภัย, ขณะนี้ยังไม่มีผู้เชี่ยวชาญ</p>
+        </div>
+    }
+    else
+    {
+        <div class="space-y-12">
+            @foreach (var user in Model)
+            {
+                var profile = profiles?.FirstOrDefault(p => p.UserId == user.Id);
+                var expertReviews = reviews?.Where(r => r.UserId == user.Id).ToList();
+
+                <div class="p-8 bg-white border rounded-3xl shadow-sm">
+                    <div class="flex items-center gap-6">
+                        <div class="flex-shrink-0">
+                            <i class="fa-solid fa-user-circle text-8xl text-gray-200"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <h2 class="text-2xl font-bold text-gray-800">@(profile?.FullName ?? "N/A")</h2>
+                            <p>อีเมล : <span class="text-gray-500">@user.Email</span></p>
+                            <p>เบอร์ : <span class="text-blue-500 mt-1">@profile?.Phone</span></p>
+                        </div>
+                    </div>
+
+                    @if (expertReviews != null && expertReviews.Any())
+                    {
+                        <div class="mt-6">
+                            <h4 class="font-bold text-lg mb-4">รีวิวจากผู้เชี่ยวชาญ:</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                @foreach(var review in expertReviews)
+                                {
+                                    var product = products?.FirstOrDefault(p => p.Id == review.ProductId);
+                                    if (product == null) continue;
+                                    
+                                    <div class="border rounded-xl overflow-hidden bg-gray-50">
+                                        <div class="h-40 bg-gray-200">
+                                            @if (product.ProductImages.Any())
+                                            {
+                                                <img src="@product.ProductImages.First().ImageUrl" alt="@product.Name" class="w-full h-full object-cover"/>
+                                            }
+                                        </div>
+                                        <div class="p-4">
+                                            <h5 class="font-bold">@product.Name</h5>
+                                            <div class="flex items-center my-2">
+                                                @for(int i = 1; i <= 5; i++)
+                                                {
+                                                    <i class="fa-solid fa-star @(i <= review.Rating ? "text-yellow-400" : "text-gray-300")"></i>
+                                                }
+                                            </div>
+                                            <p class="text-sm text-gray-600">"@review.Comment"</p>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
