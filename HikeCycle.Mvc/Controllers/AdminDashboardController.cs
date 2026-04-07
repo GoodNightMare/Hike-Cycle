@@ -56,15 +56,15 @@ namespace HikeCycle.Mvc.Controllers
 
 
             var topProducts = await _db.BookingItems
-        .GroupBy(bi => bi.Product.Name)
-        .Select(g => new
-        {
-            ProductName = g.Key,
-            TotalRented = g.Sum(bi => bi.Quantity)
-        })
-        .OrderBy(x => x.TotalRented)
-        .Take(5)
-        .ToListAsync();
+            .GroupBy(bi => bi.Product.Name)
+            .Select(g => new
+            {
+                ProductName = g.Key,
+                TotalRented = g.Sum(bi => bi.Quantity)
+            })
+            .OrderBy(x => x.TotalRented)
+            .Take(5)
+            .ToListAsync();
 
             ViewBag.TopProductNames = topProducts.Select(x => x.ProductName).ToList();
             ViewBag.TopProductCounts = topProducts.Select(x => x.TotalRented).ToList();
